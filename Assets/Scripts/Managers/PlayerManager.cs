@@ -5,8 +5,10 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Instance;
 
-    private List<Player> players = new List<Player>();
+    public List<Player> players = new List<Player>();
     private List<PlayerData> playerDataList = new List<PlayerData>();
+
+    private int spawnedPlayerIndex = 0;
 
     private void Awake()
     {
@@ -27,15 +29,17 @@ public class PlayerManager : MonoBehaviour
         // Hard-coded player data
         playerDataList.Add(new PlayerData("Dana", 3));
         playerDataList.Add(new PlayerData("Alice", 3));
-        playerDataList.Add(new PlayerData("Bar", 3));
-        playerDataList.Add(new PlayerData("Ravit", 3));
+        //playerDataList.Add(new PlayerData("Bar", 3));
+        //playerDataList.Add(new PlayerData("Ravit", 3));
     }
 
     public void AddPlayer(Player player)
     {
         players.Add(player);
+        spawnedPlayerIndex++;  // Increment the counter
         Debug.Log("Added player. Now showing player data:");
         ShowListPlayerData();
+
         // Assign name and score from playerDataList, if available
         if (playerDataList.Count > players.Count - 1)
         {
@@ -43,7 +47,10 @@ public class PlayerManager : MonoBehaviour
             player.playerName.Value = playerData.playerName;
             player.playerScore.Value = playerData.playerScore;
         }
+
+        CheckAllPlayersSpawned();
     }
+
 
     private void ShowListPlayerData()
     {
@@ -57,6 +64,18 @@ public class PlayerManager : MonoBehaviour
     public int TotalPlayerCount()
     {
         return playerDataList.Count;
+    }
+
+    private void CheckAllPlayersSpawned()
+    {
+        Debug.Log("CheckAllPlayersSpawned is called"); 
+        if (spawnedPlayerIndex == TotalPlayerCount())
+        {
+            Debug.Log("CheckAllPlayersSpawned is called");
+            // All players have been spawned, start the card manager
+            CardManager.Instance.StartCardManager();
+            Debug.Log("chackallplayerspwaned calls cardstartmanager");
+        }
     }
 
     // Method to clean up players, if necessary

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -6,16 +7,29 @@ public class PlayerUI : MonoBehaviour
     public TextMeshProUGUI playerTestText;
     public TextMeshProUGUI playerNameText; // New field for player name
     public TextMeshProUGUI playerScoreText; // New field for player score
+    [SerializeField] private Transform playerHandTransform;
 
     public void SetupPlayer(ulong playerId, string name, int score, bool isLocalPlayer, int totalPlayers, bool isServer)
     {
         playerNameText.text = name;
         playerScoreText.text = "Score: " + score;
+        //UpdateHandUI(List<ulong>);
 
         Vector3 position = DeterminePosition(playerId, isLocalPlayer, totalPlayers, isServer);
         transform.position = position;
     }
 
+    // PlayerUI objects - Local
+    public void UpdateHandUI(List<CardUI> handCardUIs)
+    {
+        Debug.Log($"Updating player UI hand with {handCardUIs.Count} cards. PlayerHandTransform is null: {playerHandTransform == null}");
+        foreach (var cardUI in handCardUIs)
+        {
+            cardUI.transform.SetParent(playerHandTransform, false);
+        }
+    }
+
+    //General local, remote display
     private Vector3 DeterminePosition(ulong playerId, bool isLocalPlayer, int totalPlayers, bool isServer)
     {
         // Handle positioning differently on the server
