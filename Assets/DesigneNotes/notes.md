@@ -116,3 +116,17 @@ while local player is always or top, these are the positionand rotaati0on of rem
 
 
     System.Collections.IEnumerator 
+
+    when action is added:
+    using System;
+
+
+    sync:
+
+    game objects with networkobject and transform components will be sync with the server when spawned.
+
+    the playerprefab should be attached to the networkmanager playerprefab which should also be added to prefabs list.
+
+    any other networkobject should be spawned with: public override void OnNetworkSpawn()
+
+    
