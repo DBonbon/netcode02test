@@ -1,24 +1,28 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ServerStartSpawner : MonoBehaviour
 {
     public GameObject objectToSpawn; // Assign this in the inspector
-    public static GameObject SpawnedObject { get; private set; } // Static reference
+    public static List<GameObject> SpawnedObjects = new List<GameObject>(); // List of spawned objects
 
     private void Start()
     {
-        NetworkManager.Singleton.OnServerStarted += SpawnObject;
+        NetworkManager.Singleton.OnServerStarted += SpawnObjects;
     }
 
-    private void SpawnObject()
+    private void SpawnObjects()
     {
         if (NetworkManager.Singleton.IsServer)
         {
-            GameObject spawnedObject = Instantiate(objectToSpawn);
-            spawnedObject.GetComponent<NetworkObject>().Spawn(); // Spawn the object on the network
-            SpawnedObject = spawnedObject; // Store the instance in the static reference
-            Debug.Log($"SpawnedObject set: {SpawnedObject.name}"); // Debug log to confirm assignment
+            for (int i = 0; i < 5; i++) // Spawn 5 objects
+            {
+                GameObject spawnedObject = Instantiate(objectToSpawn);
+                spawnedObject.GetComponent<NetworkObject>().Spawn();
+                SpawnedObjects.Add(spawnedObject);
+                Debug.Log($"SpawnedObject {i} set: {spawnedObject.name}");
+            }
         }
     }
 
@@ -26,7 +30,7 @@ public class ServerStartSpawner : MonoBehaviour
     {
         if (NetworkManager.Singleton != null)
         {
-            NetworkManager.Singleton.OnServerStarted -= SpawnObject;
+            NetworkManager.Singleton.OnServerStarted -= SpawnObjects;
         }
     }
 }

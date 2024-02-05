@@ -129,4 +129,7 @@ while local player is always or top, these are the positionand rotaati0on of rem
 
     any other networkobject should be spawned with: public override void OnNetworkSpawn()
 
-    
+
+
+    position:
+    When a GameObject is parented to another GameObject in Unity, it maintains its world position by default unless specified otherwise. You want to reset their local position to (0,0,0) relative to the parent (the player object) so that they appear at the player's location.
