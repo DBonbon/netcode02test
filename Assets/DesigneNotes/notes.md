@@ -104,6 +104,7 @@ while local player is always or top, these are the positionand rotaati0on of rem
     1. public NetworkVariable<FixedString32Bytes> CardName = new NetworkVariable<FixedString32Bytes>("CardName");
     2. // Set initial data for CardUI
             cardUIInstance.SetCardData(CardName.Value.ToString(), Suit.Value.ToString());
+    3. using Unity.Collections;
 
 
 
