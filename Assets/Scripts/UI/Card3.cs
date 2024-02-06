@@ -6,15 +6,19 @@ public class Card3 : NetworkBehaviour
 {
     // NetworkVariable to hold the card's name
     public NetworkVariable<FixedString32Bytes> CardName = new NetworkVariable<FixedString32Bytes>();
+    public NetworkVariable<FixedString32Bytes> Suit = new NetworkVariable<FixedString32Bytes>();
+    public NetworkVariable<FixedString32Bytes> Hint = new NetworkVariable<FixedString32Bytes>();
 
     // Additional attributes like suit can be added similarly
 
     // Method to initialize card properties
-    public void InitializeCard(string name)
+    public void InitializeCard(string name, string suit, string hint)
     {
         if (IsServer)
         {
             CardName.Value = new FixedString32Bytes(name);
+            Suit.Value = new FixedString32Bytes(suit);
+            Hint.Value = new FixedString32Bytes(hint);
         }
     }
 

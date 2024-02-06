@@ -1,4 +1,4 @@
-using System.Collections;
+using Unity.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
@@ -7,6 +7,7 @@ public class PlayerManager3 : NetworkBehaviour
 {
     public static int TotalPlayerPrefabs = 2;
     private int connectedPlayers = 0;
+    private List<Player3> players = new List<Player3>();
 
     private void Start()
     {
@@ -32,9 +33,12 @@ public class PlayerManager3 : NetworkBehaviour
                 var player3 = playerObject.GetComponent<Player3>();
                 if (player3 != null)
                 {
-                    player3.UpdatePlayerNameUI(); // Update name on new client
+                    // Initialize player name or other attributes here
+                    string playerName = "Player " + clientId.ToString();
+                    player3.PlayerName.Value = new FixedString32Bytes(playerName);
 
-                    // Distribute non-player objects if enough players have connected
+                    players.Add(player3);
+
                     if (connectedPlayers == TotalPlayerPrefabs)
                     {
                         DistributeCards();
@@ -43,6 +47,7 @@ public class PlayerManager3 : NetworkBehaviour
             }
         }
     }
+
 
     private void DistributeCards()
     {

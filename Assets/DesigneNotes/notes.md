@@ -122,6 +122,10 @@ while local player is always or top, these are the positionand rotaati0on of rem
     using System;
 
 
+    for using image add:
+    using UnityEngine.UI;
+
+    
     sync:
 
     game objects with networkobject and transform components will be sync with the server when spawned.

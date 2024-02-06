@@ -26,7 +26,10 @@ public class CardManager3 : MonoBehaviour
                 Card3 cardComponent = spawnedCard.GetComponent<Card3>();
                 if (cardComponent != null)
                 {
-                    cardComponent.InitializeCard("Card " + i); // Example initialization with a name
+                    string cardName = "Card " + i;
+                    string suit = "AA"; // Test suit
+                    string hint = "abc"; // Test hint
+                    cardComponent.InitializeCard(cardName, suit, hint);
                 }
 
                 SpawnedCards.Add(spawnedCard);
