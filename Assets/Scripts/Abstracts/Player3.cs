@@ -4,52 +4,29 @@ using TMPro;
 using Unity.Collections; // Required for FixedString32Bytes
 
 public class Player3 : NetworkBehaviour
-{
-    
-    [SerializeField] private TextMeshProUGUI playerNameText;
-    private float xOffset = 2f;
+{   
+    //[SerializeField] private TextMeshProUGUI playerNameText;
+    //private float xOffset = 2f;
     public NetworkVariable<FixedString32Bytes> PlayerName = new NetworkVariable<FixedString32Bytes>();
+    public NetworkVariable<int> PlayerDbId = new NetworkVariable<int>();
+    public NetworkVariable<FixedString128Bytes> PlayerImagePath = new NetworkVariable<FixedString128Bytes>();
+
+    private PlayerUI3 playerUI;
 
     public override void OnNetworkSpawn()
     {
-        if (IsServer)
-        {
-            ulong clientId = GetComponent<NetworkObject>().NetworkObjectId;
-            float xPosition = xOffset * (clientId - 1);
-            transform.position = new Vector3(xPosition, 0, 0);
-            Debug.Log("Player is Spawned");
-
-            PlayerName.Value = new FixedString32Bytes("Player " + clientId.ToString()); // Assign the player name
-        }
-
-        // Subscribe to the PlayerName variable change event for all instances (server and client)
-        PlayerName.OnValueChanged += OnPlayerNameChanged;
-        OnPlayerNameChanged(default, PlayerName.Value); // Initial update for clients
+        playerUI = GetComponent<PlayerUI3>();
     }
 
-    private void OnDestroy()
+    public void InitializePlayer(string name, int dbId, string imagePath)
     {
-        if (PlayerName.OnValueChanged != null)
+        PlayerName.Value = new FixedString32Bytes(name);
+        PlayerDbId.Value = dbId;
+        PlayerImagePath.Value = new FixedString128Bytes(imagePath);
+        
+        if (playerUI != null)
         {
-            // Unsubscribe to avoid memory leaks
-            PlayerName.OnValueChanged -= OnPlayerNameChanged;
-        }
-    }
-
-    private void OnPlayerNameChanged(FixedString32Bytes oldName, FixedString32Bytes newName)
-    {
-        UpdatePlayerNameUI();
-    }
-
-    public void UpdatePlayerNameUI()
-    {
-        if (playerNameText != null)
-        {
-            playerNameText.text = PlayerName.Value.ToString(); // Convert FixedString32Bytes to string
-        }
-        else
-        {
-            Debug.LogError("TextMeshPro component not set on PlayerPositioner.");
+            playerUI.InitializePlayerUI(PlayerName.Value.ToString(), PlayerImagePath.Value.ToString());
         }
     }
 

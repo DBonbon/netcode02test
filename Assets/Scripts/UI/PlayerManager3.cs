@@ -33,9 +33,12 @@ public class PlayerManager3 : NetworkBehaviour
                 var player3 = playerObject.GetComponent<Player3>();
                 if (player3 != null)
                 {
-                    // Initialize player name or other attributes here
+                    // Initialize player with name, dbId, and image path
                     string playerName = "Player " + clientId.ToString();
-                    player3.PlayerName.Value = new FixedString32Bytes(playerName);
+                    int playerDbId = 23; // Default database ID
+                    string playerImagePath = "Images/character_01"; // Default image path
+
+                    player3.InitializePlayer(playerName, playerDbId, playerImagePath);
 
                     players.Add(player3);
 
