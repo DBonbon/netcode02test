@@ -8,6 +8,11 @@ public class Player : NetworkBehaviour
     public NetworkVariable<int> playerTest = new NetworkVariable<int>();
     public NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>("DefaultName");
     public NetworkVariable<int> playerScore = new NetworkVariable<int>();
+    public NetworkVariable<int> Score = new NetworkVariable<int>(0);
+    public NetworkVariable<int> Result = new NetworkVariable<int>(0);
+    public NetworkVariable<bool> IsWinner = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
+
     public GameObject playerUIPrefab;
     private PlayerUI playerUIInstance;
 
@@ -18,6 +23,7 @@ public class Player : NetworkBehaviour
         if (IsServer)
         {
             PlayerManager.Instance.AddPlayer(this);
+            
         }
 
         // This will now execute for both the server and all clients

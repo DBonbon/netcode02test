@@ -7,6 +7,8 @@ public class PlayerUI3 : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI playerNameText;
     [SerializeField] private Image playerImage;
+    [SerializeField] private TextMeshProUGUI scoreText; // Add UI element for score
+    [SerializeField] private GameObject hasTurnIndicator; // Add UI element for turn indicator
 
     private const string DefaultImagePath = "Images/character_01";
 
@@ -22,6 +24,22 @@ public class PlayerUI3 : MonoBehaviour
         if (playerImage != null && imageSprite != null)
         {
             playerImage.sprite = imageSprite;
+        }
+    }
+
+    public void UpdateScoreUI(int score)
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score.ToString();
+        }
+    }
+
+    public void UpdateHasTurnUI(bool hasTurn)
+    {
+        if (hasTurnIndicator != null)
+        {
+            hasTurnIndicator.SetActive(hasTurn);
         }
     }
 }

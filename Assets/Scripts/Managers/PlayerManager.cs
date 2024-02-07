@@ -6,6 +6,7 @@ public class PlayerManager : MonoBehaviour
     public static PlayerManager Instance;
 
     public List<Player> players = new List<Player>();
+    
     private List<PlayerData> playerDataList = new List<PlayerData>();
 
     private int spawnedPlayerIndex = 0;

@@ -5,9 +5,22 @@ using System.Collections.Generic;
 
 public class CardManager3 : MonoBehaviour
 {
+    public static CardManager3 Instance;
     public GameObject cardPrefab; // Assign this in the inspector
     public static List<GameObject> SpawnedCards = new List<GameObject>(); // List of spawned objects
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+    
     private void Start()
     {
         NetworkManager.Singleton.OnServerStarted += SpawnCards;

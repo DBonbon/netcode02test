@@ -5,10 +5,24 @@ using Unity.Netcode;
 
 public class PlayerManager3 : NetworkBehaviour
 {
+    public static PlayerManager3 Instance;
     public static int TotalPlayerPrefabs = 2;
     private int connectedPlayers = 0;
-    private List<Player3> players = new List<Player3>();
+    public List<Player3> players = new List<Player3>();
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+    }
+    
     private void Start()
     {
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
@@ -45,12 +59,13 @@ public class PlayerManager3 : NetworkBehaviour
                     if (connectedPlayers == TotalPlayerPrefabs)
                     {
                         DistributeCards();
+                        UpdatePlayerToAsk();
                     }
+                    
                 }
             }
         }
     }
-
 
     private void DistributeCards()
     {
@@ -62,11 +77,20 @@ public class PlayerManager3 : NetworkBehaviour
             if (player3 != null)
             {
                 // Assign two objects to each player
-                player3.ParentCard(CardManager3.SpawnedCards[index++]);
-                player3.ParentCard(CardManager3.SpawnedCards[index++]);
+                player3.AddCardToHand(CardManager3.SpawnedCards[index++]);
+                player3.AddCardToHand(CardManager3.SpawnedCards[index++]);
             }
         }
-
-        // Remaining object stays with the ServerStartSpawner
     }
+
+   private void UpdatePlayerToAsk()
+    {
+        // Iterate through each player in the 'players' list
+        foreach (var player in players)
+        {
+            // Call a method on the player instance to update its PlayerToAsk list
+            player.UpdatePlayerToAskList(players);
+        }
+    }
+
 }
