@@ -3,9 +3,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Collections;
 
-public class CardManager : MonoBehaviour
+public class CardManager0 : MonoBehaviour
 {
-    public static CardManager Instance;
+    public static CardManager0 Instance;
 
     [SerializeField] private GameObject cardPrefab; // NetworkObject prefab, data container
     //[SerializeField] private GameObject cardUIPrefab; // MonoBehaviour prefab, UI representation
@@ -108,7 +108,7 @@ public class CardManager : MonoBehaviour
             {
                 Card card = deckCards[0];
                 deckCards.RemoveAt(0);
-                player.ReceiveCard(card);
+                //player.ReceiveCard(card);
 
                 // Update PlayerUI or other game logic as needed
             }

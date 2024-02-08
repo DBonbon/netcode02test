@@ -1,15 +1,14 @@
+using Unity.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerManager : MonoBehaviour
+public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance;
-
+    public static int TotalPlayerPrefabs = 2;
+    private int connectedPlayers = 0;
     public List<Player> players = new List<Player>();
-    
-    private List<PlayerData> playerDataList = new List<PlayerData>();
-
-    private int spawnedPlayerIndex = 0;
 
     private void Awake()
     {
@@ -22,60 +21,75 @@ public class PlayerManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        InitializePlayerData();
+    }
+    
+    private void Start()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
 
-    private void InitializePlayerData()
+    private void OnDestroy()
     {
-        // Hard-coded player data
-        playerDataList.Add(new PlayerData("Dana", 3));
-        playerDataList.Add(new PlayerData("Alice", 3));
-        //playerDataList.Add(new PlayerData("Bar", 3));
-        //playerDataList.Add(new PlayerData("Ravit", 3));
-    }
-
-    public void AddPlayer(Player player)
-    {
-        players.Add(player);
-        spawnedPlayerIndex++;  // Increment the counter
-        Debug.Log("Added player. Now showing player data:");
-        ShowListPlayerData();
-
-        // Assign name and score from playerDataList, if available
-        if (playerDataList.Count > players.Count - 1)
+        if (NetworkManager.Singleton != null)
         {
-            var playerData = playerDataList[players.Count - 1];
-            player.playerName.Value = playerData.playerName;
-            player.playerScore.Value = playerData.playerScore;
-        }
-
-        CheckAllPlayersSpawned();
-    }
-
-
-    private void ShowListPlayerData()
-    {
-        foreach (var playerData in playerDataList)
-        {
-            Debug.Log("Player Name: " + playerData.playerName + ", Score: " + playerData.playerScore);
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
         }
     }
 
-    // In PlayerManager.cs
-    public int TotalPlayerCount()
+    private void OnClientConnected(ulong clientId)
     {
-        return playerDataList.Count;
+        if (IsServer)
+        {
+            connectedPlayers++;
+            var playerObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
+            if (playerObject != null)
+            {
+                var player = playerObject.GetComponent<Player>();
+                if (player != null)
+                {
+                    // Initialize player with name, dbId, and image path
+                    string playerName = "Player " + clientId.ToString();
+                    int playerDbId = 23; // Default database ID
+                    string playerImagePath = "Images/character_01"; // Default image path
+
+                    player.InitializePlayer(playerName, playerDbId, playerImagePath);
+
+                    players.Add(player);
+
+                    if (connectedPlayers == TotalPlayerPrefabs)
+                    {
+                        DistributeCards();
+                        UpdatePlayerToAsk();
+                    }
+                    
+                }
+            }
+        }
     }
 
-    private void CheckAllPlayersSpawned()
+    private void DistributeCards()
     {
-        Debug.Log("CheckAllPlayersSpawned is called"); 
-        if (spawnedPlayerIndex == TotalPlayerCount())
+        int index = 0;
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
-            Debug.Log("CheckAllPlayersSpawned is called");
-            // All players have been spawned, start the card manager
-            CardManager.Instance.StartCardManager();
-            Debug.Log("chackallplayerspwaned calls cardstartmanager");
+            var playerObject = client.PlayerObject;
+            var player = playerObject?.GetComponent<Player>();
+            if (player != null)
+            {
+                // Assign two objects to each player
+                player.AddCardToHand(CardManager.SpawnedCards[index++]);
+                player.AddCardToHand(CardManager.SpawnedCards[index++]);
+            }
+        }
+    }
+
+   private void UpdatePlayerToAsk()
+    {
+        // Iterate through each player in the 'players' list
+        foreach (var player in players)
+        {
+            // Call a method on the player instance to update its PlayerToAsk list
+            player.UpdatePlayerToAskList(players);
         }
     }
 
@@ -84,4 +98,5 @@ public class PlayerManager : MonoBehaviour
     {
         players.Clear();
     }
+
 }

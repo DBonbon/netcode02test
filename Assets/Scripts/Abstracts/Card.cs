@@ -1,58 +1,50 @@
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using Unity.Collections;
 
 public class Card : NetworkBehaviour
 {
-    public NetworkVariable<FixedString32Bytes> CardName = new NetworkVariable<FixedString32Bytes>("CardName");
+    // NetworkVariable to hold the card's name
+    public NetworkVariable<FixedString32Bytes> CardName = new NetworkVariable<FixedString32Bytes>();
     public NetworkVariable<FixedString32Bytes> Suit = new NetworkVariable<FixedString32Bytes>();
+    public NetworkVariable<FixedString32Bytes> Hint = new NetworkVariable<FixedString32Bytes>();
 
-    public GameObject cardUIPrefab; // Assign in Inspector
-    private CardUI cardUIInstance;
+    // Additional attributes like suit can be added similarly
 
-    public override void OnNetworkSpawn()
+    // Method to initialize card properties
+    public void InitializeCard(string name, string suit, string hint)
     {
-        // Instantiate CardUI on all clients
-        InstantiateCardUI();
-    }
-
-    private void InstantiateCardUI()
-    {
-        // Find the Canvas in the scene
-        Canvas canvas = FindObjectOfType<Canvas>();
-        if (cardUIPrefab != null && canvas != null)
+        if (IsServer)
         {
-            // Instantiate the CardUI prefab under the Canvas
-            GameObject uiObject = Instantiate(cardUIPrefab, canvas.transform);
-            cardUIInstance = uiObject.GetComponent<CardUI>();
-
-            // Set initial data for CardUI
-            cardUIInstance.SetCardData(CardName.Value.ToString(), Suit.Value.ToString());
-
-            // Set the position and any other properties for the UI object
-            cardUIInstance.transform.localPosition = CalculateCardUIPosition();
+            CardName.Value = new FixedString32Bytes(name);
+            Suit.Value = new FixedString32Bytes(suit);
+            Hint.Value = new FixedString32Bytes(hint);
         }
     }
 
-    // Call this method to update the CardUI when card data changes
-    public void UpdateCardUI()
+    // Method to handle changes in the card's attributes, if necessary
+    private void OnCardNameChanged(FixedString32Bytes oldName, FixedString32Bytes newName)
     {
-        UpdateCardUIClientRpc(CardName.Value.ToString(), Suit.Value.ToString());
+        // Handle any updates required when the card's name changes
     }
 
-    [ClientRpc]
-    private void UpdateCardUIClientRpc(string cardName, string suit)
+    private void Start()
     {
-        if (cardUIInstance != null)
+        if (IsServer)
         {
-            // Update the CardUI data
-            cardUIInstance.SetCardData(cardName, suit);
+            // Initialize card properties
         }
+
+        // Subscribe to the network variable's change event
+        CardName.OnValueChanged += OnCardNameChanged;
     }
 
-    private Vector3 CalculateCardUIPosition()
+    private void OnDestroy()
     {
-        // Implement logic to calculate the position of the CardUI
-        return new Vector3(0, 0, 0);
+        // Unsubscribe to avoid memory leaks
+        if (CardName.OnValueChanged != null)
+        {
+            CardName.OnValueChanged -= OnCardNameChanged;
+        }
     }
 }

@@ -253,9 +253,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 158141702}
-  - component: {fileID: 158141706}
   - component: {fileID: 158141704}
-  - component: {fileID: 158141707}
+  - component: {fileID: 158141706}
+  - component: {fileID: 158141705}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -298,6 +298,19 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &158141705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158141701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 447c3642fbab52d4a84da457c0697f97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardPrefab: {fileID: 2520984029392753929, guid: 4b035f6858ffd0d4388ac0c2fe874fa3, type: 3}
 --- !u!114 &158141706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,22 +320,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 158141701}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab01f5953b90c9245a3fdaea5c937429, type: 3}
+  m_Script: {fileID: 11500000, guid: d49822db61dd5b6408e7a6f064e223d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardPrefab: {fileID: 2520984029392753929, guid: 4b035f6858ffd0d4388ac0c2fe874fa3, type: 3}
---- !u!114 &158141707
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 158141701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ba901af8d0a00347aa542b426c2dbc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  players: []
 --- !u!1 &169057577
 GameObject:
   m_ObjectHideFlags: 0
