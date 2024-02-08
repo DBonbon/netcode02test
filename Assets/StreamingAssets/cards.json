@@ -1,0 +1,185 @@
+{
+    "cards": [
+        {
+            "rank": "card",
+            "name": "Alef",
+            "hint": "hint"
+        },
+        {
+            "rank": "card",
+            "name": "Bet",
+            "hint": "hint"
+        },
+        {
+            "rank": "card",
+            "name": "Cimel",
+            "hint": "hint"
+        },
+        {
+            "rank": "card",
+            "name": "Dalet",
+            "hint": "hint"
+        },
+        {
+            "rank": "bard",
+            "name": "Ani",
+            "hint": "hint"
+        },
+        {
+            "rank": "bard",
+            "name": "Bico",
+            "hint": "hint"
+        },
+        {
+            "rank": "bard",
+            "name": "Caux",
+            "hint": "hint"
+        },
+        {
+            "rank": "bard",
+            "name": "Doz",
+            "hint": "hint"
+        },
+        {
+            "rank": "gard",
+            "name": "Ata",
+            "hint": "hint"
+        },
+        {
+            "rank": "gard",
+            "name": "Beta",
+            "hint": "hint"
+        },
+        {
+            "rank": "gard",
+            "name": "Comment",
+            "hint": "hint"
+        },
+        {
+            "rank": "gard",
+            "name": "Daledi",
+            "hint": "hint"
+        },
+        {
+            "rank": "hard",
+            "name": "Aalki",
+            "hint": "hint"
+        },
+        {
+            "rank": "hard",
+            "name": "Bita",
+            "hint": "hint"
+        },
+        {
+            "rank": "hard",
+            "name": "Cuta",
+            "hint": "hint"
+        },
+        {
+            "rank": "hard",
+            "name": "Dita",
+            "hint": "hint"
+        },
+
+        {
+            "rank": "kard",
+            "name": "Aora",
+            "hint": "hint"
+        },
+        {
+            "rank": "kard",
+            "name": "Bora",
+            "hint": "hint"
+        },
+        {
+            "rank": "kard",
+            "name": "Cora",
+            "hint": "hint"
+        },
+        {
+            "rank": "kard",
+            "name": "Dora",
+            "hint": "hint"
+        },
+        {
+            "rank": "fard",
+            "name": "Auri",
+            "hint": "hint"
+        },
+        {
+            "rank": "fard",
+            "name": "Buri",
+            "hint": "hint"
+        },
+        {
+            "rank": "fard",
+            "name": "Curi",
+            "hint": "hint"
+        },
+        {
+            "rank": "fard",
+            "name": "Duri",
+            "hint": "hint"
+        },
+        {
+            "rank": "lard",
+            "name": "Aabo",
+            "hint": "hint"
+        },
+        {
+            "rank": "lard",
+            "name": "Babo",
+            "hint": "hint"
+        },
+        {
+            "rank": "lard",
+            "name": "Cabo",
+            "hint": "hint"
+        },
+        {
+            "rank": "lard",
+            "name": "Dabo",
+            "hint": "hint"
+        },
+        {
+            "rank": "nard",
+            "name": "All",
+            "hint": "hint"
+        },
+        {
+            "rank": "nard",
+            "name": "Bll",
+            "hint": "hint"
+        },
+        {
+            "rank": "nard",
+            "name": "Cll",
+            "hint": "hint"
+        },
+        {
+            "rank": "nard",
+            "name": "Dll",
+            "hint": "hint"
+        },
+        {
+            "rank": "sard",
+            "name": "Ao",
+            "hint": "hint"
+        },
+        {
+            "rank": "sard",
+            "name": "Bo",
+            "hint": "hint"
+        },
+        {
+            "rank": "sard",
+            "name": "Co",
+            "hint": "hint"
+        },
+        {
+            "rank": "sard",
+            "name": "Do",
+            "hint": "hint"
+        }
+    ]
+}

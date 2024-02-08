@@ -1,0 +1,20 @@
+{
+    "players": [
+        {
+            "playerName": "Player 1",
+            "score": 0
+        },
+	    {
+            "playerName": "Player 2",
+            "ID": 462
+        },
+	    {
+            "playerName": "Player 3",
+	        "ID": 150
+        },
+	    {
+            "playerName": "Player 4",
+	        "ID": 220
+        }
+    ]
+}

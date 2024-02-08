@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public class DataManager : MonoBehaviour
 {
+    public static DataManager Instance;
     public PlayerManager playerManager; // Reference to the PlayerManager script
     //public CardManager cardManager; // Reference to the CardManager script
     
@@ -13,8 +14,8 @@ public class DataManager : MonoBehaviour
     public delegate void PlayerDataLoadedHandler(List<PlayerData> players);
     public static event PlayerDataLoadedHandler OnPlayerDataLoaded;
 
-    //public delegate void CardDataLoadedHandler(List<CardData> cards);
-    //public static event CardDataLoadedHandler OnCardDataLoaded;
+    public delegate void CardDataLoadedHandler(List<CardData> cards);
+    public static event CardDataLoadedHandler OnCardDataLoaded;
 
     // Static properties to access loaded data
     public static List<PlayerData> LoadedPlayerData { get; private set; }
@@ -25,14 +26,25 @@ public class DataManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
         DataManager.OnPlayerDataLoaded += OnPlayerDataLoaded;
-        //DataManager.OnCardDataLoaded += OnCardDataLoaded; // Ensure this line exists
+        DataManager.OnCardDataLoaded += OnCardDataLoaded; // Ensure this line exists
+
     }
+   
 
     private void Start()
     {
         LoadPlayersFromJson();
-        //LoadCardsFromJson();
+        LoadCardsFromJson();
         //Debug.Log($"{Time.time}:datamanager.start method has started");
     }
 
@@ -70,7 +82,7 @@ public class DataManager : MonoBehaviour
         LoadedPlayerData = playerDataList;
 
         // Pass the player data to the PlayerManager
-        //playerManager.InitializePlayers(playerDataList);
+        PlayerManager.Instance.LoadPlayerDataLoaded(playerDataList);
 
         // Notify subscribers that player data is loaded
         OnPlayerDataLoaded?.Invoke(playerDataList);
@@ -129,7 +141,7 @@ public class DataManager : MonoBehaviour
         */
         //Debug.Log("laodcardsdata after foreachb loop.");
         // Notify subscribers that card data is loaded
-        //OnCardDataLoaded?.Invoke(cardDataList);
+        OnCardDataLoaded?.Invoke(cardDataList);
         Debug.Log($"{Time.time}: OnCardDataLoaded event invoked with card data.");
         //cardDataLoaded = true;
         CheckStartManagers(); // Check if both player and card data are loaded

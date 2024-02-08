@@ -58,4 +58,9 @@ public class CardManager : MonoBehaviour
             NetworkManager.Singleton.OnServerStarted -= SpawnCards;
         }
     }
+
+    public void InitializeCards(List<CardData> namecardDataList)
+    {
+        //return null;
+    }
 }

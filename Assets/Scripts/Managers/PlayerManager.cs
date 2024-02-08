@@ -9,12 +9,14 @@ public class PlayerManager : NetworkBehaviour
     public static int TotalPlayerPrefabs = 2;
     private int connectedPlayers = 0;
     public List<Player> players = new List<Player>();
+    private List<PlayerData> playerDataList; 
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -25,6 +27,9 @@ public class PlayerManager : NetworkBehaviour
     
     private void Start()
     {
+        Debug.Log("playermanager started");
+        //DataManager.OnPlayerDataLoaded += HandlePlayerDataLoaded;
+        Debug.Log("playermanager started");
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
 
@@ -34,6 +39,12 @@ public class PlayerManager : NetworkBehaviour
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
         }
+    }
+
+    public void LoadPlayerDataLoaded(List<PlayerData> loadedPlayerDataList)
+    {
+        this.playerDataList = loadedPlayerDataList; // Store loaded player data
+        Debug.Log("loadedPlayerDataList added to playermanager.");
     }
 
     private void OnClientConnected(ulong clientId)
@@ -97,6 +108,11 @@ public class PlayerManager : NetworkBehaviour
     public void CleanupPlayers()
     {
         players.Clear();
+    }
+
+    public void GenerateGamePlayers(List<PlayerData> name)
+    {
+        //return null;
     }
 
 }
