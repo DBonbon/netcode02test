@@ -19,11 +19,13 @@ public class PlayerUI : MonoBehaviour
             playerNameText.text = playerName;
         }
 
-        string path = string.IsNullOrEmpty(imagePath) ? DefaultImagePath : imagePath;
-        Sprite imageSprite = Resources.Load<Sprite>(path);
-        if (playerImage != null && imageSprite != null)
+        if (!string.IsNullOrEmpty(imagePath))
         {
-            playerImage.sprite = imageSprite;
+            var imageSprite = Resources.Load<Sprite>(imagePath);
+            if (playerImage != null && imageSprite != null)
+            {
+                playerImage.sprite = imageSprite;
+            }
         }
     }
 

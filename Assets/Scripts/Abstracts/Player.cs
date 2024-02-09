@@ -36,12 +36,12 @@ public class Player : NetworkBehaviour
         playerHand = transform.Find("PlayerHandTransfrom");
     }
 
-    public void InitializePlayer(string name, string imagePath) //int dbId, 
+    public void InitializePlayer(string name, int dbId, string imagePath)
     {
-        PlayerName.Value = new FixedString32Bytes(name);
-        //PlayerDbId.Value = dbId;
-        PlayerImagePath.Value = new FixedString128Bytes(imagePath);
-        
+        PlayerName.Value = name;
+        PlayerDbId.Value = dbId;
+        PlayerImagePath.Value = imagePath;
+      
         if (playerUI != null)
         {
             playerUI.InitializePlayerUI(PlayerName.Value.ToString(), PlayerImagePath.Value.ToString());

@@ -57,8 +57,8 @@ public class PlayerManager : NetworkBehaviour
             if (player != null && connectedPlayers <= playerDataList.Count)
             {
                 string playerImagePath = "Images/character_01"; // Default image path
-                var data = playerDataList[connectedPlayers - 1]; // Match player data with connected order
-                player.InitializePlayer(data.playerName, playerImagePath); // Simplified initialization
+                var playerData = playerDataList[connectedPlayers - 1]; // Example, adjust as necessary
+                player.InitializePlayer(playerData.playerName, playerData.playerDbId, playerData.playerImagePath);
 
                 players.Add(player);
                 if (connectedPlayers == TotalPlayerPrefabs)
