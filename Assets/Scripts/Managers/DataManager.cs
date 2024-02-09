@@ -6,9 +6,8 @@ using System.Collections.Generic;
 
 public class DataManager : MonoBehaviour
 {
-    public static DataManager Instance;
     public PlayerManager playerManager; // Reference to the PlayerManager script
-    //public CardManager cardManager; // Reference to the CardManager script
+    public CardManager cardManager; // Reference to the CardManager script
     
     // Define events for player data and card data loading
     public delegate void PlayerDataLoadedHandler(List<PlayerData> players);
@@ -19,33 +18,22 @@ public class DataManager : MonoBehaviour
 
     // Static properties to access loaded data
     public static List<PlayerData> LoadedPlayerData { get; private set; }
-    //public static List<CardData> LoadedCardData { get; private set; }
+    public static List<CardData> LoadedCardData { get; private set; }
 
     private bool playerDataLoaded = false;
-    //private bool cardDataLoaded = false;
+    private bool cardDataLoaded = false;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
         DataManager.OnPlayerDataLoaded += OnPlayerDataLoaded;
-        DataManager.OnCardDataLoaded += OnCardDataLoaded; // Ensure this line exists
-
+        //DataManager.OnCardDataLoaded += OnCardDataLoaded; // Ensure this line exists
     }
-   
 
     private void Start()
     {
         LoadPlayersFromJson();
         LoadCardsFromJson();
-        //Debug.Log($"{Time.time}:datamanager.start method has started");
+        Debug.Log($"{Time.time}:datamanager.start method has started");
     }
 
     private void LoadPlayersFromJson()
@@ -57,7 +45,7 @@ public class DataManager : MonoBehaviour
 
     private IEnumerator LoadPlayersData(string path)
     {
-        //Debug.Log($"{Time.time}:LoadPlayersData started.");
+        Debug.Log($"{Time.time}:LoadPlayersData started.");
         string json;
         if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
@@ -82,86 +70,81 @@ public class DataManager : MonoBehaviour
         LoadedPlayerData = playerDataList;
 
         // Pass the player data to the PlayerManager
-        PlayerManager.Instance.LoadPlayerDataLoaded(playerDataList);
+        //playerManager.InitializePlayers(playerDataList);
 
         // Notify subscribers that player data is loaded
         OnPlayerDataLoaded?.Invoke(playerDataList);
         playerDataLoaded = true;
         //Debug.Log("player loaded from dataM");
-        //CheckStartManagers(); // Check if both player and card data are loaded
-
-        // After loading data, notify the GameFlowManager
-        //GameFlowManager.Instance.OnPlayerDataLoaded();
-        
-        Debug.Log($"{Time.time}: DataManager.LoadPlayersData coroutine ended.");
+        CheckStartManagers(); // Check if both player and card data are loaded
+        Debug.Log($"{Time.time}:LoadPlayersData ended.");
     }
 
     [System.Serializable]
     private class PlayersDataWrapper
     {
         public List<PlayerData> players;
-        //Debug.Log($"{Time.time}: DataManager.PlayersDataWrapper method has been generated");
     }
 
-
-    
     private void LoadCardsFromJson()
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "cards2.json");
-
-        StartCoroutine(LoadCardsData(path));
+        string apiUrl = "http://localhost:8081/wt/api/nextjs/v1/page_by_path/?html_path=authors/yoga/unity";
+        StartCoroutine(LoadCardsDataFromJson(apiUrl));
     }
 
-    private IEnumerator LoadCardsData(string path)
+    private IEnumerator LoadCardsDataFromJson(string apiUrl)
     {
-        Debug.Log($"{Time.time}:LoadCardsData started.");
-        //Debug.Log("laodcardsdata called.");
-        string json;
-        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+        UnityWebRequest www = UnityWebRequest.Get(apiUrl);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
         {
-            UnityWebRequest www = UnityWebRequest.Get(path);
-            yield return www.SendWebRequest();
-            json = www.downloadHandler.text;
+            Debug.LogError($"Failed to load card data from API. Error: {www.error}");
+            yield break;
+        }
+
+        string json = www.downloadHandler.text;
+        CardsDataWrapper dataWrapper = JsonUtility.FromJson<CardsDataWrapper>(json);
+
+        List<CardData> cardDataList = dataWrapper?.component_props?.cards;
+
+        if (cardDataList != null)
+        {
+            /*foreach (CardData cardData in cardDataList)
+            {
+                cardData.PopulateSiblings(cardDataList);
+            }*/
+
+            OnCardDataLoaded?.Invoke(cardDataList);
+            cardDataLoaded = true;
+            CheckStartManagers();
         }
         else
         {
-            json = File.ReadAllText(path);
+            Debug.LogError("No card data found in the API response.");
         }
-        //Debug.Log("laodcardsdata after if loop.");
-        CardsDataWrapper dataWrapper = JsonUtility.FromJson<CardsDataWrapper>(json);
-        //Debug.Log("laodcardsdata afterdatawrapper.");
-        List<CardData> cardDataList = dataWrapper.cards;
-        //Debug.Log("laodcardsdata after carddatalist");
-        // Populate siblingCardNames for each CardData object
-        /*
-        foreach (CardData cardData in cardDataList)
-        {
-            cardData.PopulateSiblings(cardDataList);
-        }
-        */
-        //Debug.Log("laodcardsdata after foreachb loop.");
-        // Notify subscribers that card data is loaded
-        OnCardDataLoaded?.Invoke(cardDataList);
-        Debug.Log($"{Time.time}: OnCardDataLoaded event invoked with card data.");
-        //cardDataLoaded = true;
-        CheckStartManagers(); // Check if both player and card data are loaded
-        Debug.Log($"{Time.time}:LoadCardsData ended.");
-        //cardManager.InitializeCards(cardDataList); // Initialize cards in CardManager
     }
+
 
     [System.Serializable]
     private class CardsDataWrapper
     {
-        public List<CardData> cards;
+        public ComponentProps component_props;
+
+        [System.Serializable]
+        public class ComponentProps
+        {
+            public List<CardData> cards;
+        }
     }
+
 
     // Check if both player and card data are loaded
     private void CheckStartManagers()
     {
-        /*if (playerDataLoaded && cardDataLoaded)
+        if (playerDataLoaded && cardDataLoaded)
         {
             // Both data sets are loaded, you can perform any necessary actions here
-        }*/
+        }
     }
-    
 }

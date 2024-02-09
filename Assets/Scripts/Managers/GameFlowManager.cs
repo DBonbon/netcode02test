@@ -13,15 +13,15 @@ public class GameFlowManager : MonoBehaviour
     //[SerializeField] private Canvas endGameCanvas;
     //[SerializeField] private float canvasDisplayDuration = 4f;
 
-    private bool isPlayerDataLoaded = false;
-    private bool isCardDataLoaded = false;
+    //private bool isPlayerDataLoaded = false;
+    //private bool isCardDataLoaded = false;
 
     //private List<Canvas> canvasesInOrder = new List<Canvas>();
 
     private void Awake()
     {
-        DataManager.OnPlayerDataLoaded += OnPlayerDataLoaded;
-        DataManager.OnCardDataLoaded += OnCardDataLoaded;
+        //DataManager.OnPlayerDataLoaded += OnPlayerDataLoaded;
+        //DataManager.OnCardDataLoaded += OnCardDataLoaded;
 
         // Add the canvases to the list in your desired order
         //canvasesInOrder.Add(setupCanvas);
@@ -31,8 +31,8 @@ public class GameFlowManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        DataManager.OnPlayerDataLoaded -= OnPlayerDataLoaded;
-        DataManager.OnCardDataLoaded -= OnCardDataLoaded;
+        //DataManager.OnPlayerDataLoaded -= OnPlayerDataLoaded;
+        //DataManager.OnCardDataLoaded -= OnCardDataLoaded;
     }
 
     private void Start()
@@ -42,6 +42,7 @@ public class GameFlowManager : MonoBehaviour
         //StartGameFlow();
     }
 
+    /*
     private void OnPlayerDataLoaded(List<PlayerData> playerDataList)
     {
         if (!isPlayerDataLoaded)
@@ -56,12 +57,13 @@ public class GameFlowManager : MonoBehaviour
             }
         }
     }
-
+*/
+    /*
     private void OnCardDataLoaded(List<CardData> cardDataList)
     {
         if (!isCardDataLoaded)
         {
-            CardManager.Instance.InitializeCards(cardDataList);
+            /*CardManager.Instance.InitializeCards(cardDataList);
             DataManager.OnCardDataLoaded -= OnCardDataLoaded;
             isCardDataLoaded = true;
 
@@ -71,7 +73,7 @@ public class GameFlowManager : MonoBehaviour
                 //StartGameFlow();
             }
         }
-    }
+    }*/
 
     /*
     private void StartGameFlow()

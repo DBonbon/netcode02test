@@ -338,6 +338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerManager: {fileID: 158141706}
+  cardManager: {fileID: 158141705}
 --- !u!1 &169057577
 GameObject:
   m_ObjectHideFlags: 0

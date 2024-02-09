@@ -6,10 +6,10 @@ using Unity.Netcode;
 public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance;
-    public static int TotalPlayerPrefabs = 2;
+    public static int TotalPlayerPrefabs = 2; // Adjust based on your game's needs
     private int connectedPlayers = 0;
     public List<Player> players = new List<Player>();
-    private List<PlayerData> playerDataList; 
+    private List<PlayerData> playerDataList;
 
     private void Awake()
     {
@@ -17,24 +17,17 @@ public class PlayerManager : NetworkBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            DataManager.OnPlayerDataLoaded += LoadPlayerDataLoaded; // Subscribe to event
         }
         else
         {
             Destroy(gameObject);
         }
-
-    }
-    
-    private void Start()
-    {
-        Debug.Log("playermanager started");
-        //DataManager.OnPlayerDataLoaded += HandlePlayerDataLoaded;
-        Debug.Log("playermanager started");
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
 
     private void OnDestroy()
     {
+        DataManager.OnPlayerDataLoaded -= LoadPlayerDataLoaded; // Unsubscribe from event
         if (NetworkManager.Singleton != null)
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
@@ -43,36 +36,35 @@ public class PlayerManager : NetworkBehaviour
 
     public void LoadPlayerDataLoaded(List<PlayerData> loadedPlayerDataList)
     {
-        this.playerDataList = loadedPlayerDataList; // Store loaded player data
-        Debug.Log("loadedPlayerDataList added to playermanager.");
+        this.playerDataList = loadedPlayerDataList; 
+        Debug.Log("Player data loaded into PlayerManager.");
+    }
+
+    private void Start()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
 
     private void OnClientConnected(ulong clientId)
     {
-        if (IsServer)
+        if (!IsServer) return;
+
+        connectedPlayers++;
+        var playerObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
+        if (playerObject != null)
         {
-            connectedPlayers++;
-            var playerObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
-            if (playerObject != null)
+            var player = playerObject.GetComponent<Player>();
+            if (player != null && connectedPlayers <= playerDataList.Count)
             {
-                var player = playerObject.GetComponent<Player>();
-                if (player != null)
+                string playerImagePath = "Images/character_01"; // Default image path
+                var data = playerDataList[connectedPlayers - 1]; // Match player data with connected order
+                player.InitializePlayer(data.playerName, playerImagePath); // Simplified initialization
+
+                players.Add(player);
+                if (connectedPlayers == TotalPlayerPrefabs)
                 {
-                    // Initialize player with name, dbId, and image path
-                    string playerName = "Player " + clientId.ToString();
-                    int playerDbId = 23; // Default database ID
-                    string playerImagePath = "Images/character_01"; // Default image path
-
-                    player.InitializePlayer(playerName, playerDbId, playerImagePath);
-
-                    players.Add(player);
-
-                    if (connectedPlayers == TotalPlayerPrefabs)
-                    {
-                        DistributeCards();
-                        UpdatePlayerToAsk();
-                    }
-                    
+                    DistributeCards();
+                    UpdatePlayerToAsk();
                 }
             }
         }
