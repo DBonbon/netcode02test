@@ -61,19 +61,46 @@ public class Player : NetworkBehaviour
 
     public void InitializePlayer(string name, int dbId, string imagePath)
     {
-        PlayerName.Value = name;
-        PlayerDbId.Value = dbId;
-        PlayerImagePath.Value = imagePath;
-      
+        if (IsServer)
+        {
+            PlayerName.Value = name;
+            PlayerDbId.Value = dbId;
+            PlayerImagePath.Value = imagePath;
+
+            // Update server UI directly here
+            UpdateServerUI(name, imagePath);
+            // setup and we want to immediately propagate these values to all clients.
+            BroadcastPlayerDbAttributes();
+        }
+        
+    }
+
+    private void UpdateServerUI(string playerName, string playerImagePath)
+    {
         if (playerUI != null)
         {
-            playerUI.InitializePlayerUI(PlayerName.Value.ToString(), PlayerImagePath.Value.ToString());
-            // Initialize UI for Score and HasTurn
-            playerUI.UpdateScoreUI(Score.Value);
+            playerUI.InitializePlayerUI(playerName, playerImagePath);
             playerUI.UpdateHasTurnUI(HasTurn.Value);
         }
     }
-    
+
+    public void BroadcastPlayerDbAttributes()
+    {
+        if (IsServer)
+        {
+            UpdatePlayerDbAttributes_ClientRpc(PlayerName.Value.ToString(), PlayerImagePath.Value.ToString());
+        }
+    }
+
+    [ClientRpc]
+    private void UpdatePlayerDbAttributes_ClientRpc(string playerName, string playerImagePath)
+    {
+        if (playerUI != null)
+        {
+            playerUI.InitializePlayerUI(playerName, playerImagePath);
+        }
+    }
+
     public void AddCardToHand(GameObject cardGameObject)
     {
         if (cardGameObject != null)
@@ -128,19 +155,20 @@ public class Player : NetworkBehaviour
         Debug.Log($"Player {PlayerName.Value} has {PlayerToAsk.Count} players to ask.");
     }
 
-    // Test method to increment Numi
+    // Test method to increment score
     void Update()
     {
-        // Simple test: Increment Numi on mouse click
+        // Simple test: Increment score on mouse click
         if (IsServer && Input.GetMouseButtonDown(0)) // Check for left mouse click
         {
             IncrementScoreTest();
         }
     }
 
+    //to remove when isn't needed anymore:
     public void IncrementScoreTest()
     {
-        Score.Value += 1; // Increment Numi by 1 for test
+        Score.Value += 1; // Increment score by 1 for test
         Debug.Log($"Test: Incremented Score to {Score.Value}");
     }
 

@@ -59,6 +59,8 @@ public class PlayerManager : NetworkBehaviour
                 string playerImagePath = "Images/character_01"; // Default image path
                 var playerData = playerDataList[connectedPlayers - 1]; // Example, adjust as necessary
                 player.InitializePlayer(playerData.playerName, playerData.playerDbId, playerData.playerImagePath);
+                // New logic to broadcast existing player names to the newly connected client
+                BroadcastPlayerNamesToNewClient(clientId);
 
                 players.Add(player);
                 if (connectedPlayers == TotalPlayerPrefabs)
@@ -67,6 +69,15 @@ public class PlayerManager : NetworkBehaviour
                     UpdatePlayerToAsk();
                 }
             }
+        }
+    }
+
+    private void BroadcastPlayerNamesToNewClient(ulong newClientId)
+    {
+        foreach (var player in players)
+        {
+            // Use the new method to broadcast both attributes
+            player.BroadcastPlayerDbAttributes();
         }
     }
 
