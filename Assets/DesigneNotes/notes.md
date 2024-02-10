@@ -140,3 +140,48 @@ while local player is always or top, these are the positionand rotaati0on of rem
     When a GameObject is parented to another GameObject in Unity, it maintains its world position by default unless specified otherwise. You want to reset their local position to (0,0,0) relative to the parent (the player object) so that they appear at the player's location.
 
     in 2D to display object on the Z, i.e. above/below use Sprite Renderer/sorting layer. 
+
+
+    Network, sync a player.attribte.value that from:
+
+    on the player.cs:
+
+    1. public NetworkVariable<int> Numi = new NetworkVariable<int>(3);
+    2. public override void OnNetworkSpawn()
+    {
+        //call to make it a server side element
+        if (IsServer)
+        {
+            Numi.Value = 3; // Initialize or re-assign to ensure it's set on all clients
+        }
+
+        // Subscribe to Numi value changes to update UI accordingly
+        Numi.OnValueChanged += OnNumiChanged;
+        OnNumiChanged(0, Numi.Value); // Manually trigger the update to set initia UI state
+    }
+
+    3. private void OnNumiChanged(int oldValue, int newValue)
+    {
+        // This method is called whenever Numi changes
+        UpdateNumiUI(newValue);
+    }
+
+    private void UpdateNumiUI(int numi)
+    {
+        if (playerUI != null)
+        {
+            playerUI.UpdateNumiUI(numi);
+        }
+    }
+
+    5. then in playerUI;
+
+    [SerializeField] private TextMeshProUGUI numiText;
+    
+    public void UpdateNumiUI(int numi)
+    {
+        if (numiText != null)
+        {
+            numiText.text = "Numi: " + numi.ToString();
+        }
+    }

@@ -15,6 +15,7 @@ public class Player : NetworkBehaviour
     public NetworkVariable<int> Result = new NetworkVariable<int>(0);
     public NetworkVariable<bool> IsWinner = new NetworkVariable<bool>(false);
     public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
+    public NetworkVariable<int> Numi = new NetworkVariable<int>(3);
 
     public List<Card> HandCards { get; set; } = new List<Card>();
     public List<Card> CardsPlayerCanAsk { get; private set; }
@@ -34,6 +35,28 @@ public class Player : NetworkBehaviour
     {
         playerUI = GetComponent<PlayerUI>();
         playerHand = transform.Find("PlayerHandTransfrom");
+        if (IsServer)
+        {
+            Score.Value = 0; // Initialize or re-assign to ensure it's set on all clients
+        }
+
+        // Subscribe to Numi value changes to update UI accordingly
+        Score.OnValueChanged += OnScoreChanged;
+        OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state
+    }
+
+    private void OnScoreChanged(int oldValue, int newValue)
+    {
+        // This method is called whenever Numi changes
+        UpdateScoreUI(newValue);
+    }
+
+    private void UpdateScoreUI(int score)
+    {
+        if (playerUI != null)
+        {
+            playerUI.UpdateScoreUI(score);
+        }
     }
 
     public void InitializePlayer(string name, int dbId, string imagePath)
@@ -50,32 +73,6 @@ public class Player : NetworkBehaviour
             playerUI.UpdateHasTurnUI(HasTurn.Value);
         }
     }
-
-    /*public void AddCardToHand(Card card)
-    {
-        if (card != null && PlayerHand != null)
-        {
-            var cardNetworkObject = card.GetComponent<NetworkObject>();
-            if (cardNetworkObject != null)
-            {
-                // This ensures that we're only trying to parent network objects under other network objects.
-                card.transform.SetParent(PlayerHand.transform, false);
-                card.transform.localPosition = Vector3.zero; // Optionally reset local position.
-                Debug.Log($"Card {card.name} added to player {PlayerName.Value}'s hand.");
-
-                // Logical addition to the HandCards list, if necessary.
-                HandCards.Add(card);
-            }
-            else
-            {
-                Debug.LogError("The card does not have a NetworkObject component.");
-            }
-        }
-        else
-        {
-            Debug.LogError("Card is null or PlayerHand is not set.");
-        }
-    }*/
     
     public void AddCardToHand(GameObject cardGameObject)
     {
@@ -105,15 +102,6 @@ public class Player : NetworkBehaviour
         }
     }
 
-    // Example methods to update Score and HasTurn
-    public void UpdateScore(int newScore)
-    {
-        Score.Value = newScore;
-        if (playerUI != null)
-        {
-            playerUI.UpdateScoreUI(newScore);
-        }
-    }
 
     public void UpdateTurnStatus(bool hasTurn)
     {
@@ -138,6 +126,22 @@ public class Player : NetworkBehaviour
 
         // Optional: Log the count for verification
         Debug.Log($"Player {PlayerName.Value} has {PlayerToAsk.Count} players to ask.");
+    }
+
+    // Test method to increment Numi
+    void Update()
+    {
+        // Simple test: Increment Numi on mouse click
+        if (IsServer && Input.GetMouseButtonDown(0)) // Check for left mouse click
+        {
+            IncrementScoreTest();
+        }
+    }
+
+    public void IncrementScoreTest()
+    {
+        Score.Value += 1; // Increment Numi by 1 for test
+        Debug.Log($"Test: Incremented Score to {Score.Value}");
     }
 
 

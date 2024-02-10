@@ -9,6 +9,7 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private Image playerImage;
     [SerializeField] private TextMeshProUGUI scoreText; // Add UI element for score
     [SerializeField] private GameObject hasTurnIndicator; // Add UI element for turn indicator
+    [SerializeField] private TextMeshProUGUI numiText;
 
     private const string DefaultImagePath = "Images/character_01";
 
@@ -31,7 +32,7 @@ public class PlayerUI : MonoBehaviour
 
     public void UpdateScoreUI(int score)
     {
-        if (scoreText != null)
+        if (numiText != null)
         {
             scoreText.text = "Score: " + score.ToString();
         }
