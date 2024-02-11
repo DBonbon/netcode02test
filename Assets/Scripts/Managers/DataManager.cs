@@ -26,7 +26,7 @@ public class DataManager : MonoBehaviour
     private void Awake()
     {
         DataManager.OnPlayerDataLoaded += OnPlayerDataLoaded;
-        //DataManager.OnCardDataLoaded += OnCardDataLoaded; // Ensure this line exists
+        DataManager.OnCardDataLoaded += OnCardDataLoaded; // Ensure this line exists
     }
 
     private void Start()
@@ -88,32 +88,40 @@ public class DataManager : MonoBehaviour
 
     private void LoadCardsFromJson()
     {
-        string apiUrl = "http://localhost:8081/wt/api/nextjs/v1/page_by_path/?html_path=authors/yoga/unity";
-        StartCoroutine(LoadCardsDataFromJson(apiUrl));
+        string path = Path.Combine(Application.streamingAssetsPath, "cards.json");
+        StartCoroutine(LoadCardsData(path));
+        //string apiUrl = "http://localhost:8081/wt/api/nextjs/v1/page_by_path/?html_path=authors/yoga/unity";
+        //StartCoroutine(LoadCardsDataFromJson(apiUrl));
     }
 
-    private IEnumerator LoadCardsDataFromJson(string apiUrl)
+    private IEnumerator LoadCardsData(string path)
     {
-        UnityWebRequest www = UnityWebRequest.Get(apiUrl);
-        yield return www.SendWebRequest();
-
-        if (www.result != UnityWebRequest.Result.Success)
+        string json;
+        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
-            Debug.LogError($"Failed to load card data from API. Error: {www.error}");
-            yield break;
+            UnityWebRequest www = UnityWebRequest.Get(path);
+            yield return www.SendWebRequest();
+            json = www.downloadHandler.text;
+            // Use UnityWebRequest for mobile platforms
+            // ... (code to load JSON using UnityWebRequest)
+        }
+        else
+        {
+            json = File.ReadAllText(path);
         }
 
-        string json = www.downloadHandler.text;
+        // Create a wrapper class to hold the "players" array from the JSON data
         CardsDataWrapper dataWrapper = JsonUtility.FromJson<CardsDataWrapper>(json);
 
-        List<CardData> cardDataList = dataWrapper?.component_props?.cards;
+        // Get the player data list from the wrapper
+        List<CardData> cardDataList = dataWrapper.cards;
 
         if (cardDataList != null)
         {
-            /*foreach (CardData cardData in cardDataList)
+            foreach (CardData cardData in cardDataList)
             {
                 cardData.PopulateSiblings(cardDataList);
-            }*/
+            }
 
             OnCardDataLoaded?.Invoke(cardDataList);
             cardDataLoaded = true;
@@ -125,8 +133,13 @@ public class DataManager : MonoBehaviour
         }
     }
 
-
     [System.Serializable]
+    private class CardsDataWrapper
+    {
+        public List<CardData> cards;
+    }
+    
+    /*[System.Serializable]
     private class CardsDataWrapper
     {
         public ComponentProps component_props;
@@ -136,7 +149,7 @@ public class DataManager : MonoBehaviour
         {
             public List<CardData> cards;
         }
-    }
+    }*/
 
 
     // Check if both player and card data are loaded

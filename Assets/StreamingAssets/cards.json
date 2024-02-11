@@ -1,185 +1,185 @@
 {
     "cards": [
         {
-            "rank": "card",
-            "name": "Alef",
+            "suit": "card",
+            "cardName": "Alef",
+            "hint": "hint1"
+        },
+        {
+            "suit": "card",
+            "cardName": "Bet",
+            "hint": "hint3"
+        },
+        {
+            "suit": "card",
+            "cardName": "Cimel",
             "hint": "hint"
         },
         {
-            "rank": "card",
-            "name": "Bet",
+            "suit": "card",
+            "cardName": "Dalet",
+            "hint": "hin5t"
+        },
+        {
+            "suit": "bard",
+            "cardName": "Ani",
             "hint": "hint"
         },
         {
-            "rank": "card",
-            "name": "Cimel",
+            "suit": "bard",
+            "cardName": "Bico",
+            "hint": "hint7"
+        },
+        {
+            "suit": "bard",
+            "cardName": "Caux",
+            "hint": "hint7"
+        },
+        {
+            "suit": "bard",
+            "cardName": "Doz",
             "hint": "hint"
         },
         {
-            "rank": "card",
-            "name": "Dalet",
+            "suit": "gard",
+            "cardName": "Ata",
+            "hint": "hint7"
+        },
+        {
+            "suit": "gard",
+            "cardName": "Beta",
             "hint": "hint"
         },
         {
-            "rank": "bard",
-            "name": "Ani",
+            "suit": "gard",
+            "cardName": "Comment",
             "hint": "hint"
         },
         {
-            "rank": "bard",
-            "name": "Bico",
+            "suit": "gard",
+            "cardName": "Daledi",
             "hint": "hint"
         },
         {
-            "rank": "bard",
-            "name": "Caux",
+            "suit": "hard",
+            "cardName": "Aalki",
+            "hint": "hint6"
+        },
+        {
+            "suit": "hard",
+            "cardName": "Bita",
             "hint": "hint"
         },
         {
-            "rank": "bard",
-            "name": "Doz",
-            "hint": "hint"
+            "suit": "hard",
+            "cardName": "Cuta",
+            "hint": "hint5"
         },
         {
-            "rank": "gard",
-            "name": "Ata",
-            "hint": "hint"
-        },
-        {
-            "rank": "gard",
-            "name": "Beta",
-            "hint": "hint"
-        },
-        {
-            "rank": "gard",
-            "name": "Comment",
-            "hint": "hint"
-        },
-        {
-            "rank": "gard",
-            "name": "Daledi",
-            "hint": "hint"
-        },
-        {
-            "rank": "hard",
-            "name": "Aalki",
-            "hint": "hint"
-        },
-        {
-            "rank": "hard",
-            "name": "Bita",
-            "hint": "hint"
-        },
-        {
-            "rank": "hard",
-            "name": "Cuta",
-            "hint": "hint"
-        },
-        {
-            "rank": "hard",
-            "name": "Dita",
+            "suit": "hard",
+            "cardName": "Dita",
             "hint": "hint"
         },
 
         {
-            "rank": "kard",
-            "name": "Aora",
+            "suit": "kard",
+            "cardName": "Aora",
+            "hint": "hint4"
+        },
+        {
+            "suit": "kard",
+            "cardName": "Bora",
             "hint": "hint"
         },
         {
-            "rank": "kard",
-            "name": "Bora",
+            "suit": "kard",
+            "cardName": "Cora",
             "hint": "hint"
         },
         {
-            "rank": "kard",
-            "name": "Cora",
+            "suit": "kard",
+            "cardName": "Dora",
+            "hint": "hint4"
+        },
+        {
+            "suit": "fard",
+            "cardName": "Auri",
             "hint": "hint"
         },
         {
-            "rank": "kard",
-            "name": "Dora",
+            "suit": "fard",
+            "cardName": "Buri",
             "hint": "hint"
         },
         {
-            "rank": "fard",
-            "name": "Auri",
+            "suit": "fard",
+            "cardName": "Curi",
             "hint": "hint"
         },
         {
-            "rank": "fard",
-            "name": "Buri",
+            "suit": "fard",
+            "cardName": "Duri",
             "hint": "hint"
         },
         {
-            "rank": "fard",
-            "name": "Curi",
+            "suit": "lard",
+            "cardName": "Aabo",
             "hint": "hint"
         },
         {
-            "rank": "fard",
-            "name": "Duri",
+            "suit": "lard",
+            "cardName": "Babo",
             "hint": "hint"
         },
         {
-            "rank": "lard",
-            "name": "Aabo",
+            "suit": "lard",
+            "cardName": "Cabo",
             "hint": "hint"
         },
         {
-            "rank": "lard",
-            "name": "Babo",
+            "suit": "lard",
+            "cardName": "Dabo",
             "hint": "hint"
         },
         {
-            "rank": "lard",
-            "name": "Cabo",
+            "suit": "nard",
+            "cardName": "All",
             "hint": "hint"
         },
         {
-            "rank": "lard",
-            "name": "Dabo",
+            "suit": "nard",
+            "cardName": "Bll",
             "hint": "hint"
         },
         {
-            "rank": "nard",
-            "name": "All",
+            "suit": "nard",
+            "cardName": "Cll",
             "hint": "hint"
         },
         {
-            "rank": "nard",
-            "name": "Bll",
+            "suit": "nard",
+            "cardName": "Dll",
             "hint": "hint"
         },
         {
-            "rank": "nard",
-            "name": "Cll",
+            "suit": "sard",
+            "cardName": "Ao",
             "hint": "hint"
         },
         {
-            "rank": "nard",
-            "name": "Dll",
-            "hint": "hint"
+            "suit": "sard",
+            "cardName": "Bo",
+            "hint": "hint1"
         },
         {
-            "rank": "sard",
-            "name": "Ao",
-            "hint": "hint"
+            "suit": "sard",
+            "cardName": "Co",
+            "hint": "hint2"
         },
         {
-            "rank": "sard",
-            "name": "Bo",
-            "hint": "hint"
-        },
-        {
-            "rank": "sard",
-            "name": "Co",
-            "hint": "hint"
-        },
-        {
-            "rank": "sard",
-            "name": "Do",
-            "hint": "hint"
+            "suit": "sard",
+            "cardName": "Do",
+            "hint": "hint3"
         }
     ]
 }

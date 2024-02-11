@@ -177,11 +177,52 @@ while local player is always or top, these are the positionand rotaati0on of rem
     5. then in playerUI;
 
     [SerializeField] private TextMeshProUGUI numiText;
-    
+
     public void UpdateNumiUI(int numi)
     {
         if (numiText != null)
         {
             numiText.text = "Numi: " + numi.ToString();
+        }
+    }
+
+
+    Rest connect to DB:
+    private void LoadCardsFromJson()
+    {
+        string apiUrl = "http://localhost:8081/wt/api/nextjs/v1/page_by_path/?html_path=authors/yoga/unity";
+        StartCoroutine(LoadCardsDataFromJson(apiUrl));
+    }
+
+    private IEnumerator LoadCardsDataFromJson(string apiUrl)
+    {
+        UnityWebRequest www = UnityWebRequest.Get(apiUrl);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Failed to load card data from API. Error: {www.error}");
+            yield break;
+        }
+
+        string json = www.downloadHandler.text;
+        CardsDataWrapper dataWrapper = JsonUtility.FromJson<CardsDataWrapper>(json);
+
+        List<CardData> cardDataList = dataWrapper?.component_props?.cards;
+
+        if (cardDataList != null)
+        {
+            /*foreach (CardData cardData in cardDataList)
+            {
+                cardData.PopulateSiblings(cardDataList);
+            }*/
+
+            OnCardDataLoaded?.Invoke(cardDataList);
+            cardDataLoaded = true;
+            CheckStartManagers();
+        }
+        else
+        {
+            Debug.LogError("No card data found in the API response.");
         }
     }
