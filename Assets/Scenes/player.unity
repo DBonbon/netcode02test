@@ -312,6 +312,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardPrefab: {fileID: 2520984029392753929, guid: 4b035f6858ffd0d4388ac0c2fe874fa3, type: 3}
+  cardDataList: []
 --- !u!114 &158141706
 MonoBehaviour:
   m_ObjectHideFlags: 0
