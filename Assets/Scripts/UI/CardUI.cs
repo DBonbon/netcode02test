@@ -1,13 +1,19 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode; // Ensure this namespace is included
+using System.Collections.Generic;
 
 public class CardUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private TextMeshProUGUI suitText;
     [SerializeField] private TextMeshProUGUI hintText;
-    [SerializeField] private Image iconImage; // Assign in the inspector
+    [SerializeField] private Image iconImage;
+    [SerializeField] private TextMeshProUGUI siblingText1;
+    [SerializeField] private TextMeshProUGUI siblingText2;
+    [SerializeField] private TextMeshProUGUI siblingText3;
+    [SerializeField] private TextMeshProUGUI siblingText4;
 
     private Card card;
     private Sprite[] cardIcons;
@@ -15,8 +21,17 @@ public class CardUI : MonoBehaviour
     private void Start()
     {
         card = GetComponent<Card>();
-        // Load all card icon sprites from the Resources folder
         cardIcons = Resources.LoadAll<Sprite>("Images");
+        if (card.SiblingNames != null)
+        {
+            // Ensure we correctly subscribe to the NetworkList's event
+            card.SiblingNames.OnListChanged += HandleSiblingsChanged;
+        }
+        UpdateCardUI();
+    }
+
+    private void HandleSiblingsChanged(NetworkListEvent<SiblingName> changeEvent)
+    {
         UpdateCardUI();
     }
 
@@ -24,25 +39,36 @@ public class CardUI : MonoBehaviour
     {
         if (card != null)
         {
-            if (cardNameText != null)
-                cardNameText.text = card.CardName.Value.ToString(); // Convert FixedString32Bytes to string
+            cardNameText.text = card.CardName.Value.ToString();
+            suitText.text = card.Suit.Value.ToString();
+            hintText.text = card.Hint.Value.ToString();
 
-            if (suitText != null)
-                suitText.text = card.Suit.Value.ToString(); // Convert FixedString32Bytes to string
-
-            if (hintText != null)
-                hintText.text = card.Hint.Value.ToString(); // Convert FixedString32Bytes to string
-
-            // Assign a random icon to the card
+            // Update the icon if applicable
             if (iconImage != null && cardIcons.Length > 0)
             {
-                int iconIndex = Random.Range(0, cardIcons.Length);
-                iconImage.sprite = cardIcons[iconIndex];
+                iconImage.sprite = cardIcons[Random.Range(0, cardIcons.Length)];
             }
 
-            // Update iconImage sprite here if necessary
+            // Update sibling texts based on the NetworkList
+            UpdateSiblingText(siblingText1, 0);
+            UpdateSiblingText(siblingText2, 1);
+            UpdateSiblingText(siblingText3, 2);
+            UpdateSiblingText(siblingText4, 3);
         }
     }
 
-    // Optionally, subscribe to card's NetworkVariable changes to update UI in real-time
+    private void UpdateSiblingText(TextMeshProUGUI siblingText, int index)
+    {
+        if (card.SiblingNames.Count > index)
+        {
+            siblingText.gameObject.SetActive(true);
+            SiblingName siblingName = card.SiblingNames[index];
+            siblingText.text = siblingName.Name;
+            siblingText.color = siblingName.Name == card.CardName.Value.ToString() ? Color.red : Color.white;
+        }
+        else
+        {
+            siblingText.gameObject.SetActive(false);
+        }
+    }
 }

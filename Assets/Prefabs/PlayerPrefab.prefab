@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3354202893
+  GlobalObjectIdHash: 1448195455
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3354202893
+  GlobalObjectIdHash: 1448195455
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -378,7 +378,7 @@ MonoBehaviour:
     m_InternalValue: 0
   Numi:
     m_InternalValue: 3
-  playerHand: {fileID: 1222316254135708148}
+  playerHand: {fileID: 5315489125756686426}
   playerQuartets: {fileID: 0}
 --- !u!114 &8333241961384468523
 MonoBehaviour:
@@ -396,7 +396,6 @@ MonoBehaviour:
   playerImage: {fileID: 4286863747093191473}
   scoreText: {fileID: 6377012821003461293}
   hasTurnIndicator: {fileID: 6070280659734846774}
-  numiText: {fileID: 0}
 --- !u!1 &1437391088516248032
 GameObject:
   m_ObjectHideFlags: 0
@@ -803,7 +802,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3354202893
+  GlobalObjectIdHash: 1448195455
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -1153,6 +1152,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  gameObject: {fileID: 0}
+  siblingNames: []
 --- !u!1 &6941149681232152235
 GameObject:
   m_ObjectHideFlags: 0
@@ -1639,6 +1640,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  gameObject: {fileID: 0}
+  siblingNames: []
 --- !u!1001 &2063341765796887268
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1653,7 +1656,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4802039633454748770, guid: 13c10db7b8c20d14d91f40282c69b9e7, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3354202893
+      value: 1448195455
       objectReference: {fileID: 0}
     - target: {fileID: 6153640391127149246, guid: 13c10db7b8c20d14d91f40282c69b9e7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1718,8 +1721,12 @@ PrefabInstance:
       value: PlayerHandTransform
       objectReference: {fileID: 0}
     - target: {fileID: 4802039633454748770, guid: 13c10db7b8c20d14d91f40282c69b9e7, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4802039633454748770, guid: 13c10db7b8c20d14d91f40282c69b9e7, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3354202893
+      value: 1448195455
       objectReference: {fileID: 0}
     - target: {fileID: 6153640391127149246, guid: 13c10db7b8c20d14d91f40282c69b9e7, type: 3}
       propertyPath: m_LocalPosition.x

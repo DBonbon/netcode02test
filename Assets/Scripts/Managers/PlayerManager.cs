@@ -83,19 +83,33 @@ public class PlayerManager : NetworkBehaviour
 
     private void DistributeCards()
     {
-        int index = 0;
+        int index = 0; // Index to keep track of the card to distribute
+        int cardsPerPlayer = 5; // Set to 5 cards per player
+
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
             var playerObject = client.PlayerObject;
             var player = playerObject?.GetComponent<Player>();
             if (player != null)
             {
-                // Assign two objects to each player
-                player.AddCardToHand(CardManager.SpawnedCards[index++]);
-                player.AddCardToHand(CardManager.SpawnedCards[index++]);
+                // Dynamically assign cards based on cardsPerPlayer
+                for (int i = 0; i < cardsPerPlayer; i++)
+                {
+                    // Check if the index is within the bounds of the SpawnedCards list
+                    if (index < CardManager.SpawnedCards.Count)
+                    {
+                        player.AddCardToHand(CardManager.SpawnedCards[index++]);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Not enough cards to distribute to all players.");
+                        break; // Exit the loop if there are not enough cards
+                    }
+                }
             }
         }
     }
+
 
    private void UpdatePlayerToAsk()
     {

@@ -28,16 +28,32 @@ public class CardManager : MonoBehaviour
     public void LoadCardDataLoaded(List<CardData> loadedCardDataList)
     {
         this.cardDataList = loadedCardDataList;
-        Debug.Log("Card data loaded into CardManager. Total cards: " + cardDataList.Count);
 
-        // Optionally, log details of the first card to verify data integrity
+        // Shuffle the cards before spawning them
+        ShuffleCards();
+
+        Debug.Log("Card data loaded into CardManager. Total cards: " + cardDataList.Count);
+        // Optionally, log details of the first card to verify shuffle integrity
         if (cardDataList.Any())
         {
             var firstCard = cardDataList.First();
-            Debug.Log($"First card name: {firstCard.cardName}, Suit: {firstCard.suit}");
+            Debug.Log($"First card name after shuffle: {firstCard.cardName}, Suit: {firstCard.suit}");
         }
     }
 
+    private void ShuffleCards()
+    {
+        System.Random rng = new System.Random();  
+        int n = cardDataList.Count;  
+        while (n > 1) 
+        {  
+            n--;  
+            int k = rng.Next(n + 1);  
+            CardData value = cardDataList[k];  
+            cardDataList[k] = cardDataList[n];  
+            cardDataList[n] = value;  
+        }
+    }
 
     private void Start()
     {
@@ -57,17 +73,14 @@ public class CardManager : MonoBehaviour
                 if (cardComponent != null && i < cardDataList.Count)
                 {
                     CardData data = cardDataList[i];
-                    // Ensure the cardName, suit, and hint are correctly passed from CardData
-                    cardComponent.InitializeCard(data.cardName, data.suit, data.hint); // Using "DefaultHint" or data.hint as needed
+                    // Pass the sibling names along with other data
+                    cardComponent.InitializeCard(data.cardName, data.suit, data.hint, data.siblings);
                 }
 
                 SpawnedCards.Add(spawnedCard);
-                Debug.Log($"SpawnedCard {i} set: {spawnedCard.name}");
             }
         }
     }
-
-
 
     private void OnDestroy()
     {

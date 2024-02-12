@@ -23,18 +23,7 @@ public class CardData
             .ToList();
 
         // Debug log to check the populated siblings
-        //Debug.Log($"Siblings for card {name}: {string.Join(", ", siblings)}");
+        Debug.Log($"Siblings for card {cardName}: {string.Join(", ", siblings)}");
     }
 
 }
-/*public class CardData
-{
-    public string CardName { get; private set; }
-    public string Suit { get; private set; }
-
-    public CardData(string cardName, string suit)
-    {
-        CardName = cardName;
-        Suit = suit;
-    }
-}*/
