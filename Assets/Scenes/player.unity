@@ -311,7 +311,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 447c3642fbab52d4a84da457c0697f97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD
   cardPrefab: {fileID: 2520984029392753929, guid: 1ef35263a7b51a6439af5d9947c0426a, type: 3}
+=======
+  cardPrefab: {fileID: 2520984029392753929, guid: 4b035f6858ffd0d4388ac0c2fe874fa3, type: 3}
+>>>>>>> 60b0cfa3f459e14c7380bb02071949e64ac65af8
   cardDataList: []
 --- !u!114 &158141706
 MonoBehaviour:
