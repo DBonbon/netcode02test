@@ -57,23 +57,46 @@ public class CardManager : MonoBehaviour
 
     private void Start()
     {
-        NetworkManager.Singleton.OnServerStarted += SpawnCards;
+        NetworkManager.Singleton.OnServerStarted += () => StartCoroutine(StartCardSpawningProcess());
     }
 
-    public void SpawnCards()
+
+    System.Collections.IEnumerator StartCardSpawningProcess()
+    {
+        // Wait until the deck is confirmed to be spawned
+        while (DeckManager.Instance.DeckInstance == null)
+        {
+            yield return null; // Wait for one frame
+        }
+
+        // Now that we have the deck, proceed to spawn cards
+        SpawnCards();
+    }
+
+    private void SpawnCards()
     {
         if (NetworkManager.Singleton.IsServer)
         {
+            GameObject deck = DeckManager.Instance.DeckInstance; // Access the deck instance
+            if (deck == null)
+            {
+                Debug.LogError("Deck instance is not available for parenting.");
+                return;
+            }
+
             for (int i = 0; i < cardDataList.Count; i++)
             {
                 GameObject spawnedCard = Instantiate(cardPrefab);
                 spawnedCard.GetComponent<NetworkObject>().Spawn();
 
+                // Parent to deck after spawning and reset local position to align exactly with the deck
+                spawnedCard.transform.SetParent(deck.transform, false);
+                //spawnedCard.transform.localPosition = Vector3.zero;
+
                 Card cardComponent = spawnedCard.GetComponent<Card>();
-                if (cardComponent != null && i < cardDataList.Count)
+                if (cardComponent != null)
                 {
                     CardData data = cardDataList[i];
-                    // Pass the sibling names along with other data
                     cardComponent.InitializeCard(data.cardName, data.suit, data.hint, data.siblings);
                 }
 
@@ -81,6 +104,9 @@ public class CardManager : MonoBehaviour
             }
         }
     }
+
+
+
 
     private void OnDestroy()
     {

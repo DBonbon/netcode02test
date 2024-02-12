@@ -226,3 +226,52 @@ while local player is always or top, these are the positionand rotaati0on of rem
             Debug.LogError("No card data found in the API response.");
         }
     }
+
+
+
+    To make a simple networkobnject:
+
+    1. under canvas - create empty
+    2. add canvas to it (verify it's inherit)
+    3. add image to canvas - a simple visible object.
+    4. add networkobject componenet
+    5. add it in assets/prefabs
+    6. add to networkmanager.prefabs_list
+    7. create a script and add it to managers game object, or any other gameobject. 
+
+    this script, start it when server.start:
+
+    using UnityEngine;
+    using Unity.Netcode;
+
+    public class ServerStartSpawner : MonoBehaviour
+    {
+        public GameObject prefabToSpawn;
+
+        private void Start()
+        {
+            NetworkManager.Singleton.OnServerStarted += SpawnPrefab;
+        }
+
+        private void OnDestroy()
+        {
+            if (NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.OnServerStarted -= SpawnPrefab;
+            }
+        }
+
+        private void SpawnPrefab()
+        {
+            if (NetworkManager.Singleton.IsServer && prefabToSpawn != null)
+            {
+                GameObject spawnedObject = Instantiate(prefabToSpawn);
+                spawnedObject.GetComponent<NetworkObject>().Spawn();
+                Debug.Log("Prefab spawned on server start.");
+            }
+        }
+    }
+
+
+    8. go play mode, start network, and test.
+    
