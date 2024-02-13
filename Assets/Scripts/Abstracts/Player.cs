@@ -15,11 +15,12 @@ public class Player : NetworkBehaviour
     public NetworkVariable<int> Result = new NetworkVariable<int>(0);
     public NetworkVariable<bool> IsWinner = new NetworkVariable<bool>(false);
     public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
-    public NetworkVariable<int> Numi = new NetworkVariable<int>(3);
 
     public List<Card> HandCards { get; set; } = new List<Card>();
     public List<Card> CardsPlayerCanAsk { get; private set; }
     public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
+
+    [SerializeField] private GameObject playerHandPrefab;
 
     [SerializeField]
     private Transform playerHand;
@@ -40,14 +41,14 @@ public class Player : NetworkBehaviour
             Score.Value = 0; // Initialize or re-assign to ensure it's set on all clients
         }
 
-        // Subscribe to Numi value changes to update UI accordingly
+        // Subscribe to Score value changes to update UI accordingly
         Score.OnValueChanged += OnScoreChanged;
         OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state
     }
 
     private void OnScoreChanged(int oldValue, int newValue)
     {
-        // This method is called whenever Numi changes
+        // This method is called whenever Score changes
         UpdateScoreUI(newValue);
     }
 
@@ -71,6 +72,8 @@ public class Player : NetworkBehaviour
             UpdateServerUI(name, imagePath);
             // setup and we want to immediately propagate these values to all clients.
             BroadcastPlayerDbAttributes();
+            // Spawn and parent the player hand
+            SpawnAndParentPlayerHand();
         }
         
     }
@@ -129,7 +132,6 @@ public class Player : NetworkBehaviour
         }
     }
 
-
     public void UpdateTurnStatus(bool hasTurn)
     {
         HasTurn.Value = hasTurn;
@@ -172,5 +174,34 @@ public class Player : NetworkBehaviour
         Debug.Log($"Test: Incremented Score to {Score.Value}");
     }
 
+    private void SpawnAndParentPlayerHand()
+    {
+        if (IsServer)
+        {
+            GameObject handObject = Instantiate(playerHandPrefab);
+            NetworkObject handNetworkObject = handObject.GetComponent<NetworkObject>();
+
+            if (handNetworkObject != null)
+            {
+                handNetworkObject.Spawn();
+                
+                // Immediately parent to the player object, ensuring to use worldPositionStays as false
+                // to maintain local orientation and scale relative to the new parent.
+                handObject.transform.SetParent(this.transform, false);
+                handObject.transform.localPosition = Vector3.zero;
+            }
+            else
+            {
+                Debug.LogError("Spawned PlayerHand does not have a NetworkObject component.");
+            }
+        }
+    }
+
+    // Ensure OnDestroy is correctly implemented to handle any cleanup
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        // Your cleanup logic here
+    }
 
 }

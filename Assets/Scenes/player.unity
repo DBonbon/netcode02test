@@ -263,8 +263,6 @@ GameObject:
   - component: {fileID: 158141705}
   - component: {fileID: 158141707}
   - component: {fileID: 158141709}
-  - component: {fileID: 158141711}
-  - component: {fileID: 158141712}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -319,7 +317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 447c3642fbab52d4a84da457c0697f97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardPrefab: {fileID: 2520984029392753929, guid: 1ef35263a7b51a6439af5d9947c0426a, type: 3}
+  cardPrefab: {fileID: 8109355277419734685, guid: 39774a2463e51084d8788ec11915ce6b, type: 3}
   cardDataList: []
 --- !u!114 &158141706
 MonoBehaviour:
@@ -361,34 +359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c8a33a9de53754082e5d820bcb5966, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deckPrefab: {fileID: 8653362386994412985, guid: 21e4d7e935379bb4d832733a79c69259, type: 3}
---- !u!114 &158141711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 158141701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0b5d1176302ceb4ebc07c445738d0df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  beckPrefab: {fileID: 2370104698055487081, guid: 8b4271254f7a86c40a0b943bd5c4841b, type: 3}
---- !u!114 &158141712
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 158141701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f4df3df6d183b9419afaf6cc2f94a57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bardPrefab: {fileID: 8109355277419734685, guid: 32c5db091b3ea36488e8977f7968eccf, type: 3}
-  bardDataList: []
+  deckPrefab: {fileID: 2370104698055487081, guid: c909f35bd1aa1084a9462bfac6556999, type: 3}
 --- !u!1 &169057577
 GameObject:
   m_ObjectHideFlags: 0
@@ -1513,7 +1484,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1930362566}
-    PlayerPrefab: {fileID: 1339108545153035326, guid: 98fcbb5995844a741b727ca259a5bedb, type: 3}
+    PlayerPrefab: {fileID: 6127999316211474927, guid: c539253c36db55048a5502e16269baa0, type: 3}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 4b1279b235f911346a1af19aa813307c, type: 2}

@@ -110,8 +110,7 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-
-   private void UpdatePlayerToAsk()
+    private void UpdatePlayerToAsk()
     {
         // Iterate through each player in the 'players' list
         foreach (var player in players)
