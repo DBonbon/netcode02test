@@ -264,7 +264,7 @@ GameObject:
   - component: {fileID: 158141707}
   - component: {fileID: 158141709}
   - component: {fileID: 158141711}
-  - component: {fileID: 158141710}
+  - component: {fileID: 158141712}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerManager: {fileID: 158141706}
   cardManager: {fileID: 158141705}
-  bardManager: {fileID: 158141710}
+  bardManager: {fileID: 0}
 --- !u!114 &158141709
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,7 +362,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deckPrefab: {fileID: 8653362386994412985, guid: 21e4d7e935379bb4d832733a79c69259, type: 3}
---- !u!114 &158141710
+--- !u!114 &158141711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158141701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0b5d1176302ceb4ebc07c445738d0df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  beckPrefab: {fileID: 2370104698055487081, guid: 8b4271254f7a86c40a0b943bd5c4841b, type: 3}
+--- !u!114 &158141712
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -376,19 +389,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bardPrefab: {fileID: 8109355277419734685, guid: 32c5db091b3ea36488e8977f7968eccf, type: 3}
   bardDataList: []
---- !u!114 &158141711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 158141701}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0b5d1176302ceb4ebc07c445738d0df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  beckPrefab: {fileID: 3778038620240409840, guid: 608c06c6b8bede9419fbbbcaa3fabfc3, type: 3}
 --- !u!1 &169057577
 GameObject:
   m_ObjectHideFlags: 0
@@ -633,10 +633,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

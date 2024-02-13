@@ -57,17 +57,30 @@ public class BardManager : MonoBehaviour
 
     private void Start()
     {
-        NetworkManager.Singleton.OnServerStarted += SpawnBards;
+        NetworkManager.Singleton.OnServerStarted += () => StartCoroutine(StartBardSpawningProcess());
     }
 
-    /*private void SpawnBards()
+
+    System.Collections.IEnumerator StartBardSpawningProcess()
+    {
+        // Wait until the beck is confirmed to be spawned
+        while (BeckManager.Instance.BeckInstance == null)
+        {
+            yield return null; // Wait for one frame
+        }
+
+        // Now that we have the beck, proceed to spawn bards
+        SpawnBards();
+    }
+
+    private void SpawnBards()
     {
         if (NetworkManager.Singleton.IsServer)
         {
-            GameObject deck = DeckManager.Instance.DeckInstance; // Access the deck instance
-            if (deck == null)
+            GameObject beck = BeckManager.Instance.BeckInstance; // Access the beck instance
+            if (beck == null)
             {
-                Debug.LogError("Deck instance is not available for parenting.");
+                Debug.LogError("Beck instance is not available for parenting.");
                 return;
             }
 
@@ -76,21 +89,25 @@ public class BardManager : MonoBehaviour
                 GameObject spawnedBard = Instantiate(bardPrefab);
                 spawnedBard.GetComponent<NetworkObject>().Spawn();
 
-                // Parent to deck after spawning and reset local position to align exactly with the deck
-                spawnedBard.transform.SetParent(deck.transform, false);
+                // Parent to beck after spawning and reset local position to align exactly with the beck
+                spawnedBard.transform.SetParent(beck.transform, false);
+                //spawnedBard.transform.SetParent(null); 
                 //spawnedBard.transform.localPosition = Vector3.zero;
 
                 Bard bardComponent = spawnedBard.GetComponent<Bard>();
                 if (bardComponent != null)
                 {
                     BardData data = bardDataList[i];
-                    bardComponent.InitializeBard(data.bardName, data.suit, data.hint, data.siblings);
+                    bardComponent.InitializeBard(data.bardName, data.suit, data.hint, data.biblings);
                 }
 
                 SpawnedBards.Add(spawnedBard);
             }
-        }*/
-    public void SpawnBards()
+        }
+    }
+
+
+    /*public void SpawnBards()
     {
         if (NetworkManager.Singleton.IsServer)
         {
@@ -103,14 +120,15 @@ public class BardManager : MonoBehaviour
                 if (bardComponent != null && i < bardDataList.Count)
                 {
                     BardData data = bardDataList[i];
-                    // Pass the bibling names along with other data
+                    // Pass the sibling names along with other data
                     bardComponent.InitializeBard(data.bardName, data.suit, data.hint, data.biblings);
                 }
 
                 SpawnedBards.Add(spawnedBard);
             }
         }
-    }
+    }*/
+
 
     private void OnDestroy()
     {
