@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class BardManager : MonoBehaviour
 {
-    public static BardManager Instance;
+    /*public static BardManager Instance;
     public GameObject bardPrefab; // Assign this in the inspector
     public static List<GameObject> SpawnedBards = new List<GameObject>(); // List of spawned objects
     public List<BardData> bardDataList = new List<BardData>();
@@ -104,7 +104,7 @@ public class BardManager : MonoBehaviour
                 SpawnedBards.Add(spawnedBard);
             }
         }
-    }
+    }*/
 
 
     /*public void SpawnBards()
@@ -130,7 +130,7 @@ public class BardManager : MonoBehaviour
     }*/
 
 
-    private void OnDestroy()
+/*    private void OnDestroy()
     {
         if (NetworkManager.Singleton != null)
         {
@@ -143,5 +143,5 @@ public class BardManager : MonoBehaviour
     public void InitializeBards(List<BardData> namebardDataList)
     {
         //return null;
-    }
+    }*/
 }

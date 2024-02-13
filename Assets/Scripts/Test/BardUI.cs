@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class BardUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI bardNameText;
+    /*[SerializeField] private TextMeshProUGUI bardNameText;
     [SerializeField] private TextMeshProUGUI suitText;
     [SerializeField] private TextMeshProUGUI hintText;
     [SerializeField] private Image iconImage;
@@ -70,5 +70,5 @@ public class BardUI : MonoBehaviour
         {
             biblingText.gameObject.SetActive(false);
         }
-    }
+    }*/
 }

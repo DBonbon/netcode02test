@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BardData
 {
-    public int id;
+    /*public int id;
     public string suit;
     public string bardName;
     public string hint;
@@ -24,6 +24,6 @@ public class BardData
 
         // Debug log to check the populated biblings
         Debug.Log($"Biblings for bard {bardName}: {string.Join(", ", biblings)}");
-    }
+    }*/
 
 }

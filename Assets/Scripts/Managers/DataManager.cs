@@ -8,7 +8,6 @@ public class DataManager : MonoBehaviour
 {
     public PlayerManager playerManager; // Reference to the PlayerManager script
     public CardManager cardManager; // Reference to the CardManager script
-    public BardManager bardManager; // Reference to the CardManager script
     
     // Define events for player data and card data loading
     public delegate void PlayerDataLoadedHandler(List<PlayerData> players);
@@ -17,26 +16,17 @@ public class DataManager : MonoBehaviour
     public delegate void CardDataLoadedHandler(List<CardData> cards);
     public static event CardDataLoadedHandler OnCardDataLoaded;
 
-    public delegate void BardDataLoadedHandler(List<BardData> bards);
-    public static event BardDataLoadedHandler OnBardDataLoaded;
-
     // Static properties to access loaded data
     public static List<PlayerData> LoadedPlayerData { get; private set; }
     public static List<CardData> LoadedCardData { get; private set; }
 
-    public static List<BardData> LoadedBardData { get; private set; }
-
     private bool playerDataLoaded = false;
     private bool cardDataLoaded = false;
-
-    private bool bardDataLoaded = false;
 
     private void Awake()
     {
         DataManager.OnPlayerDataLoaded += OnPlayerDataLoaded;
         DataManager.OnCardDataLoaded += OnCardDataLoaded; // Ensure this line exists
-
-        DataManager.OnBardDataLoaded += OnBardDataLoaded;
     }
 
     private void Start()
@@ -44,8 +34,6 @@ public class DataManager : MonoBehaviour
         LoadPlayersFromJson();
         LoadCardsFromJson();
         Debug.Log($"{Time.time}:datamanager.start method has started");
-
-        LoadBardsFromJson();
     }
 
     private void LoadPlayersFromJson()
@@ -159,59 +147,6 @@ public class DataManager : MonoBehaviour
         {
             // Both data sets are loaded, you can perform any necessary actions here
         }
-    }
-
-    private void LoadBardsFromJson()
-    {
-        string path = Path.Combine(Application.streamingAssetsPath, "bards.json");
-        StartCoroutine(LoadBardsData(path));
-        //string apiUrl = "http://localhost:8081/wt/api/nextjs/v1/page_by_path/?html_path=authors/yoga/unity";
-        //StartCoroutine(LoadBardsDataFromJson(apiUrl));
-    }
-
-    private IEnumerator LoadBardsData(string path)
-    {
-        string json;
-        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            UnityWebRequest www = UnityWebRequest.Get(path);
-            yield return www.SendWebRequest();
-            json = www.downloadHandler.text;
-            // Use UnityWebRequest for mobile platforms
-            // ... (code to load JSON using UnityWebRequest)
-        }
-        else
-        {
-            json = File.ReadAllText(path);
-        }
-
-        // Create a wrapper class to hold the "players" array from the JSON data
-        BardsDataWrapper dataWrapper = JsonUtility.FromJson<BardsDataWrapper>(json);
-
-        // Get the player data list from the wrapper
-        List<BardData> bardDataList = dataWrapper.bards;
-
-        if (bardDataList != null)
-        {
-            foreach (BardData bardData in bardDataList)
-            {
-                bardData.PopulateBiblings(bardDataList);
-            }
-
-            OnBardDataLoaded?.Invoke(bardDataList);
-            bardDataLoaded = true;
-            CheckStartManagers();
-        }
-        else
-        {
-            Debug.LogError("No bard data found in the API response.");
-        }
-    }
-
-    [System.Serializable]
-    private class BardsDataWrapper
-    {
-        public List<BardData> bards;
     }
 
 

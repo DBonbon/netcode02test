@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerUI1 : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
+    /*void Start()
     {
         
     }
@@ -14,5 +14,5 @@ public class PlayerUI1 : MonoBehaviour
     void Update()
     {
         
-    }
+    }*/
 }

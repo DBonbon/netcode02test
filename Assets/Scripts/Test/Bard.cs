@@ -4,6 +4,9 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
+public class Bard : NetworkBehaviour
+{
+/*
 public struct BiblingName : INetworkSerializable, IEquatable<BiblingName>
 {
     private FixedString32Bytes name;
@@ -84,6 +87,6 @@ public class Bard : NetworkBehaviour, IComparable<Bard>
         var otherSuit = other.Suit.Value.ToString();
 
         return String.Compare(currentSuit, otherSuit, StringComparison.Ordinal);
-    }
+    }*/
 
 }

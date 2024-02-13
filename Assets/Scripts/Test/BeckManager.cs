@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BeckManager : MonoBehaviour
 {
-    public static BeckManager Instance;
+    /*public static BeckManager Instance;
     public GameObject beckPrefab;
     public GameObject BeckInstance { get; private set; } // Store the spawned beck instance
 
@@ -41,5 +41,5 @@ public class BeckManager : MonoBehaviour
             BeckInstance.GetComponent<NetworkObject>().Spawn();
             Debug.Log("Beck prefab spawned on server start.");
         }
-    }
+    }*/
 }

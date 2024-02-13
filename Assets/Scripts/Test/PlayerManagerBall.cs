@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerManagerBall : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
+    /*void Start()
     {
         
     }
@@ -14,5 +14,5 @@ public class PlayerManagerBall : MonoBehaviour
     void Update()
     {
         
-    }
+    }*/
 }
