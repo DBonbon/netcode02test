@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using Unity.Collections; // Required for FixedString32Bytes
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Player : NetworkBehaviour
 {   
@@ -21,11 +22,12 @@ public class Player : NetworkBehaviour
     public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
 
     [SerializeField] private GameObject playerHandPrefab;
+    private Transform playerHandTransform; // To store the instantiated playerHandPrefab's transform
 
-    [SerializeField]
+    /*[SerializeField]
     private Transform playerHand;
     public Transform PlayerHand { get { return playerHand; } set { playerHand = value; } }
-
+    */
     [SerializeField]
     private Transform playerQuartets;
     public Transform PlayerQuartets { get { return playerQuartets; } set { playerQuartets = value; } }
@@ -35,15 +37,15 @@ public class Player : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         playerUI = GetComponent<PlayerUI>();
-        playerHand = transform.Find("PlayerHandTransfrom");
+
         if (IsServer)
         {
-            Score.Value = 0; // Initialize or re-assign to ensure it's set on all clients
+            Score.Value = 0; // Initialize or re-assign to ensure it's set on all clients.
         }
 
-        // Subscribe to Score value changes to update UI accordingly
+        // Subscribe to Score value changes to update UI accordingly.
         Score.OnValueChanged += OnScoreChanged;
-        OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state
+        OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state.
     }
 
     private void OnScoreChanged(int oldValue, int newValue)
@@ -106,12 +108,12 @@ public class Player : NetworkBehaviour
 
     public void AddCardToHand(GameObject cardGameObject)
     {
-        if (cardGameObject != null)
+        if (cardGameObject != null && playerHandTransform != null)
         {
-            // Set the parent to this GameObject's transform (keeping it under the Player GameObject)
-            cardGameObject.transform.SetParent(transform, false);
-            cardGameObject.transform.localPosition = Vector3.zero; // Optionally reset local position
-            Debug.Log($"Card {cardGameObject.name} parented to player {PlayerName.Value}.");
+            // Parent the card to the playerHandTransform
+            cardGameObject.transform.SetParent(playerHandTransform, false);
+            cardGameObject.transform.localPosition = Vector3.zero;
+            Debug.Log($"Card {cardGameObject.name} parented to player hand {PlayerName.Value}.");
 
             // Attempt to retrieve the Card component from the card GameObject
             var cardComponent = cardGameObject.GetComponent<Card>();
@@ -128,7 +130,7 @@ public class Player : NetworkBehaviour
         }
         else
         {
-            Debug.LogError("Attempted to add a null card to the hand.");
+            Debug.LogError("playerHandTransform is not assigned or cardGameObject is null.");
         }
     }
 
@@ -180,15 +182,27 @@ public class Player : NetworkBehaviour
         {
             GameObject handObject = Instantiate(playerHandPrefab);
             NetworkObject handNetworkObject = handObject.GetComponent<NetworkObject>();
-
             if (handNetworkObject != null)
             {
                 handNetworkObject.Spawn();
-                
-                // Immediately parent to the player object, ensuring to use worldPositionStays as false
-                // to maintain local orientation and scale relative to the new parent.
-                handObject.transform.SetParent(this.transform, false);
-                handObject.transform.localPosition = Vector3.zero;
+                playerHandTransform = handObject.transform;
+                playerHandTransform.SetParent(this.transform, false);
+                playerHandTransform.localPosition = Vector3.zero;
+
+                // Check if the playerHandPrefab has a Canvas, and if so, add the Horizontal Layout Group to it.
+                var canvas = handObject.GetComponentInChildren<Canvas>();
+                if (canvas != null)
+                {
+                    var layoutGroup = canvas.gameObject.AddComponent<HorizontalLayoutGroup>();
+                    layoutGroup.spacing = 10; // Adjust spacing as needed
+                    layoutGroup.childAlignment = TextAnchor.MiddleCenter;
+                    layoutGroup.childForceExpandWidth = false;
+                    layoutGroup.childForceExpandHeight = false;
+                }
+                else
+                {
+                    Debug.LogWarning("Player hand prefab does not contain a Canvas component for the layout group.");
+                }
             }
             else
             {
