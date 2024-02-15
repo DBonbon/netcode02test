@@ -1,15 +1,17 @@
 using Unity.Netcode;
 using UnityEngine;
-using System.Linq;
-using Unity.Collections;
 using System.Collections.Generic;
 
 public class CardManager : MonoBehaviour
 {
     public static CardManager Instance;
-    public GameObject cardPrefab; // Assign this in the inspector
-    public static List<GameObject> SpawnedCards = new List<GameObject>(); // List of spawned objects
-    public List<CardData> cardDataList = new List<CardData>();
+    public GameObject cardPrefab; // Network object prefab for cards
+    public GameObject cardUIPrefab; // UI prefab for cards
+    public Transform cardUIPoolParent; // Parent object for Card UI instances
+
+    private List<CardUI> cardUIPool = new List<CardUI>(); // Pool for Card UI
+    public List<CardData> cardDataList = new List<CardData>(); // Loaded card data
+    private List<GameObject> spawnedCards = new List<GameObject>(); // Inventory of spawned network card object
 
     private void Awake()
     {
@@ -17,41 +19,11 @@ public class CardManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            DataManager.OnCardDataLoaded += LoadCardDataLoaded; // Subscribe to event
+            DataManager.OnCardDataLoaded += LoadCardDataLoaded;
         }
         else
         {
             Destroy(gameObject);
-        }
-    }
-    
-    public void LoadCardDataLoaded(List<CardData> loadedCardDataList)
-    {
-        this.cardDataList = loadedCardDataList;
-
-        // Shuffle the cards before spawning them
-        ShuffleCards();
-
-        Debug.Log("Card data loaded into CardManager. Total cards: " + cardDataList.Count);
-        // Optionally, log details of the first card to verify shuffle integrity
-        if (cardDataList.Any())
-        {
-            var firstCard = cardDataList.First();
-            Debug.Log($"First card name after shuffle: {firstCard.cardName}, Suit: {firstCard.suit}");
-        }
-    }
-
-    private void ShuffleCards()
-    {
-        System.Random rng = new System.Random();  
-        int n = cardDataList.Count;  
-        while (n > 1) 
-        {  
-            n--;  
-            int k = rng.Next(n + 1);  
-            CardData value = cardDataList[k];  
-            cardDataList[k] = cardDataList[n];  
-            cardDataList[n] = value;  
         }
     }
 
@@ -60,16 +32,40 @@ public class CardManager : MonoBehaviour
         NetworkManager.Singleton.OnServerStarted += () => StartCoroutine(StartCardSpawningProcess());
     }
 
+    private void LoadCardDataLoaded(List<CardData> loadedCardDataList)
+    {
+        cardDataList = loadedCardDataList;
+        ShuffleCards();
+        InitializeCardUIPool(); // Ensure CardUI pool is initialized after loading data
+    }
+
+    private void InitializeCardUIPool()
+    {
+        foreach (var cardUIInstance in cardUIPool)
+        {
+            Destroy(cardUIInstance.gameObject); // Clear existing pool
+        }
+        cardUIPool.Clear();
+
+        foreach (var cardData in cardDataList)
+        {
+            var cardUIObject = Instantiate(cardUIPrefab, cardUIPoolParent);
+            var cardUIComponent = cardUIObject.GetComponent<CardUI>();
+            if (cardUIComponent)
+            {
+                cardUIComponent.UpdateCardUIWithCardData(cardData);
+                cardUIPool.Add(cardUIComponent);
+                cardUIObject.SetActive(false); // Start inactive
+            }
+        }
+    }
 
     System.Collections.IEnumerator StartCardSpawningProcess()
     {
-        // Wait until the deck is confirmed to be spawned
         while (DeckManager.Instance.DeckInstance == null)
         {
-            yield return null; // Wait for one frame
+            yield return null;
         }
-
-        // Now that we have the deck, proceed to spawn cards
         SpawnCards();
     }
 
@@ -77,49 +73,42 @@ public class CardManager : MonoBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
-            GameObject deck = DeckManager.Instance.DeckInstance; // Access the deck instance
-            if (deck == null)
+            // Clear the existing spawnedCards list to prepare for new card objects
+            spawnedCards.Clear();
+
+            foreach (var cardData in cardDataList)
             {
-                Debug.LogError("Deck instance is not available for parenting.");
-                return;
-            }
-
-            for (int i = 0; i < cardDataList.Count; i++)
-            {
-                GameObject spawnedCard = Instantiate(cardPrefab);
-                spawnedCard.GetComponent<NetworkObject>().Spawn();
-
-                // Parent to deck after spawning and reset local position to align exactly with the deck
-                spawnedCard.transform.SetParent(deck.transform, false);
-                //spawnedCard.transform.localPosition = Vector3.zero;
-
-                Card cardComponent = spawnedCard.GetComponent<Card>();
+                var spawnedCard = Instantiate(cardPrefab, DeckManager.Instance.DeckInstance.transform);
+                var cardComponent = spawnedCard.GetComponent<Card>();
                 if (cardComponent != null)
                 {
-                    CardData data = cardDataList[i];
-                    cardComponent.InitializeCard(data.cardName, data.suit, data.hint, data.siblings);
+                    cardComponent.InitializeCard(cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);
+                    spawnedCard.GetComponent<NetworkObject>().Spawn();
+                    // Add the spawned network card object to the inventory
+                    spawnedCards.Add(spawnedCard);
                 }
-
-                SpawnedCards.Add(spawnedCard);
             }
         }
     }
 
-
-
+    private void ShuffleCards()
+    {
+        System.Random rng = new System.Random();
+        int n = cardDataList.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            var value = cardDataList[k];
+            cardDataList[k] = cardDataList[n];
+            cardDataList[n] = value;
+        }
+    }
 
     private void OnDestroy()
     {
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.OnServerStarted -= SpawnCards;
-        }
-
-        DataManager.OnCardDataLoaded -= LoadCardDataLoaded; 
+        DataManager.OnCardDataLoaded -= LoadCardDataLoaded;
     }
 
-    public void InitializeCards(List<CardData> namecardDataList)
-    {
-        //return null;
-    }
+    // Utility methods for CardUI pool management can be added here if needed
 }

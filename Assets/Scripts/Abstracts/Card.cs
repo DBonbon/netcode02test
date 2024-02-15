@@ -7,7 +7,6 @@ using System.Collections.Generic;
 public struct SiblingName : INetworkSerializable, IEquatable<SiblingName>
 {
     private FixedString32Bytes name;
-
     public string Name => name.ToString();
 
     public SiblingName(string name)
@@ -20,13 +19,11 @@ public struct SiblingName : INetworkSerializable, IEquatable<SiblingName>
         serializer.SerializeValue(ref name);
     }
 
-    // Implement the Equals method for IEquatable<SiblingName>
     public bool Equals(SiblingName other)
     {
         return name.Equals(other.name);
     }
 
-    // It's also a good practice to override Equals(object obj) and GetHashCode()
     public override bool Equals(object obj)
     {
         return obj is SiblingName other && Equals(other);

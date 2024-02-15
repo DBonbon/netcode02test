@@ -90,7 +90,7 @@ public class PlayerManager : NetworkBehaviour
         {
             var playerObject = client.PlayerObject;
             var player = playerObject?.GetComponent<Player>();
-            if (player != null)
+            /*if (player != null)
             {
                 // Dynamically assign cards based on cardsPerPlayer
                 for (int i = 0; i < cardsPerPlayer; i++)
@@ -106,7 +106,7 @@ public class PlayerManager : NetworkBehaviour
                         break; // Exit the loop if there are not enough cards
                     }
                 }
-            }
+            }*/
         }
     }
 

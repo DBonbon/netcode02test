@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Netcode; // Ensure this namespace is included
 using System.Collections.Generic;
 
 public class CardUI : MonoBehaviour
@@ -10,65 +9,58 @@ public class CardUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI suitText;
     [SerializeField] private TextMeshProUGUI hintText;
     [SerializeField] private Image iconImage;
-    [SerializeField] private TextMeshProUGUI siblingText1;
-    [SerializeField] private TextMeshProUGUI siblingText2;
-    [SerializeField] private TextMeshProUGUI siblingText3;
-    [SerializeField] private TextMeshProUGUI siblingText4;
+    [SerializeField] private List<TextMeshProUGUI> siblingTexts;
 
-    private Card card;
     private Sprite[] cardIcons;
 
-    private void Start()
+    private void Awake()
     {
-        card = GetComponent<Card>();
-        cardIcons = Resources.LoadAll<Sprite>("Images");
-        if (card.SiblingNames != null)
+        cardIcons = Resources.LoadAll<Sprite>("Images/character_01"); // Adjust the path as needed
+    }
+
+    public void UpdateCardUIWithCardData(CardData cardData)
+    {
+        string matchingSiblingName = cardData.cardName; // For highlighting
+        UpdateUI(cardData.cardName, cardData.suit, cardData.hint, cardData.siblings, matchingSiblingName);
+    }
+
+    public void UpdateUI(string cardName, string suit, string hint, List<string> siblings, string matchingSiblingName)
+    {
+        cardNameText.text = cardName;
+        suitText.text = suit;
+        hintText.text = hint;
+
+        if (iconImage != null && cardIcons.Length > 0)
         {
-            // Ensure we correctly subscribe to the NetworkList's event
-            card.SiblingNames.OnListChanged += HandleSiblingsChanged;
+            iconImage.sprite = cardIcons[Random.Range(0, cardIcons.Length)];
         }
-        UpdateCardUI();
-    }
 
-    private void HandleSiblingsChanged(NetworkListEvent<SiblingName> changeEvent)
-    {
-        UpdateCardUI();
-    }
-
-    private void UpdateCardUI()
-    {
-        if (card != null)
+        for (int i = 0; i < siblingTexts.Count; i++)
         {
-            cardNameText.text = card.CardName.Value.ToString();
-            suitText.text = card.Suit.Value.ToString();
-            hintText.text = card.Hint.Value.ToString();
-
-            // Update the icon if applicable
-            if (iconImage != null && cardIcons.Length > 0)
+            if (i < siblings.Count)
             {
-                iconImage.sprite = cardIcons[Random.Range(0, cardIcons.Length)];
+                siblingTexts[i].gameObject.SetActive(true);
+                siblingTexts[i].text = siblings[i];
+                siblingTexts[i].color = siblings[i] == matchingSiblingName ? Color.red : Color.white;
             }
-
-            // Update sibling texts based on the NetworkList
-            UpdateSiblingText(siblingText1, 0);
-            UpdateSiblingText(siblingText2, 1);
-            UpdateSiblingText(siblingText3, 2);
-            UpdateSiblingText(siblingText4, 3);
+            else
+            {
+                siblingTexts[i].gameObject.SetActive(false);
+            }
         }
     }
 
-    private void UpdateSiblingText(TextMeshProUGUI siblingText, int index)
+    public void ResetUI()
     {
-        if (card.SiblingNames.Count > index)
-        {
-            siblingText.gameObject.SetActive(true);
-            SiblingName siblingName = card.SiblingNames[index];
-            siblingText.text = siblingName.Name;
-            siblingText.color = siblingName.Name == card.CardName.Value.ToString() ? Color.red : Color.white;
-        }
-        else
+        cardNameText.text = "";
+        suitText.text = "";
+        hintText.text = "";
+        iconImage.sprite = null;
+        foreach (var siblingText in siblingTexts)
         {
             siblingText.gameObject.SetActive(false);
+            siblingText.text = "";
+            siblingText.color = Color.white;
         }
     }
 }
