@@ -37,6 +37,7 @@ public struct SiblingName : INetworkSerializable, IEquatable<SiblingName>
 
 public class Card : NetworkBehaviour, IComparable<Card>
 {
+    public NetworkVariable<int> cardId = new NetworkVariable<int>();
     public NetworkVariable<FixedString32Bytes> CardName = new NetworkVariable<FixedString32Bytes>();
     public NetworkVariable<FixedString32Bytes> Suit = new NetworkVariable<FixedString32Bytes>();
     public NetworkVariable<FixedString32Bytes> Hint = new NetworkVariable<FixedString32Bytes>();
@@ -45,10 +46,14 @@ public class Card : NetworkBehaviour, IComparable<Card>
 
     public NetworkList<SiblingName> SiblingNames = new NetworkList<SiblingName>();
 
-    public void InitializeCard(string name, string suit, string hint, List<string> siblings)
+    public void InitializeCard(int id, string name, string suit, string hint, List<string> siblings)
     {
+        Debug.Log("the intialized card was called");
+        Debug.Log($"checking is server on: {IsServer}");
         if (IsServer)
         {
+            Debug.Log($"checking is server on: {IsServer}");
+            cardId.Value = id;
             CardName.Value = name;
             Suit.Value = suit;
             Hint.Value = hint;
@@ -57,6 +62,8 @@ public class Card : NetworkBehaviour, IComparable<Card>
             {
                 SiblingNames.Add(new SiblingName(sibling));
             }
+            Debug.Log($"the cardId is: {cardId.Value}");
+            Debug.Log($"the cardname is: {CardName.Value}");
         }
     }
 

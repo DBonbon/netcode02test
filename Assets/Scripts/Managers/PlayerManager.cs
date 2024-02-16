@@ -83,32 +83,47 @@ public class PlayerManager : NetworkBehaviour
 
     private void DistributeCards()
     {
-        int index = 0; // Index to keep track of the card to distribute
-        int cardsPerPlayer = 5; // Set to 5 cards per player
+        int cardsPerPlayer = 5; // Assuming 5 cards per player for this example
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        // Check if there are enough cards for all players
+        Debug.Log($"the number of spawnedCards is: {CardManager.Instance.spawnedCards.Count}");
+        Debug.Log($"the number of cards needed to be distributed: {cardsPerPlayer * players.Count}");
+        if (CardManager.Instance.spawnedCards.Count < cardsPerPlayer * players.Count)
         {
-            var playerObject = client.PlayerObject;
-            var player = playerObject?.GetComponent<Player>();
-            /*if (player != null)
+            Debug.LogError("Not enough cards for all players.");
+            return;
+        }
+
+        foreach (var player in players)
+        {
+            for (int i = 0; i < cardsPerPlayer; i++)
             {
-                // Dynamically assign cards based on cardsPerPlayer
-                for (int i = 0; i < cardsPerPlayer; i++)
+                // Ensure there's a card to distribute
+                if (CardManager.Instance.spawnedCards.Count > 0)
                 {
-                    // Check if the index is within the bounds of the SpawnedCards list
-                    if (index < CardManager.SpawnedCards.Count)
+                    GameObject cardGameObject = CardManager.Instance.spawnedCards[0]; // Get the first card
+                    Card cardComponent = cardGameObject.GetComponent<Card>(); // Get the Card component
+
+                    if (cardComponent != null)
                     {
-                        player.AddCardToHand(CardManager.SpawnedCards[index++]);
+                        player.AddCardToHand(cardGameObject); // Add the card to the player's hand
+                        CardManager.Instance.spawnedCards.RemoveAt(0); // Remove the card from the spawned list
                     }
                     else
                     {
-                        Debug.LogWarning("Not enough cards to distribute to all players.");
-                        break; // Exit the loop if there are not enough cards
+                        Debug.LogError("Spawned card does not have a Card component.");
                     }
                 }
-            }*/
+            }
+
+            // After adding cards to the player's hand, update the player's UI
+            if (player.TryGetComponent(out PlayerUI playerUI))
+            {
+                playerUI.UpdatePlayerHandUI(player.HandCards);
+            }
         }
     }
+
 
     private void UpdatePlayerToAsk()
     {

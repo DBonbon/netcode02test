@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CardData
 {
-    public int id;
+    public int cardId;
     public string suit;
     public string cardName;
     public string hint;

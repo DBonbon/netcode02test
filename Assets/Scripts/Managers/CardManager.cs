@@ -11,7 +11,7 @@ public class CardManager : MonoBehaviour
 
     private List<CardUI> cardUIPool = new List<CardUI>(); // Pool for Card UI
     public List<CardData> cardDataList = new List<CardData>(); // Loaded card data
-    private List<GameObject> spawnedCards = new List<GameObject>(); // Inventory of spawned network card object
+    public List<GameObject> spawnedCards = new List<GameObject>(); // Inventory of spawned network card object
 
     private void Awake()
     {
@@ -60,6 +60,19 @@ public class CardManager : MonoBehaviour
         }
     }
 
+    public CardUI FetchCardUIById(int cardId)
+    {
+        foreach (CardUI cardUI in cardUIPool)
+        {
+            // Match based on cardId instead of CardName
+            if (cardUI.cardId == cardId && !cardUI.gameObject.activeInHierarchy)
+            {
+                return cardUI;
+            }
+        }
+        return null;
+    }
+
     System.Collections.IEnumerator StartCardSpawningProcess()
     {
         while (DeckManager.Instance.DeckInstance == null)
@@ -71,21 +84,21 @@ public class CardManager : MonoBehaviour
 
     private void SpawnCards()
     {
-        if (NetworkManager.Singleton.IsServer)
+        foreach (var cardData in cardDataList)
         {
-            // Clear the existing spawnedCards list to prepare for new card objects
-            spawnedCards.Clear();
-
-            foreach (var cardData in cardDataList)
+            var spawnedCard = Instantiate(cardPrefab, DeckManager.Instance.DeckInstance.transform);
+            var networkObject = spawnedCard.GetComponent<NetworkObject>();
+            if (networkObject != null)
             {
-                var spawnedCard = Instantiate(cardPrefab, DeckManager.Instance.DeckInstance.transform);
+                networkObject.Spawn(); // Spawn the card on the network
+                
                 var cardComponent = spawnedCard.GetComponent<Card>();
                 if (cardComponent != null)
                 {
-                    cardComponent.InitializeCard(cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);
-                    spawnedCard.GetComponent<NetworkObject>().Spawn();
-                    // Add the spawned network card object to the inventory
+                    // Now that the card is spawned, initialize it
+                    cardComponent.InitializeCard(cardData.cardId, cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);
                     spawnedCards.Add(spawnedCard);
+                    Debug.Log($"Card initialized and its Name is: {cardData.cardName}");
                 }
             }
         }

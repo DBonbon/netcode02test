@@ -2,6 +2,7 @@ using Unity.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PlayerUI : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private Image playerImage;
     [SerializeField] private TextMeshProUGUI scoreText; // Add UI element for score
     [SerializeField] private GameObject hasTurnIndicator; // Add UI element for turn indicator
+
+    [SerializeField] private Transform cardDisplayTransform; // Container for card UI elements
 
     private const string DefaultImagePath = "Images/character_01";
 
@@ -25,6 +28,31 @@ public class PlayerUI : MonoBehaviour
             if (playerImage != null && imageSprite != null)
             {
                 playerImage.sprite = imageSprite;
+            }
+        }
+    }
+
+    public void UpdatePlayerHandUI(List<Card> handCards)
+    {
+        // Deactivate all card UIs currently being displayed to reset the state.
+        foreach (Transform child in cardDisplayTransform)
+        {
+            child.gameObject.SetActive(false);
+        }
+
+        // For each Card in the player's hand, find and activate the corresponding CardUI from the pool
+        foreach (Card card in handCards)
+        {
+            // Use FetchCardUIById instead of FetchCardUIByName
+            CardUI cardUI = CardManager.Instance.FetchCardUIById(card.cardId.Value);
+            if (cardUI != null)
+            {
+                cardUI.gameObject.SetActive(true); // Make the CardUI visible
+                cardUI.transform.SetParent(cardDisplayTransform, false); // Reparent the CardUI to the player's UI
+            }
+            else
+            {
+                Debug.LogWarning($"No CardUI found for card ID: {card.cardId.Value}");
             }
         }
     }

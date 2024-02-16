@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 public class CardUI : MonoBehaviour
 {
+    public string CardName;
+    public int cardId;
+
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private TextMeshProUGUI suitText;
     [SerializeField] private TextMeshProUGUI hintText;
@@ -20,6 +23,10 @@ public class CardUI : MonoBehaviour
 
     public void UpdateCardUIWithCardData(CardData cardData)
     {
+        // Set the CardName when updating UI with card data
+        this.cardId = cardData.cardId;
+        CardName = cardData.cardName;
+        this.cardId = cardData.cardId;        
         string matchingSiblingName = cardData.cardName; // For highlighting
         UpdateUI(cardData.cardName, cardData.suit, cardData.hint, cardData.siblings, matchingSiblingName);
     }

@@ -21,16 +21,16 @@ public class Player : NetworkBehaviour
     public List<Card> CardsPlayerCanAsk { get; private set; }
     public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
 
-    [SerializeField] private GameObject playerHandPrefab;
-    private Transform playerHandTransform; // To store the instantiated playerHandPrefab's transform
+    //[SerializeField] private GameObject playerHandPrefab;
+    //private Transform playerHandTransform; // To store the instantiated playerHandPrefab's transform
 
     /*[SerializeField]
     private Transform playerHand;
     public Transform PlayerHand { get { return playerHand; } set { playerHand = value; } }
     */
     [SerializeField]
-    private Transform playerQuartets;
-    public Transform PlayerQuartets { get { return playerQuartets; } set { playerQuartets = value; } }
+    //private Transform playerQuartets;
+    //public Transform PlayerQuartets { get { return playerQuartets; } set { playerQuartets = value; } }
 
     private PlayerUI playerUI;
 
@@ -108,12 +108,12 @@ public class Player : NetworkBehaviour
 
     public void AddCardToHand(GameObject cardGameObject)
     {
-        if (cardGameObject != null && playerHandTransform != null)
+        if (cardGameObject != null) // && playerHandTransform != null
         {
             // Parent the card to the playerHandTransform
-            cardGameObject.transform.SetParent(playerHandTransform, false);
-            cardGameObject.transform.localPosition = Vector3.zero;
-            Debug.Log($"Card {cardGameObject.name} parented to player hand {PlayerName.Value}.");
+            //cardGameObject.transform.SetParent(playerHandTransform, false);
+            //cardGameObject.transform.localPosition = Vector3.zero;
+            //Debug.Log($"Card {cardGameObject.name} parented to player hand {PlayerName.Value}.");
 
             // Attempt to retrieve the Card component from the card GameObject
             var cardComponent = cardGameObject.GetComponent<Card>();
@@ -126,6 +126,12 @@ public class Player : NetworkBehaviour
             else
             {
                 Debug.LogError($"The GameObject {cardGameObject.name} does not have a Card component.");
+            }
+
+            // Update the UI to reflect the new hand
+            if (playerUI != null)
+            {
+                playerUI.UpdatePlayerHandUI(HandCards);
             }
         }
         else
@@ -177,17 +183,17 @@ public class Player : NetworkBehaviour
     }
 
     private void SpawnAndParentPlayerHand()
-    {
+    {/*
         if (IsServer)
         {
             GameObject handObject = Instantiate(playerHandPrefab);
             NetworkObject handNetworkObject = handObject.GetComponent<NetworkObject>();
             if (handNetworkObject != null)
             {
-                handNetworkObject.Spawn();
-                playerHandTransform = handObject.transform;
-                playerHandTransform.SetParent(this.transform, false);
-                playerHandTransform.localPosition = Vector3.zero;
+                //handNetworkObject.Spawn();
+                //playerHandTransform = handObject.transform;
+                //playerHandTransform.SetParent(this.transform, false);
+                //playerHandTransform.localPosition = Vector3.zero;
 
                 // Check if the playerHandPrefab has a Canvas, and if so, add the Horizontal Layout Group to it.
                 var canvas = handObject.GetComponentInChildren<Canvas>();
@@ -208,7 +214,7 @@ public class Player : NetworkBehaviour
             {
                 Debug.LogError("Spawned PlayerHand does not have a NetworkObject component.");
             }
-        }
+        }*/
     }
 
     // Ensure OnDestroy is correctly implemented to handle any cleanup
