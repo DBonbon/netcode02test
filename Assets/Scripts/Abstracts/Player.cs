@@ -22,17 +22,6 @@ public class Player : NetworkBehaviour
     public List<Card> CardsPlayerCanAsk { get; private set; }
     public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
 
-    //[SerializeField] private GameObject playerHandPrefab;
-    //private Transform playerHandTransform; // To store the instantiated playerHandPrefab's transform
-
-    /*[SerializeField]
-    private Transform playerHand;
-    public Transform PlayerHand { get { return playerHand; } set { playerHand = value; } }
-    */
-    [SerializeField]
-    //private Transform playerQuartets;
-    //public Transform PlayerQuartets { get { return playerQuartets; } set { playerQuartets = value; } }
-
     private PlayerUI playerUI;
 
     public override void OnNetworkSpawn()
