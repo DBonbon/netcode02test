@@ -116,13 +116,12 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
 
-            // After adding cards to the player's hand, update the player's UI
-            if (player.TryGetComponent(out PlayerUI playerUI))
-            {
-                playerUI.UpdatePlayerHandUI(player.HandCards);
-            }
+            // Now, correctly send card IDs to the client after all cards have been added to the hand
+            player.SendCardIDsToClient();
         }
     }
+
+
 
 
     private void UpdatePlayerToAsk()

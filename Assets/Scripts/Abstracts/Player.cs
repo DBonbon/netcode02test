@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Collections; // Required for FixedString32Bytes
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Linq;
 
 public class Player : NetworkBehaviour
 {   
@@ -108,35 +109,57 @@ public class Player : NetworkBehaviour
 
     public void AddCardToHand(GameObject cardGameObject)
     {
-        if (cardGameObject != null) // && playerHandTransform != null
+        if (cardGameObject != null)
         {
-            // Parent the card to the playerHandTransform
-            //cardGameObject.transform.SetParent(playerHandTransform, false);
-            //cardGameObject.transform.localPosition = Vector3.zero;
-            //Debug.Log($"Card {cardGameObject.name} parented to player hand {PlayerName.Value}.");
-
-            // Attempt to retrieve the Card component from the card GameObject
             var cardComponent = cardGameObject.GetComponent<Card>();
             if (cardComponent != null)
             {
-                // Add the Card component to the HandCards list
                 HandCards.Add(cardComponent);
                 Debug.Log($"Card {cardComponent.name} added to player {PlayerName.Value}'s HandCards list.");
+
+                // Prepare a list of card IDs to send to the UI
+                List<int> cardIDs = new List<int>();
+                foreach (var card in HandCards)
+                {
+                    cardIDs.Add(card.cardId.Value);
+                }
+
+                // Update the UI with the list of card IDs
+                if (playerUI != null)
+                {
+                    playerUI.UpdatePlayerHandUIWithIDs(cardIDs);
+                }
             }
             else
             {
                 Debug.LogError($"The GameObject {cardGameObject.name} does not have a Card component.");
             }
-
-            // Update the UI to reflect the new hand
-            if (playerUI != null)
-            {
-                playerUI.UpdatePlayerHandUI(HandCards);
-            }
         }
         else
         {
-            Debug.LogError("playerHandTransform is not assigned or cardGameObject is null.");
+            Debug.LogError("cardGameObject is null.");
+        }
+    }
+
+
+    // This method is called on the server to send the card IDs to the client
+    public void SendCardIDsToClient()
+    {
+        if (IsServer)
+        {
+            int[] cardIDs = HandCards.Select(card => card.cardId.Value).ToArray();
+            UpdatePlayerHandUI_ClientRpc(cardIDs, OwnerClientId);
+        }
+    }
+
+    // ClientRpc to update the player's hand UI with the given card IDs
+    [ClientRpc]
+    private void UpdatePlayerHandUI_ClientRpc(int[] cardIDs, ulong targetClient)
+    {
+        // Ensure that this RPC is executed only by the target client
+        if (IsOwner)
+        {
+            playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
         }
     }
 

@@ -32,7 +32,30 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-    public void UpdatePlayerHandUI(List<Card> handCards)
+    // New method to update UI based on card IDs
+    public void UpdatePlayerHandUIWithIDs(List<int> cardIDs)
+    {
+        foreach (Transform child in cardDisplayTransform)
+        {
+            child.gameObject.SetActive(false);
+        }
+
+        foreach (int cardID in cardIDs)
+        {
+            CardUI cardUI = CardManager.Instance.FetchCardUIById(cardID);
+            if (cardUI != null)
+            {
+                cardUI.gameObject.SetActive(true);
+                cardUI.transform.SetParent(cardDisplayTransform, false);
+            }
+            else
+            {
+                Debug.LogWarning($"No CardUI found for card ID: {cardID}");
+            }
+        }
+    }
+    
+    /*public void UpdatePlayerHandUI(List<Card> handCards)
     {
         // Deactivate all card UIs currently being displayed to reset the state.
         foreach (Transform child in cardDisplayTransform)
@@ -55,7 +78,7 @@ public class PlayerUI : MonoBehaviour
                 Debug.LogWarning($"No CardUI found for card ID: {card.cardId.Value}");
             }
         }
-    }
+    }*/
 
     public void UpdateScoreUI(int score)
     {
