@@ -65,7 +65,9 @@ public class PlayerManager : NetworkBehaviour
                 players.Add(player);
                 if (connectedPlayers == TotalPlayerPrefabs)
                 {
-                    DistributeCards();
+                    //DistributeCards();
+                    CardManager.Instance.DistributeCards(players);
+                    Debug.Log("CardManager.Instance.DistributeCards(players)");
                     UpdatePlayerToAsk();
                 }
             }
