@@ -19,8 +19,9 @@ public class Player : NetworkBehaviour
     public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
 
     public List<Card> HandCards { get; set; } = new List<Card>();
-    public List<Card> CardsPlayerCanAsk { get; private set; }
     public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
+    public List<Card> CardsPlayerCanAsk { get; private set; } = new List<Card>();
+    public List<Card> Quartets { get; private set; } = new List<Card>();
 
     private PlayerUI playerUI;
 
@@ -123,6 +124,9 @@ public class Player : NetworkBehaviour
             {
                 Debug.LogError($"The GameObject {cardGameObject.name} does not have a Card component.");
             }
+
+            UpdateCardsPlayerCanAsk();
+            CheckForQuartets();
         }
         else
         {
@@ -159,6 +163,60 @@ public class Player : NetworkBehaviour
         {
             playerUI.UpdateHasTurnUI(hasTurn);
         }
+    }
+
+    public void UpdateCardsPlayerCanAsk()
+    {
+        // Ensure CardsPlayerCanAsk is initialized
+        if (CardsPlayerCanAsk == null)
+        {
+            CardsPlayerCanAsk = new List<Card>();
+        }
+        else
+        {
+            CardsPlayerCanAsk.Clear();
+        }
+
+        // You should ensure CardManager.Instance provides access to all cards in the game correctly
+        // Assuming CardManager.Instance.spawnedCards is a List<Card> and not List<GameObject>
+        //var allCards = CardManager.Instance.spawnedCards; // Make sure this is a List<Card>
+        var allCardComponents = CardManager.Instance.spawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
+
+        // Filter out cards that have the same suit as at least one card in HandCards
+        // and are not already in HandCards
+        foreach (var card in allCardComponents)
+        {
+            if (HandCards.Any(handCard => handCard.Suit.Value == card.Suit.Value) && !HandCards.Contains(card))
+            {
+                CardsPlayerCanAsk.Add(card);
+            }
+        }
+        Debug.Log($"Player {PlayerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
+    }
+
+    public void CheckForQuartets()
+    {
+        // Group cards by their Suit value
+        var groupedBySuit = HandCards.GroupBy(card => card.Suit.Value.ToString());
+
+        foreach (var suitGroup in groupedBySuit)
+        {
+            if (suitGroup.Count() == 4) // Exactly 4 cards of the same suit
+            {
+                MoveCardsToQuartetsArea(suitGroup.ToList());
+            }
+        }
+    }
+
+    private void MoveCardsToQuartetsArea(List<Card> quartet)
+    {
+        foreach (var card in quartet)
+        {
+            HandCards.Remove(card);
+            Quartets.Add(card);
+        }
+
+        // Optionally, trigger some UI update or gameplay effect here
     }
 
     public void UpdatePlayerToAskList(List<Player> allPlayers)

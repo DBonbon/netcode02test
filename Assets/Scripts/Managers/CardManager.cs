@@ -96,7 +96,8 @@ public class CardManager : MonoBehaviour
                 if (cardComponent != null)
                 {
                     // Now that the card is spawned, initialize it
-                    cardComponent.InitializeCard(cardData.cardId, cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);
+                    cardComponent.InitializeCard(cardData.cardId, cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);                   
+                    //DeckManager.Instance.DeckInstance.GetComponent<Deck>().AddCardToDeck(spawnedCard); // Parent to deck
                     spawnedCards.Add(spawnedCard);
                     Debug.Log($"Card initialized and its Name is: {cardData.cardName}");
                 }
@@ -123,5 +124,5 @@ public class CardManager : MonoBehaviour
         DataManager.OnCardDataLoaded -= LoadCardDataLoaded;
     }
 
-    // Utility methods for CardUI pool management can be added here if needed
+       // Utility methods for CardUI pool management can be added here if needed
 }
