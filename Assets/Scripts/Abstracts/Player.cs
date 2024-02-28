@@ -114,9 +114,11 @@ public class Player : NetworkBehaviour
                     cardIDs.Add(card.cardId.Value);
                 }
 
+                
                 // Update the UI with the list of card IDs
                 if (playerUI != null)
                 {
+                    //SendCardIDsToClient();
                     playerUI.UpdatePlayerHandUIWithIDs(cardIDs);
                 }
             }

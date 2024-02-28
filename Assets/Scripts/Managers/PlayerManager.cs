@@ -10,6 +10,7 @@ public class PlayerManager : NetworkBehaviour
     private int connectedPlayers = 0;
     public List<Player> players = new List<Player>();
     private List<PlayerData> playerDataList;
+    [SerializeField] private Transform deckUIContainer;
 
     private void Awake()
     {
@@ -119,7 +120,7 @@ public class PlayerManager : NetworkBehaviour
             }
 
             // Now, correctly send card IDs to the client after all cards have been added to the hand
-            player.SendCardIDsToClient();
+            //player.SendCardIDsToClient();
         }
     }
 
