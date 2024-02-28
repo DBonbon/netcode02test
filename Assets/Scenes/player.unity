@@ -314,9 +314,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardPrefab: {fileID: 3172851869048252884, guid: 48d9e2c2e3c412b4182bb61ce582be57, type: 3}
   cardUIPrefab: {fileID: 8109355277419734685, guid: eaff271e9156c7c41bd155b5b0dcd641, type: 3}
-  cardUIPoolParent: {fileID: 296558449}
-  cardDataList: []
-  spawnedCards: []
+  DecklTransform: {fileID: 1674250969}
+  allCardsList: []
+  allSpawnedCards: []
 --- !u!114 &158141706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -357,7 +357,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deckPrefab: {fileID: 6045256632694920856, guid: 8699c37e7312bd24da388eae4fa70e4f, type: 3}
-  deckUIContainer: {fileID: 296558449}
 --- !u!1 &169057577
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,11 +7,11 @@ public class CardManager : MonoBehaviour
     public static CardManager Instance;
     public GameObject cardPrefab; // Network object prefab for cards
     public GameObject cardUIPrefab; // UI prefab for cards
-    public Transform cardUIPoolParent; // Parent object for Card UI instances
+    public Transform DecklTransform; // Parent object for Card UI instances
 
     private List<CardUI> cardUIPool = new List<CardUI>(); // Pool for Card UI
-    public List<CardData> cardDataList = new List<CardData>(); // Loaded card data
-    public List<GameObject> spawnedCards = new List<GameObject>(); // Inventory of spawned network card object
+    public List<CardData> allCardsList = new List<CardData>(); // Loaded card data
+    public List<GameObject> allSpawnedCards = new List<GameObject>(); // Inventory of spawned network card object
 
     private void Awake()
     {
@@ -34,7 +34,7 @@ public class CardManager : MonoBehaviour
 
     private void LoadCardDataLoaded(List<CardData> loadedCardDataList)
     {
-        cardDataList = loadedCardDataList;
+       allCardsList = loadedCardDataList;
         ShuffleCards();
         InitializeCardUIPool(); // Ensure CardUI pool is initialized after loading data
     }
@@ -47,9 +47,9 @@ public class CardManager : MonoBehaviour
         }
         cardUIPool.Clear();
 
-        foreach (var cardData in cardDataList)
+        foreach (var cardData in allCardsList)
         {
-            var cardUIObject = Instantiate(cardUIPrefab, cardUIPoolParent);
+            var cardUIObject = Instantiate(cardUIPrefab, DecklTransform);
             var cardUIComponent = cardUIObject.GetComponent<CardUI>();
             if (cardUIComponent)
             {
@@ -84,7 +84,7 @@ public class CardManager : MonoBehaviour
 
     private void SpawnCards()
     {
-        foreach (var cardData in cardDataList)
+        foreach (var cardData in allCardsList)
         {
             var spawnedCard = Instantiate(cardPrefab, DeckManager.Instance.DeckInstance.transform);
             var networkObject = spawnedCard.GetComponent<NetworkObject>();
@@ -98,7 +98,7 @@ public class CardManager : MonoBehaviour
                     // Now that the card is spawned, initialize it
                     cardComponent.InitializeCard(cardData.cardId, cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);                   
                     //DeckManager.Instance.DeckInstance.GetComponent<Deck>().AddCardToDeck(spawnedCard); // Parent to deck
-                    spawnedCards.Add(spawnedCard);
+                    allSpawnedCards.Add(spawnedCard);
                     Debug.Log($"Card initialized and its Name is: {cardData.cardName}");
                 }
             }
@@ -108,14 +108,14 @@ public class CardManager : MonoBehaviour
     private void ShuffleCards()
     {
         System.Random rng = new System.Random();
-        int n = cardDataList.Count;
+        int n =allCardsList.Count;
         while (n > 1)
         {
             n--;
             int k = rng.Next(n + 1);
-            var value = cardDataList[k];
-            cardDataList[k] = cardDataList[n];
-            cardDataList[n] = value;
+            var value =allCardsList[k];
+           allCardsList[k] =allCardsList[n];
+           allCardsList[n] = value;
         }
     }
 

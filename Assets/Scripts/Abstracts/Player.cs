@@ -178,9 +178,9 @@ public class Player : NetworkBehaviour
         }
 
         // You should ensure CardManager.Instance provides access to all cards in the game correctly
-        // Assuming CardManager.Instance.spawnedCards is a List<Card> and not List<GameObject>
-        //var allCards = CardManager.Instance.spawnedCards; // Make sure this is a List<Card>
-        var allCardComponents = CardManager.Instance.spawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
+        // Assuming CardManager.Instance.allSpawnedCards is a List<Card> and not List<GameObject>
+        //var allCards = CardManager.Instance.allSpawnedCards; // Make sure this is a List<Card>
+        var allCardComponents = CardManager.Instance.allSpawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
 
         // Filter out cards that have the same suit as at least one card in HandCards
         // and are not already in HandCards
