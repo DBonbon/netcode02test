@@ -25,80 +25,80 @@
             "cardId": 24
         },
         {
-            "suit": "bard",
+            "suit": "card",
             "cardName": "Ani",
             "hint": "hint",
             "cardId": 25
         },
         {
-            "suit": "bard",
+            "suit": "card",
             "cardName": "Bico",
             "hint": "hint7",
             "cardId": 26
         },
         {
-            "suit": "bard",
+            "suit": "card",
             "cardName": "Caux",
             "hint": "hint7",
             "cardId": 27
         },
         {
-            "suit": "bard",
+            "suit": "card",
             "cardName": "Doz",
             "hint": "hint",
             "cardId": 29
         },
         {
-            "suit": "bard",
+            "suit": "gard",
             "cardName": "Ata",
             "hint": "hint7",
             "cardId": 221
         },
         {
-            "suit": "bard",
+            "suit": "gard",
             "cardName": "Beta",
             "hint": "hint",
             "cardId": 222
         },
         {
-            "suit": "bard",
+            "suit": "gard",
             "cardName": "Comment",
             "hint": "hint",
             "cardId": 223
         },
         {
-            "suit": "bard",
+            "suit": "gard",
             "cardName": "Daledi",
             "hint": "hint",
             "cardId": 224
         },
         {
-            "suit": "hard",
+            "suit": "gard",
             "cardName": "Aalki",
             "hint": "hint6",
             "cardId": 225
         },
         {
-            "suit": "hard",
+            "suit": "gard",
             "cardName": "Bita",
             "hint": "hint",
             "cardId": 226
         },
         {
-            "suit": "hard",
+            "suit": "gard",
             "cardName": "Cuta",
             "hint": "hint5",
             "cardId": 227
         },
         {
-            "suit": "hard",
+            "suit": "gard",
             "cardName": "Dita",
             "hint": "hint",
             "cardId": 228
         },
 
         {
-            "suit": "kard",
+            "suit": "gard",
             "cardName": "Aora",
             "hint": "hint4",
             "cardId": 229

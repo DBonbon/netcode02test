@@ -105,6 +105,8 @@
                 // Potentially update UI here as necessary
                 Debug.Log($"Card {card.name} added to player {PlayerName.Value}'s HandCards list.");
                 UpdatePlayerHandUI();
+                UpdateCardsPlayerCanAsk();
+                CheckForQuartets();
             }
         }
 
@@ -152,6 +154,18 @@
         else
         {
             Debug.LogError("cardGameObject is null.");
+        }
+    }
+
+    public void RemoveCardFromHand(Card card)
+    {
+        if (card != null && IsServer)
+        {
+            HandCards.Remove(card);
+            Debug.Log($"Removed card {card.CardName} from player's hand.");
+            // Update UI if necessary
+            UpdatePlayerHandUI();
+            UpdateCardsPlayerCanAsk();
         }
     }
 
@@ -228,7 +242,43 @@
         }
     }
 
-    private void MoveCardsToQuartetsArea(List<Card> quartet)
+    /*private void MoveCardsToQuartetsArea(List<Card> quartet)
+    {
+        foreach (var card in quartet)
+        {
+            HandCards.Remove(card);
+            QuartetsAdd(quartet);
+        }
+
+        // Optionally, trigger some UI update or gameplay effect here
+    }*/
+
+    public void MoveCardsToQuartetsArea(List<Card> quartet)
+    {
+        Debug.Log("Moving cards to quartets area.");
+
+        Quartet quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartet>();
+        if (quartetZone == null)
+        {
+            Debug.LogError("Quartet zone not found.");
+            return;
+        }
+
+        foreach (var card in quartet)
+        {
+            RemoveCardFromHand(card);
+            quartetZone.AddCardToQuartet(card);
+            Debug.Log($"Moved card {card.CardName} to Quartet.");
+        }
+        IncrementScoreTest();
+
+        // You may want to update the player's UI here to reflect the removal of these cards from their hand
+        
+    }
+
+    
+
+    /*private void MoveCardsToQuartetsArea(List<Card> quartet)
     {
         foreach (var card in quartet)
         {
@@ -237,7 +287,7 @@
         }
 
         // Optionally, trigger some UI update or gameplay effect here
-    }
+    }*/
 
     public void UpdatePlayerToAskList(List<Player> allPlayers)
     {
@@ -274,38 +324,8 @@
 
     private void SpawnAndParentPlayerHand()
     {/*
-        if (IsServer)
-        {
-            GameObject handObject = Instantiate(playerHandPrefab);
-            NetworkObject handNetworkObject = handObject.GetComponent<NetworkObject>();
-            if (handNetworkObject != null)
-            {
-                //handNetworkObject.Spawn();
-                //playerHandTransform = handObject.transform;
-                //playerHandTransform.SetParent(this.transform, false);
-                //playerHandTransform.localPosition = Vector3.zero;
-
-                // Check if the playerHandPrefab has a Canvas, and if so, add the Horizontal Layout Group to it.
-                var canvas = handObject.GetComponentInChildren<Canvas>();
-                if (canvas != null)
-                {
-                    var layoutGroup = canvas.gameObject.AddComponent<HorizontalLayoutGroup>();
-                    layoutGroup.spacing = 10; // Adjust spacing as needed
-                    layoutGroup.childAlignment = TextAnchor.MiddleCenter;
-                    layoutGroup.childForceExpandWidth = false;
-                    layoutGroup.childForceExpandHeight = false;
-                }
-                else
-                {
-                    Debug.LogWarning("Player hand prefab does not contain a Canvas component for the layout group.");
-                }
-            }
-            else
-            {
-                Debug.LogError("Spawned PlayerHand does not have a NetworkObject component.");
-            }
-        }*/
-    }
+        
+    */}
 
     // Ensure OnDestroy is correctly implemented to handle any cleanup
     public override void OnDestroy()

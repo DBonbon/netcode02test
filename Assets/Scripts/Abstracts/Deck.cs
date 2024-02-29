@@ -53,9 +53,6 @@ public class Deck : NetworkBehaviour
         }
     }
 
-    
-
-
     public Card RemoveCardFromDeck()
     {
         if (DeckCards.Count > 0)

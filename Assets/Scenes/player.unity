@@ -257,6 +257,7 @@ GameObject:
   - component: {fileID: 158141706}
   - component: {fileID: 158141705}
   - component: {fileID: 158141707}
+  - component: {fileID: 158141710}
   - component: {fileID: 158141709}
   m_Layer: 0
   m_Name: Managers
@@ -330,6 +331,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   players: []
+  deckUIContainer: {fileID: 0}
 --- !u!114 &158141707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -357,6 +359,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deckPrefab: {fileID: 6045256632694920856, guid: 8699c37e7312bd24da388eae4fa70e4f, type: 3}
+--- !u!114 &158141710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158141701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08043e8c829f22b4dbe4714fe4a678ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  quartetPrefab: {fileID: 6045256632694920856, guid: 13587d5ea5cc4184fb773bfc26176a5b, type: 3}
 --- !u!1 &169057577
 GameObject:
   m_ObjectHideFlags: 0
