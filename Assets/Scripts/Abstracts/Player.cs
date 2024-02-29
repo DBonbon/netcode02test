@@ -1,125 +1,144 @@
-using Unity.Netcode;
-using UnityEngine;
-using TMPro;
-using Unity.Collections; // Required for FixedString32Bytes
-using System.Collections.Generic;
-using UnityEngine.UI;
-using System.Linq;
+    using Unity.Netcode;
+    using UnityEngine;
+    using TMPro;
+    using Unity.Collections; // Required for FixedString32Bytes
+    using System.Collections.Generic;
+    using UnityEngine.UI;
+    using System.Linq;
 
-public class Player : NetworkBehaviour
-{   
-    //[SerializeField] private TextMeshProUGUI playerNameText;
-    //private float xOffset = 2f;
-    public NetworkVariable<FixedString32Bytes> PlayerName = new NetworkVariable<FixedString32Bytes>();
-    public NetworkVariable<int> PlayerDbId = new NetworkVariable<int>();
-    public NetworkVariable<FixedString128Bytes> PlayerImagePath = new NetworkVariable<FixedString128Bytes>();
-    public NetworkVariable<int> Score = new NetworkVariable<int>(0);
-    public NetworkVariable<int> Result = new NetworkVariable<int>(0);
-    public NetworkVariable<bool> IsWinner = new NetworkVariable<bool>(false);
-    public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
+    public class Player : NetworkBehaviour
+    {   
+        //[SerializeField] private TextMeshProUGUI playerNameText;
+        //private float xOffset = 2f;
+        public NetworkVariable<FixedString32Bytes> PlayerName = new NetworkVariable<FixedString32Bytes>();
+        public NetworkVariable<int> PlayerDbId = new NetworkVariable<int>();
+        public NetworkVariable<FixedString128Bytes> PlayerImagePath = new NetworkVariable<FixedString128Bytes>();
+        public NetworkVariable<int> Score = new NetworkVariable<int>(0);
+        public NetworkVariable<int> Result = new NetworkVariable<int>(0);
+        public NetworkVariable<bool> IsWinner = new NetworkVariable<bool>(false);
+        public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
 
-    public List<Card> HandCards { get; set; } = new List<Card>();
-    public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
-    public List<Card> CardsPlayerCanAsk { get; private set; } = new List<Card>();
-    public List<Card> Quartets { get; private set; } = new List<Card>();
+        public List<Card> HandCards { get; set; } = new List<Card>();
+        public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
+        public List<Card> CardsPlayerCanAsk { get; private set; } = new List<Card>();
+        public List<Card> Quartets { get; private set; } = new List<Card>();
 
-    private PlayerUI playerUI;
+        private PlayerUI playerUI;
 
-    public override void OnNetworkSpawn()
-    {
-        playerUI = GetComponent<PlayerUI>();
-
-        if (IsServer)
+        public override void OnNetworkSpawn()
         {
-            Score.Value = 0; // Initialize or re-assign to ensure it's set on all clients.
-        }
+            playerUI = GetComponent<PlayerUI>();
 
-        // Subscribe to Score value changes to update UI accordingly.
-        Score.OnValueChanged += OnScoreChanged;
-        OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state.
-    }
-
-    private void OnScoreChanged(int oldValue, int newValue)
-    {
-        // This method is called whenever Score changes
-        UpdateScoreUI(newValue);
-    }
-
-    private void UpdateScoreUI(int score)
-    {
-        if (playerUI != null)
-        {
-            playerUI.UpdateScoreUI(score);
-        }
-    }
-
-    public void InitializePlayer(string name, int dbId, string imagePath)
-    {
-        if (IsServer)
-        {
-            PlayerName.Value = name;
-            PlayerDbId.Value = dbId;
-            PlayerImagePath.Value = imagePath;
-
-            // Update server UI directly here
-            UpdateServerUI(name, imagePath);
-            // setup and we want to immediately propagate these values to all clients.
-            BroadcastPlayerDbAttributes();
-            // Spawn and parent the player hand
-            SpawnAndParentPlayerHand();
-        }
-        
-    }
-
-    private void UpdateServerUI(string playerName, string playerImagePath)
-    {
-        if (playerUI != null)
-        {
-            playerUI.InitializePlayerUI(playerName, playerImagePath);
-            playerUI.UpdateHasTurnUI(HasTurn.Value);
-        }
-    }
-
-    public void BroadcastPlayerDbAttributes()
-    {
-        if (IsServer)
-        {
-            UpdatePlayerDbAttributes_ClientRpc(PlayerName.Value.ToString(), PlayerImagePath.Value.ToString());
-        }
-    }
-
-    [ClientRpc]
-    private void UpdatePlayerDbAttributes_ClientRpc(string playerName, string playerImagePath)
-    {
-        if (playerUI != null)
-        {
-            playerUI.InitializePlayerUI(playerName, playerImagePath);
-        }
-    }
-
-    public void AddCardToHand(GameObject cardGameObject)
-    {
-        if (cardGameObject != null)
-        {
-            var cardComponent = cardGameObject.GetComponent<Card>();
-            if (cardComponent != null)
+            if (IsServer)
             {
-                HandCards.Add(cardComponent);
-                Debug.Log($"Card {cardComponent.name} added to player {PlayerName.Value}'s HandCards list.");
+                Score.Value = 0; // Initialize or re-assign to ensure it's set on all clients.
+            }
 
-                // Prepare a list of card IDs to send to the UI
-                List<int> cardIDs = new List<int>();
-                foreach (var card in HandCards)
+            // Subscribe to Score value changes to update UI accordingly.
+            Score.OnValueChanged += OnScoreChanged;
+            OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state.
+        }
+
+        private void OnScoreChanged(int oldValue, int newValue)
+        {
+            // This method is called whenever Score changes
+            UpdateScoreUI(newValue);
+        }
+
+        private void UpdateScoreUI(int score)
+        {
+            if (playerUI != null)
+            {
+                playerUI.UpdateScoreUI(score);
+            }
+        }
+
+        public void InitializePlayer(string name, int dbId, string imagePath)
+        {
+            if (IsServer)
+            {
+                PlayerName.Value = name;
+                PlayerDbId.Value = dbId;
+                PlayerImagePath.Value = imagePath;
+
+                // Update server UI directly here
+                UpdateServerUI(name, imagePath);
+                // setup and we want to immediately propagate these values to all clients.
+                BroadcastPlayerDbAttributes();
+                // Spawn and parent the player hand
+                SpawnAndParentPlayerHand();
+            }
+            
+        }
+
+        private void UpdateServerUI(string playerName, string playerImagePath)
+        {
+            if (playerUI != null)
+            {
+                playerUI.InitializePlayerUI(playerName, playerImagePath);
+                playerUI.UpdateHasTurnUI(HasTurn.Value);
+            }
+        }
+
+        public void BroadcastPlayerDbAttributes()
+        {
+            if (IsServer)
+            {
+                UpdatePlayerDbAttributes_ClientRpc(PlayerName.Value.ToString(), PlayerImagePath.Value.ToString());
+            }
+        }
+
+        [ClientRpc]
+        private void UpdatePlayerDbAttributes_ClientRpc(string playerName, string playerImagePath)
+        {
+            if (playerUI != null)
+            {
+                playerUI.InitializePlayerUI(playerName, playerImagePath);
+            }
+        }
+
+        // In Player.cs
+        public void AddCardToHand(Card card) 
+        {
+            if (IsServer) {
+                HandCards.Add(card);
+                // Potentially update UI here as necessary
+                Debug.Log($"Card {card.name} added to player {PlayerName.Value}'s HandCards list.");
+                UpdatePlayerHandUI();
+            }
+        }
+
+        public void UpdatePlayerHandUI()
+        {
+            // Assuming you have a method to update UI based on the current hand
+            List<int> cardIDs = HandCards.Select(c => c.cardId.Value).ToList();
+            playerUI?.UpdatePlayerHandUIWithIDs(cardIDs);
+            Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {PlayerName.Value}'s HandCards list.");
+        }
+
+        public void AddCardToHand0(GameObject cardGameObject)
+        {
+            if (cardGameObject != null)
+            {
+                var cardComponent = cardGameObject.GetComponent<Card>();
+                if (cardComponent != null)
                 {
+                    HandCards.Add(cardComponent);
+                    Debug.Log($"Card {cardComponent.name} added to player {PlayerName.Value}'s HandCards list.");
+
+                    // Prepare a list of card IDs to send to the UI
+                    List<int> cardIDs = new List<int>();
+                    foreach (var card in HandCards)
+                    {
                     cardIDs.Add(card.cardId.Value);
                 }
-
                 
                 // Update the UI with the list of card IDs
                 if (playerUI != null)
                 {
                     //SendCardIDsToClient();
                     playerUI.UpdatePlayerHandUIWithIDs(cardIDs);
+                    Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {PlayerName.Value}'s HandCards list.");
                 }
             }
             else
@@ -135,7 +154,6 @@ public class Player : NetworkBehaviour
             Debug.LogError("cardGameObject is null.");
         }
     }
-
 
     // This method is called on the server to send the card IDs to the client
     public void SendCardIDsToClient()

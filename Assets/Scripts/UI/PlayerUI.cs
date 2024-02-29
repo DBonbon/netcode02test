@@ -39,9 +39,10 @@ public class PlayerUI : MonoBehaviour
         {
             child.gameObject.SetActive(false);
         }
-
+        Debug.Log("playerui UpdatePlayerHandUIWithIDs is called");
         foreach (int cardID in cardIDs)
         {
+            Debug.Log("playerui UpdatePlayerHandUIWithIDs is called in the loop");
             CardUI cardUI = CardManager.Instance.FetchCardUIById(cardID);
             if (cardUI != null)
             {

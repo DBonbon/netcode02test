@@ -86,19 +86,37 @@ public class CardManager : MonoBehaviour
     {
         foreach (var cardData in allCardsList)
         {
-            var spawnedCard = Instantiate(cardPrefab, DeckManager.Instance.DeckInstance.transform);
+            var spawnedCard = Instantiate(cardPrefab, transform); // Instantiate without parent to avoid hierarchy issues
             var networkObject = spawnedCard.GetComponent<NetworkObject>();
             if (networkObject != null)
             {
-                networkObject.Spawn(); // Spawn the card on the network
+                networkObject.Spawn();
                 
                 var cardComponent = spawnedCard.GetComponent<Card>();
                 if (cardComponent != null)
                 {
-                    // Now that the card is spawned, initialize it
-                    cardComponent.InitializeCard(cardData.cardId, cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);                   
-                    //DeckManager.Instance.DeckInstance.GetComponent<Deck>().AddCardToDeck(spawnedCard); // Parent to deck
+                    // Initialize the card
+                    cardComponent.InitializeCard(cardData.cardId, cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);
                     allSpawnedCards.Add(spawnedCard);
+
+                    // Assuming DeckInstance holds the deck GameObject, access Deck component to call AddCardToDeck
+                    if (DeckManager.Instance.DeckInstance != null)
+                    {
+                        var deckComponent = DeckManager.Instance.DeckInstance.GetComponent<Deck>();
+                        if (deckComponent != null)
+                        {
+                            deckComponent.AddCardToDeck(spawnedCard); // Pass the GameObject directly
+                        }
+                        else
+                        {
+                            Debug.LogError("Deck component not found on DeckInstance.");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("DeckInstance is null.");
+                    }
+                    
                     Debug.Log($"Card initialized and its Name is: {cardData.cardName}");
                 }
             }
@@ -124,7 +142,7 @@ public class CardManager : MonoBehaviour
         DataManager.OnCardDataLoaded -= LoadCardDataLoaded;
     }
 
-    public void DistributeCards(List<Player> players)
+    /*public void DistributeCards0(List<Player> players)
     {
         int cardsPerPlayer = 5; // Assuming 5 cards per player for this example
 
@@ -162,7 +180,39 @@ public class CardManager : MonoBehaviour
             // Now, correctly send card IDs to the client after all cards have been added to the hand
             player.SendCardIDsToClient();
         }
+    }*/
+
+    // CardManager.cs
+    // In CardManager.cs
+    public void DistributeCards(List<Player> players) 
+    {
+        
+        Debug.Log("distributecards started");
+        int cardsPerPlayer = 5; // Assuming 5 cards per player
+
+        Deck deck = DeckManager.Instance.DeckInstance.GetComponent<Deck>();
+        if (deck == null) {
+            Debug.LogError("Deck is not found.");
+            return;
+        }
+
+        foreach (var player in players) {
+            for (int i = 0; i < cardsPerPlayer; i++) {
+                Card card = deck.RemoveCardFromDeck(); // This now returns a Card object
+                if (card != null) {
+                    player.AddCardToHand(card); // Adjusted to accept Card objects
+                    Debug.Log("playerAddCardToHand Card");
+                } else {
+                    Debug.LogWarning("Deck is out of cards.");
+                    break; // Stop if there are no more cards
+                }
+            }
+            player.SendCardIDsToClient();
+        }
     }
+
+
+
 
        // Utility methods for CardUI pool management can be added here if needed
 }

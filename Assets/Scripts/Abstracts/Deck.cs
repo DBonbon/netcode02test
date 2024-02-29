@@ -7,7 +7,7 @@ public class Deck : NetworkBehaviour
 {
     [SerializeField] public Transform cardsContainer; // Assign in the inspector
 
-    public List<GameObject> DeckCards = new List<GameObject>();
+    public List<Card> DeckCards { get; set; } = new List<Card>();
 
     private DeckUI deckUI;
 
@@ -17,29 +17,76 @@ public class Deck : NetworkBehaviour
         deckUI = GetComponent<DeckUI>(); // Get the DeckUI component
     }
 
-    public void AddCardToDeck(GameObject card)
+    public void AddCardToDeck(GameObject cardGameObject)
     {
-        if (IsServer)
+        if (cardGameObject != null)
         {
-            DeckCards.Add(card);
-            card.transform.SetParent(cardsContainer, false);
+            var cardComponent = cardGameObject.GetComponent<Card>();
+            if (IsServer && cardComponent != null)
+            {
+                DeckCards.Add(cardComponent);
+                Debug.Log($"Card {cardComponent.name} added to player to deckCards list.");
 
-            // Optionally, send update to clients about the new card
-            UpdateDeckUIOnAllClients();
+                // Prepare a list of card IDs to send to the UI
+                List<int> cardIDs = new List<int>();
+                foreach (var card in DeckCards)
+                {
+                    cardIDs.Add(card.cardId.Value);
+                }
+
+                
+                // Update the UI with the list of card IDs
+                if (deckUI != null)
+                {
+                    //SendCardIDsToClient();
+                    deckUI.UpdateDeckUIWithIDs(cardIDs);
+                }
+            }
+            else
+            {
+                Debug.LogError($"The GameObject deck does not have a Card component.");
+            }
+        }
+        else
+        {
+            Debug.LogError("cardGameObject is null.");
         }
     }
 
-    public void RemoveCardFromDeck(GameObject card)
-    {
-        if (IsServer && DeckCards.Contains(card))
-        {
-            DeckCards.Remove(card);
+    
 
-            // Optionally, send update to clients about the removed card
-            UpdateDeckUIOnAllClients();
+
+    public Card RemoveCardFromDeck()
+    {
+        if (DeckCards.Count > 0)
+        {
+            Card cardToGive = DeckCards[0]; // Take the first card
+            DeckCards.RemoveAt(0); // Remove it from the deck
+
+            // Immediately update the list of card IDs
+            List<int> cardIDs = DeckCards.Select(card => card.cardId.Value).ToList();
+            
+            // Update the UI with the list of card IDs
+            deckUI.UpdateDeckUIWithIDs(cardIDs);
+
+            // Ensure UI is updated on all clients
+            UpdateDeckUIOnClients_ClientRpc(cardIDs.ToArray());
+
+            return cardToGive; // Return the removed card
         }
+        return null; // Return null if no cards are left
     }
 
+    [ClientRpc]
+    private void UpdateDeckUIOnClients_ClientRpc(int[] cardIDs)
+    {
+        if (deckUI != null)
+        {
+            deckUI.UpdateDeckUIWithIDs(new List<int>(cardIDs)); // Ensure UI update call on client
+        }
+    }
+    
+    /*
     private void UpdateDeckUIOnAllClients()
     {
         int[] cardIDs = DeckCards.Select(card => card.GetComponent<Card>().cardId.Value).ToArray();
@@ -55,5 +102,5 @@ public class Deck : NetworkBehaviour
         {
             deckUI.UpdateDeckUIWithIDs(new List<int>(cardIDs)); // Convert back to List for the method call
         }
-    }
+    }*/
 }

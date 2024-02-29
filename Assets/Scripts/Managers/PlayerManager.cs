@@ -84,7 +84,7 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    private void DistributeCards()
+    /*private void DistributeCards()
     {
         int cardsPerPlayer = 5; // Assuming 5 cards per player for this example
 
@@ -122,7 +122,7 @@ public class PlayerManager : NetworkBehaviour
             // Now, correctly send card IDs to the client after all cards have been added to the hand
             //player.SendCardIDsToClient();
         }
-    }
+    }*/
 
 
 

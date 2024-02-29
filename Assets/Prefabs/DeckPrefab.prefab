@@ -113,6 +113,7 @@ GameObject:
   - component: {fileID: 7744049109403582010}
   - component: {fileID: 187612399618790641}
   - component: {fileID: 7706110274289186557}
+  - component: {fileID: 6909066816408899654}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -177,6 +178,32 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6909066816408899654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5655884866394518195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 50
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &6045256632694920856
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,6 +214,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1763425183171140343}
   - component: {fileID: 1584605004265873386}
+  - component: {fileID: -5081857038631837437}
+  - component: {fileID: 1771838515158552920}
   m_Layer: 0
   m_Name: DeckPrefab
   m_TagString: Untagged
@@ -230,3 +259,29 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &-5081857038631837437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6045256632694920856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8675161cf21eaff458c1cbaa56028f59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardsContainer: {fileID: 0}
+--- !u!114 &1771838515158552920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6045256632694920856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b282e17e88248c4f9a6ea96478f0c79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deckDisplayTransform: {fileID: 7744049109403582010}
