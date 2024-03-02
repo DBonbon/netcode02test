@@ -22,7 +22,7 @@ public class Quartet : NetworkBehaviour
         if (card != null && IsServer)
         {
             QuartetCards.Add(card);
-            Debug.Log($"Card {card.CardName} added to QuartetCards list.");
+            Debug.Log($"Card {card.cardName} added to QuartetCards list.");
 
             // Immediately update the list of card IDs and UI
             UpdateQuartetUI();

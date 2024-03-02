@@ -5,12 +5,13 @@
     using System.Collections.Generic;
     using UnityEngine.UI;
     using System.Linq;
+    using System;
 
     public class Player : NetworkBehaviour
     {   
         //[SerializeField] private TextMeshProUGUI playerNameText;
         //private float xOffset = 2f;
-        public NetworkVariable<FixedString32Bytes> PlayerName = new NetworkVariable<FixedString32Bytes>();
+        public NetworkVariable<FixedString128Bytes> PlayerName = new NetworkVariable<FixedString128Bytes>();
         public NetworkVariable<int> PlayerDbId = new NetworkVariable<int>();
         public NetworkVariable<FixedString128Bytes> PlayerImagePath = new NetworkVariable<FixedString128Bytes>();
         public NetworkVariable<int> Score = new NetworkVariable<int>(0);
@@ -22,6 +23,11 @@
         public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
         public List<Card> CardsPlayerCanAsk { get; private set; } = new List<Card>();
         public List<Card> Quartets { get; private set; } = new List<Card>();
+
+        //we use Action event since these aren't Network variables like score for which the event onValueChange is already incuded in the 
+        //from the networkvariable wrapper, NetworkVariable<T>.OnValueChanged
+        public event Action OnPlayerToAskListUpdated;
+        public event Action OnCardsPlayerCanAskListUpdated;
 
         private PlayerUI playerUI;
 
@@ -36,21 +42,10 @@
 
             // Subscribe to Score value changes to update UI accordingly.
             Score.OnValueChanged += OnScoreChanged;
+            HasTurn.OnValueChanged += OnHasTurnChanged;
+
             OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state.
-        }
-
-        private void OnScoreChanged(int oldValue, int newValue)
-        {
-            // This method is called whenever Score changes
-            UpdateScoreUI(newValue);
-        }
-
-        private void UpdateScoreUI(int score)
-        {
-            if (playerUI != null)
-            {
-                playerUI.UpdateScoreUI(score);
-            }
+            OnHasTurnChanged(false, HasTurn.Value); // Manually trigger to ensure UI is correctly set up on spawn.
         }
 
         public void InitializePlayer(string name, int dbId, string imagePath)
@@ -103,19 +98,11 @@
             if (IsServer) {
                 HandCards.Add(card);
                 // Potentially update UI here as necessary
-                Debug.Log($"Card {card.name} added to player {PlayerName.Value}'s HandCards list.");
+                //Debug.Log($"Card {card.name} added to player {PlayerName.Value}'s HandCards list.");
                 UpdatePlayerHandUI();
                 UpdateCardsPlayerCanAsk();
                 CheckForQuartets();
             }
-        }
-
-        public void UpdatePlayerHandUI()
-        {
-            // Assuming you have a method to update UI based on the current hand
-            List<int> cardIDs = HandCards.Select(c => c.cardId.Value).ToList();
-            playerUI?.UpdatePlayerHandUIWithIDs(cardIDs);
-            Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {PlayerName.Value}'s HandCards list.");
         }
 
         public void AddCardToHand0(GameObject cardGameObject)
@@ -161,12 +148,60 @@
     {
         if (card != null && IsServer)
         {
-            HandCards.Remove(card);
-            Debug.Log($"Removed card {card.CardName} from player's hand.");
+            //HandCards.Remove(card);
+            Debug.Log($"Removed card {card.cardName} from player's hand.");
             // Update UI if necessary
             UpdatePlayerHandUI();
             UpdateCardsPlayerCanAsk();
         }
+    }
+
+    //Update section
+    public void UpdateTurnStatus(bool hasTurn)
+    {
+        HasTurn.Value = hasTurn;
+        if (playerUI != null)
+        {
+            playerUI.UpdateHasTurnUI(hasTurn);
+        }
+    }
+
+    private void OnScoreChanged(int oldValue, int newValue)
+    {
+        // This method is called whenever Score changes
+        UpdateScoreUI(newValue);
+    }
+
+    private void UpdateScoreUI(int score)
+    {
+        if (playerUI != null)
+        {
+            playerUI.UpdateScoreUI(score);
+        }
+    }
+
+    // Add this method to handle HasTurn changes
+    private void OnHasTurnChanged(bool oldValue, bool newValue)
+    {
+        if (playerUI != null)
+        {
+            playerUI.UpdateHasTurnUI(newValue);
+        }
+    }
+
+    //to remove when isn't needed anymore:
+    public void IncrementScore()
+    {
+        Score.Value += 1; // Increment score by 1 for test
+        //Debug.Log($"Test: Incremented Score to {Score.Value}");
+    }
+
+    public void UpdatePlayerHandUI()
+    {
+        // Assuming you have a method to update UI based on the current hand
+        List<int> cardIDs = HandCards.Select(c => c.cardId.Value).ToList();
+        playerUI?.UpdatePlayerHandUIWithIDs(cardIDs);
+        Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {PlayerName.Value}'s HandCards list.");
     }
 
     // This method is called on the server to send the card IDs to the client
@@ -190,15 +225,6 @@
         }
     }
 
-    public void UpdateTurnStatus(bool hasTurn)
-    {
-        HasTurn.Value = hasTurn;
-        if (playerUI != null)
-        {
-            playerUI.UpdateHasTurnUI(hasTurn);
-        }
-    }
-
     public void UpdateCardsPlayerCanAsk()
     {
         // Ensure CardsPlayerCanAsk is initialized
@@ -211,8 +237,6 @@
             CardsPlayerCanAsk.Clear();
         }
 
-        // You should ensure CardManager.Instance provides access to all cards in the game correctly
-        // Assuming CardManager.Instance.allSpawnedCards is a List<Card> and not List<GameObject>
         //var allCards = CardManager.Instance.allSpawnedCards; // Make sure this is a List<Card>
         var allCardComponents = CardManager.Instance.allSpawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
 
@@ -225,9 +249,30 @@
                 CardsPlayerCanAsk.Add(card);
             }
         }
+        //playerUI.InitializeTurnUI(player);
+        playerUI?.InitializeTurnUI(this);
+        OnCardsPlayerCanAskListUpdated?.Invoke();
         Debug.Log($"Player {PlayerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
     }
 
+    public void UpdatePlayerToAskList(List<Player> allPlayers)
+    {
+        PlayerToAsk.Clear();
+
+        foreach (var potentialPlayer in allPlayers)
+        {
+            if (potentialPlayer != this)
+            {
+                PlayerToAsk.Add(potentialPlayer);
+            }
+        }
+
+        OnPlayerToAskListUpdated?.Invoke(); // Raise the event
+        // Optional: Log the count for verification
+        Debug.Log($"Player {PlayerName.Value} has {PlayerToAsk.Count} players to ask.");
+    }
+
+    //utility method section:
     public void CheckForQuartets()
     {
         // Group cards by their Suit value
@@ -242,20 +287,9 @@
         }
     }
 
-    /*private void MoveCardsToQuartetsArea(List<Card> quartet)
-    {
-        foreach (var card in quartet)
-        {
-            HandCards.Remove(card);
-            QuartetsAdd(quartet);
-        }
-
-        // Optionally, trigger some UI update or gameplay effect here
-    }*/
-
     public void MoveCardsToQuartetsArea(List<Card> quartet)
     {
-        Debug.Log("Moving cards to quartets area.");
+        //Debug.Log("Moving cards to quartets area.");
 
         Quartet quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartet>();
         if (quartetZone == null)
@@ -268,41 +302,18 @@
         {
             RemoveCardFromHand(card);
             quartetZone.AddCardToQuartet(card);
-            Debug.Log($"Moved card {card.CardName} to Quartet.");
+            Debug.Log($"Moved card {card.cardName} to Quartet.");
         }
-        IncrementScoreTest();
+        IncrementScore();
 
         // You may want to update the player's UI here to reflect the removal of these cards from their hand
         
     }
 
-    
-
-    /*private void MoveCardsToQuartetsArea(List<Card> quartet)
+    // Check if the player's hand is empty
+    public bool IsHandEmpty()
     {
-        foreach (var card in quartet)
-        {
-            HandCards.Remove(card);
-            Quartets.Add(card);
-        }
-
-        // Optionally, trigger some UI update or gameplay effect here
-    }*/
-
-    public void UpdatePlayerToAskList(List<Player> allPlayers)
-    {
-        PlayerToAsk.Clear(); // Clear the list to ensure it's up-to-date
-
-        foreach (var potentialPlayer in allPlayers)
-        {
-            if (potentialPlayer != this) // Exclude the current player
-            {
-                PlayerToAsk.Add(potentialPlayer);
-            }
-        }
-
-        // Optional: Log the count for verification
-        Debug.Log($"Player {PlayerName.Value} has {PlayerToAsk.Count} players to ask.");
+        return HandCards.Count == 0;
     }
 
     // Test method to increment score
@@ -319,7 +330,7 @@
     public void IncrementScoreTest()
     {
         Score.Value += 1; // Increment score by 1 for test
-        Debug.Log($"Test: Incremented Score to {Score.Value}");
+        //Debug.Log($"Test: Incremented Score to {Score.Value}");
     }
 
     private void SpawnAndParentPlayerHand()

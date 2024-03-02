@@ -7,6 +7,9 @@ public class DeckManager : MonoBehaviour
     public GameObject deckPrefab;
     public GameObject DeckInstance { get; private set; } // Store the spawned deck instance
 
+    // Property to access the Deck component of the DeckInstance
+    public Deck CurrentDeck { get; private set; }
+
     private void Awake()
     {
         if (Instance == null)
@@ -38,8 +41,9 @@ public class DeckManager : MonoBehaviour
         if (NetworkManager.Singleton.IsServer && deckPrefab != null)
         {
             DeckInstance = Instantiate(deckPrefab);
+            CurrentDeck = DeckInstance.GetComponent<Deck>();
             DeckInstance.GetComponent<NetworkObject>().Spawn();
-            Debug.Log("Deck prefab spawned on server start.");
+            //Debug.Log("Deck prefab spawned on server start.");
         }
     }
 }

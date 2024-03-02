@@ -117,7 +117,7 @@ public class CardManager : MonoBehaviour
                         Debug.LogError("DeckInstance is null.");
                     }
                     
-                    Debug.Log($"Card initialized and its Name is: {cardData.cardName}");
+                    //Debug.Log($"Card initialized and its Name is: {cardData.cardName}");
                 }
             }
         }
@@ -142,52 +142,9 @@ public class CardManager : MonoBehaviour
         DataManager.OnCardDataLoaded -= LoadCardDataLoaded;
     }
 
-    /*public void DistributeCards0(List<Player> players)
-    {
-        int cardsPerPlayer = 5; // Assuming 5 cards per player for this example
-
-        // Check if there are enough cards for all players
-        Debug.Log($"the number of spawnedCards is: {allSpawnedCards.Count}");
-        Debug.Log($"the number of cards needed to be distributed: {cardsPerPlayer * players.Count}");
-        if (allSpawnedCards.Count < cardsPerPlayer * players.Count)
-        {
-            Debug.LogError("Not enough cards for all players.");
-            return;
-        }
-
-        foreach (var player in players)
-        {
-            for (int i = 0; i < cardsPerPlayer; i++)
-            {
-                // Ensure there's a card to distribute
-                if (allSpawnedCards.Count > 0)
-                {
-                    GameObject cardGameObject = allSpawnedCards[0]; // Get the first card
-                    Card cardComponent = cardGameObject.GetComponent<Card>(); // Get the Card component
-
-                    if (cardComponent != null)
-                    {
-                        player.AddCardToHand(cardGameObject); // Add the card to the player's hand
-                        allSpawnedCards.RemoveAt(0); // Remove the card from the spawned list
-                    }
-                    else
-                    {
-                        Debug.LogError("Spawned card does not have a Card component.");
-                    }
-                }
-            }
-
-            // Now, correctly send card IDs to the client after all cards have been added to the hand
-            player.SendCardIDsToClient();
-        }
-    }*/
-
-    // CardManager.cs
-    // In CardManager.cs
     public void DistributeCards(List<Player> players) 
-    {
-        
-        Debug.Log("distributecards started");
+    {       
+        //Debug.Log("distributecards started");
         int cardsPerPlayer = 17; // Assuming 5 cards per player
 
         Deck deck = DeckManager.Instance.DeckInstance.GetComponent<Deck>();
@@ -201,7 +158,7 @@ public class CardManager : MonoBehaviour
                 Card card = deck.RemoveCardFromDeck(); // This now returns a Card object
                 if (card != null) {
                     player.AddCardToHand(card); // Adjusted to accept Card objects
-                    Debug.Log("playerAddCardToHand Card");
+                    //Debug.Log("playerAddCardToHand Card");
                 } else {
                     Debug.LogWarning("Deck is out of cards.");
                     break; // Stop if there are no more cards
@@ -211,7 +168,39 @@ public class CardManager : MonoBehaviour
         }
     }
 
+    public void DrawCardFromDeck(Player currentPlayer)
+    {
+        if (currentPlayer != null)
+        {
+            /*if (deckCards.Count > 0)
+            {
+                Card card = deckCards[0]; // Get the top card from the deck
+                deckCards.RemoveAt(0); // Remove the card from the deckCards list
 
+                currentPlayer.AddCardToHand(card); // Add the card to the player's hand
+
+                // Update the card's parent transform to the player's hand
+                card.gameObject.transform.SetParent(currentPlayer.PlayerHand);
+
+                 
+
+                // You can apply an offset if needed
+                Vector3 positionOffset = new Vector3(0, 0, currentPlayer.HandCards.Count * 0.02f);
+                card.gameObject.transform.localPosition += positionOffset;
+
+                // You might want to update the visual representation of the deck.
+                UpdateDeck();
+            }
+            else
+            {
+                Debug.LogWarning("No cards left in the deck.");
+            }*/
+        }
+        else
+        {
+            Debug.LogWarning("Invalid player.");
+        }
+    }
 
 
        // Utility methods for CardUI pool management can be added here if needed

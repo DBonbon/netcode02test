@@ -38,7 +38,7 @@ public class PlayerManager : NetworkBehaviour
     public void LoadPlayerDataLoaded(List<PlayerData> loadedPlayerDataList)
     {
         this.playerDataList = loadedPlayerDataList; 
-        Debug.Log("Player data loaded into PlayerManager.");
+        //Debug.Log("Player data loaded into PlayerManager.");
     }
 
     private void Start()
@@ -68,7 +68,9 @@ public class PlayerManager : NetworkBehaviour
                 {
                     //DistributeCards();
                     CardManager.Instance.DistributeCards(players);
-                    Debug.Log("CardManager.Instance.DistributeCards(players)");
+                    //Debug.Log("CardManager.Instance.DistributeCards(players)");
+                    AssignTurnToPlayer();
+                    TurnManager.Instance.StartTurnManager();
                     UpdatePlayerToAsk();
                 }
             }
@@ -84,49 +86,6 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    /*private void DistributeCards()
-    {
-        int cardsPerPlayer = 5; // Assuming 5 cards per player for this example
-
-        // Check if there are enough cards for all players
-        Debug.Log($"the number of spawnedCards is: {CardManager.Instance.allSpawnedCards.Count}");
-        Debug.Log($"the number of cards needed to be distributed: {cardsPerPlayer * players.Count}");
-        if (CardManager.Instance.allSpawnedCards.Count < cardsPerPlayer * players.Count)
-        {
-            Debug.LogError("Not enough cards for all players.");
-            return;
-        }
-
-        foreach (var player in players)
-        {
-            for (int i = 0; i < cardsPerPlayer; i++)
-            {
-                // Ensure there's a card to distribute
-                if (CardManager.Instance.allSpawnedCards.Count > 0)
-                {
-                    GameObject cardGameObject = CardManager.Instance.allSpawnedCards[0]; // Get the first card
-                    Card cardComponent = cardGameObject.GetComponent<Card>(); // Get the Card component
-
-                    if (cardComponent != null)
-                    {
-                        player.AddCardToHand(cardGameObject); // Add the card to the player's hand
-                        CardManager.Instance.allSpawnedCards.RemoveAt(0); // Remove the card from the spawned list
-                    }
-                    else
-                    {
-                        Debug.LogError("Spawned card does not have a Card component.");
-                    }
-                }
-            }
-
-            // Now, correctly send card IDs to the client after all cards have been added to the hand
-            //player.SendCardIDsToClient();
-        }
-    }*/
-
-
-
-
     private void UpdatePlayerToAsk()
     {
         // Iterate through each player in the 'players' list
@@ -135,6 +94,23 @@ public class PlayerManager : NetworkBehaviour
             // Call a method on the player instance to update its PlayerToAsk list
             player.UpdatePlayerToAskList(players);
         }
+    }
+
+    private void AssignTurnToPlayer()
+    {
+        if (!IsServer || players.Count == 0) return;
+
+        // Reset all players' HasTurn to false first
+        foreach (var player in players)
+        {
+            player.HasTurn.Value = false;
+        }
+
+        // Randomly select a player to assign the turn
+        int randomIndex = Random.Range(0, players.Count);
+        players[randomIndex].HasTurn.Value = true;
+
+        Debug.Log($"Turn assigned to player: {players[randomIndex].PlayerName.Value}");
     }
 
     // Method to clean up players, if necessary

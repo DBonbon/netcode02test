@@ -38,10 +38,10 @@ public struct SiblingName : INetworkSerializable, IEquatable<SiblingName>
 public class Card : NetworkBehaviour, IComparable<Card>
 {
     public NetworkVariable<int> cardId = new NetworkVariable<int>();
-    public NetworkVariable<FixedString32Bytes> CardName = new NetworkVariable<FixedString32Bytes>();
-    public NetworkVariable<FixedString32Bytes> Suit = new NetworkVariable<FixedString32Bytes>();
-    public NetworkVariable<FixedString32Bytes> Hint = new NetworkVariable<FixedString32Bytes>();
-    public NetworkVariable<FixedString64Bytes> Level = new NetworkVariable<FixedString64Bytes>();
+    public NetworkVariable<FixedString128Bytes> cardName = new NetworkVariable<FixedString128Bytes>();
+    public NetworkVariable<FixedString128Bytes> Suit = new NetworkVariable<FixedString128Bytes>();
+    public NetworkVariable<FixedString128Bytes> Hint = new NetworkVariable<FixedString128Bytes>();
+    public NetworkVariable<FixedString128Bytes> Level = new NetworkVariable<FixedString128Bytes>();
     public NetworkVariable<FixedString128Bytes> CardImagePath = new NetworkVariable<FixedString128Bytes>();
 
     public NetworkList<SiblingName> SiblingNames = new NetworkList<SiblingName>();
@@ -54,7 +54,7 @@ public class Card : NetworkBehaviour, IComparable<Card>
         {
             Debug.Log($"checking is server on: {IsServer}");
             cardId.Value = id;
-            CardName.Value = name;
+            cardName.Value = name;
             Suit.Value = suit;
             Hint.Value = hint;
             SiblingNames.Clear();
@@ -63,7 +63,7 @@ public class Card : NetworkBehaviour, IComparable<Card>
                 SiblingNames.Add(new SiblingName(sibling));
             }
             Debug.Log($"the cardId is: {cardId.Value}");
-            Debug.Log($"the cardname is: {CardName.Value}");
+            Debug.Log($"the cardname is: {cardName.Value}");
         }
     }
 
