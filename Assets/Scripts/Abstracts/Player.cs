@@ -60,10 +60,7 @@
                 UpdateServerUI(name, imagePath);
                 // setup and we want to immediately propagate these values to all clients.
                 BroadcastPlayerDbAttributes();
-                // Spawn and parent the player hand
-                SpawnAndParentPlayerHand();
             }
-            
         }
 
         private void UpdateServerUI(string playerName, string playerImagePath)
@@ -157,6 +154,14 @@
     }
 
     //Update section
+    private void OnHasTurnChanged(bool oldValue, bool newValue)
+    {
+        if (playerUI != null)
+        {
+            playerUI.UpdateHasTurnUI(newValue);
+        }
+    }
+
     public void UpdateTurnStatus(bool hasTurn)
     {
         HasTurn.Value = hasTurn;
@@ -177,15 +182,6 @@
         if (playerUI != null)
         {
             playerUI.UpdateScoreUI(score);
-        }
-    }
-
-    // Add this method to handle HasTurn changes
-    private void OnHasTurnChanged(bool oldValue, bool newValue)
-    {
-        if (playerUI != null)
-        {
-            playerUI.UpdateHasTurnUI(newValue);
         }
     }
 
@@ -250,7 +246,7 @@
             }
         }
         //playerUI.InitializeTurnUI(player);
-        playerUI?.InitializeTurnUI(this);
+        //playerUI?.InitializeTurnUI(this);
         OnCardsPlayerCanAskListUpdated?.Invoke();
         Debug.Log($"Player {PlayerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
     }
@@ -332,11 +328,6 @@
         Score.Value += 1; // Increment score by 1 for test
         //Debug.Log($"Test: Incremented Score to {Score.Value}");
     }
-
-    private void SpawnAndParentPlayerHand()
-    {/*
-        
-    */}
 
     // Ensure OnDestroy is correctly implemented to handle any cleanup
     public override void OnDestroy()

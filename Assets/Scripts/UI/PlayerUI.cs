@@ -5,20 +5,27 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
 
-
 public class PlayerUI : MonoBehaviour
 {
+    // Personal UI Elements
+    #region Personal
     [SerializeField] private TextMeshProUGUI playerNameText;
     [SerializeField] private Image playerImage;
-    [SerializeField] private TextMeshProUGUI scoreText; // Add UI element for score
-    [SerializeField] private GameObject hasTurnIndicator; // Add UI element for turn indicator
+    [SerializeField] private TextMeshProUGUI scoreText;
+    #endregion
 
-    public TMP_Dropdown cardsDropdown; // Dropdown for cards player can ask
-    public TMP_Dropdown playersDropdown; // Dropdown for active players
-    //public Button guessButton; // Button for guess request
-    [SerializeField] public Button guessButton; // Reference to the guess button
+    // Turn UI Elements
+    #region Turn
+    [SerializeField] private TMP_Dropdown cardsDropdown; 
+    [SerializeField] private TMP_Dropdown playersDropdown;
+    [SerializeField] private GameObject hasTurnIndicator;
+    [SerializeField] private Button guessButton;
+    #endregion
 
-    [SerializeField] private Transform cardDisplayTransform; // Container for card UI elements
+    // Hand UI Elements
+    #region Hand
+    [SerializeField] private Transform cardDisplayTransform;
+    #endregion
 
     //lists to retreive cards value in the guessbuttonclickhandler
     private List<Card> CardsPlayerCanAsk;
@@ -29,40 +36,7 @@ public class PlayerUI : MonoBehaviour
 
     private const string DefaultImagePath = "Images/character_01";
 
-    public Player currentPlayer
-    {
-        get { return _currentPlayer; }
-        set
-        {
-            if (_currentPlayer != null)
-            {
-                _currentPlayer.OnPlayerToAskListUpdated -= UpdatePlayersDropdownHandler;
-                _currentPlayer.OnCardsPlayerCanAskListUpdated -= UpdateCardsDropdownHandler;
-                Debug.Log("Unsubscribed from player events");
-            }
-
-            _currentPlayer = value;
-
-            if (_currentPlayer != null)
-            {
-                _currentPlayer.OnPlayerToAskListUpdated += UpdatePlayersDropdownHandler;
-                _currentPlayer.OnCardsPlayerCanAskListUpdated += UpdateCardsDropdownHandler;
-                Debug.Log("Subscribed to new player events");
-            }
-        }
-    }
-
-    private Player _currentPlayer; // Backing field for currentPlayer
-
-    private void OnDestroy()
-    {
-        // Clean up event subscriptions when the UI is destroyed
-        if (_currentPlayer != null)
-        {
-            _currentPlayer.OnPlayerToAskListUpdated -= UpdatePlayersDropdownHandler;
-            _currentPlayer.OnCardsPlayerCanAskListUpdated -= UpdateCardsDropdownHandler;
-        }
-    }
+    public Player currentPlayer;
 
     public void InitializePlayerUI(string playerName, string imagePath)
     {
@@ -95,7 +69,6 @@ public class PlayerUI : MonoBehaviour
         UpdateCardsDropdown(currentPlayer.CardsPlayerCanAsk);
 
         // Deactivate the turn UI objects for players without turn
-        // Deactivate the turn UI objects for players without turn
         if (!player.HasTurn.Value) // Changed from !player.hasTurn to !player.HasTurn.Value
         {
             cardsDropdown.gameObject.SetActive(false);
@@ -109,18 +82,6 @@ public class PlayerUI : MonoBehaviour
             guessButton.gameObject.SetActive(true);
         }
 
-    }
-
-    private void UpdatePlayersDropdownHandler()
-    {
-        Debug.Log("Handling Player to Ask List Updated event.");
-        UpdatePlayersDropdown(_currentPlayer.PlayerToAsk);
-    }
-
-    private void UpdateCardsDropdownHandler()
-    {
-        Debug.Log("Handling Cards to Ask List Updated event.");
-        UpdateCardsDropdown(_currentPlayer.CardsPlayerCanAsk);
     }
 
     // New method to update UI based on card IDs
@@ -168,7 +129,6 @@ public class PlayerUI : MonoBehaviour
         playersDropdown.gameObject.SetActive(hasTurn);
         guessButton.gameObject.SetActive(hasTurn);
     }
-
 
     public void UpdatePlayersDropdown(List<Player> updatedPlayersToAsk)
     {
