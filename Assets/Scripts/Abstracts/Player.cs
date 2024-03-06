@@ -77,6 +77,7 @@
             if (IsServer)
             {
                 UpdatePlayerDbAttributes_ClientRpc(PlayerName.Value.ToString(), PlayerImagePath.Value.ToString());
+                Debug.Log("UpdatePlayerDbAttributes_ClientRpc is called");
             }
         }
 
@@ -86,6 +87,7 @@
             if (playerUI != null)
             {
                 playerUI.InitializePlayerUI(playerName, playerImagePath);
+                Debug.Log("UpdatePlayerDbAttributes_ClientRpc is running");
             }
         }
 
@@ -97,243 +99,239 @@
                 // Potentially update UI here as necessary
                 //Debug.Log($"Card {card.name} added to player {PlayerName.Value}'s HandCards list.");
                 UpdatePlayerHandUI();
-                UpdateCardsPlayerCanAsk();
+                UpdateCardsPlayerCanAsk(); 
                 CheckForQuartets();
             }
         }
 
-        public void AddCardToHand0(GameObject cardGameObject)
+        public void RemoveCardFromHand(Card card)
         {
-            if (cardGameObject != null)
+            if (card != null && IsServer)
             {
-                var cardComponent = cardGameObject.GetComponent<Card>();
-                if (cardComponent != null)
-                {
-                    HandCards.Add(cardComponent);
-                    Debug.Log($"Card {cardComponent.name} added to player {PlayerName.Value}'s HandCards list.");
+                //HandCards.Remove(card);
+                Debug.Log($"Removed card {card.cardName} from player's hand.");
+                // Update UI if necessary
+                UpdatePlayerHandUI();
+                UpdateCardsPlayerCanAsk();
+            }
+        }
 
-                    // Prepare a list of card IDs to send to the UI
-                    List<int> cardIDs = new List<int>();
-                    foreach (var card in HandCards)
-                    {
-                    cardIDs.Add(card.cardId.Value);
-                }
-                
-                // Update the UI with the list of card IDs
-                if (playerUI != null)
+        private void OnHasTurnChanged(bool oldValue, bool newValue)
+        {
+            if (IsLocalPlayer) // Ensuring this runs only for the local player's instance
+            {
+                if (newValue)
                 {
-                    //SendCardIDsToClient();
-                    playerUI.UpdatePlayerHandUIWithIDs(cardIDs);
-                    Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {PlayerName.Value}'s HandCards list.");
+                    PrepareTurnUIUpdate();
                 }
+                else if (playerUI != null)
+                {
+                    playerUI.UpdateHasTurnUI(false);
+                }
+            }
+        }
+
+        public void PrepareTurnUIUpdate()
+        {
+            Debug.Log($"PrepareTurnUIUpdate is called");
+            Debug.Log($"Isserver check: {IsServer}");
+            Debug.Log($"IsLocalPlayer check: {IsLocalPlayer}");
+            if (IsLocalPlayer)
+            {
+                // Log the count and contents of PlayerToAsk
+                Debug.Log($"PlayerToAsk Count: {PlayerToAsk.Count}");
+                foreach (var player in PlayerToAsk)
+                {
+                    Debug.Log($"PlayerToAsk Item: {player.PlayerName.Value} with OwnerClientId: {player.OwnerClientId}");
+                }
+
+                int[] cardIDs = HandCards.Select(card => card.cardId.Value).ToArray();
+                ulong[] playerIDs = PlayerToAsk.Select(player => player.OwnerClientId).ToArray();
+                Debug.Log($"Card IDs Count: {cardIDs.Length}, Player IDs Count: {playerIDs.Length}");
+
+                UpdateTurnUIObjectsClientRpc(true, cardIDs, playerIDs, OwnerClientId);
+            }
+        }
+
+        [ClientRpc]
+        private void UpdateTurnUIObjectsClientRpc(bool hasTurn, int[] cardIDs, ulong[] playerIDs, ulong targetClientId)
+        {
+            Debug.Log($"UpdateTurnUIObjectsClientRpc is called: {hasTurn} ;{cardIDs} ; {playerIDs}; {targetClientId}");
+            if (NetworkManager.Singleton.LocalClientId == targetClientId)
+            {
+                playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
+                Debug.Log($"Player cs Updating cards dropdown. IDs count: {cardIDs.Length}");
+                Debug.Log($"Player cs Updating players dropdown. IDs count: {playerIDs.Length}");
+                playerUI?.UpdatePlayersDropdownWithIDs(playerIDs);
+                playerUI?.UpdateHasTurnUI(hasTurn);
+            }
+        }
+
+        private void OnScoreChanged(int oldValue, int newValue)
+        {
+            // This method is called whenever Score changes
+            UpdateScoreUI(newValue);
+        }
+
+        private void UpdateScoreUI(int score)
+        {
+            if (playerUI != null)
+            {
+                playerUI.UpdateScoreUI(score);
+            }
+        }
+
+        //to remove when isn't needed anymore:
+        public void IncrementScore()
+        {
+            Score.Value += 1; // Increment score by 1 for test
+            //Debug.Log($"Test: Incremented Score to {Score.Value}");
+        }
+
+        public void UpdatePlayerHandUI()
+        {
+            // Assuming you have a method to update UI based on the current hand
+            List<int> cardIDs = HandCards.Select(c => c.cardId.Value).ToList();
+            playerUI?.UpdatePlayerHandUIWithIDs(cardIDs);
+            Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {PlayerName.Value}'s HandCards list.");
+        }
+
+        // This method is called on the server to send the card IDs to the client
+        public void SendCardIDsToClient()
+        {
+            if (IsServer)
+            {
+                int[] cardIDs = HandCards.Select(card => card.cardId.Value).ToArray();
+                UpdatePlayerHandUI_ClientRpc(cardIDs, OwnerClientId);
+                Debug.Log("UpdatePlayerHandUI_ClientRpc is called");
+                
+            }
+        }
+
+        // ClientRpc to update the player's hand UI with the given card IDs
+        [ClientRpc]
+        private void UpdatePlayerHandUI_ClientRpc(int[] cardIDs, ulong targetClient)
+        {
+            // Ensure that this RPC is executed only by the target client
+            if (IsOwner)
+            {
+                //playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
+                Debug.Log("UpdatePlayerHandUI_ClientRpc is running");
+            }
+        }
+
+        public void UpdateCardsPlayerCanAsk()
+        {
+            // Ensure CardsPlayerCanAsk is initialized
+            if (CardsPlayerCanAsk == null)
+            {
+                CardsPlayerCanAsk = new List<Card>();
             }
             else
             {
-                Debug.LogError($"The GameObject {cardGameObject.name} does not have a Card component.");
+                CardsPlayerCanAsk.Clear();
             }
 
-            UpdateCardsPlayerCanAsk();
-            CheckForQuartets();
-        }
-        else
-        {
-            Debug.LogError("cardGameObject is null.");
-        }
-    }
+            //var allCards = CardManager.Instance.allSpawnedCards; // Make sure this is a List<Card>
+            var allCardComponents = CardManager.Instance.allSpawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
 
-    public void RemoveCardFromHand(Card card)
-    {
-        if (card != null && IsServer)
-        {
-            //HandCards.Remove(card);
-            Debug.Log($"Removed card {card.cardName} from player's hand.");
-            // Update UI if necessary
-            UpdatePlayerHandUI();
-            UpdateCardsPlayerCanAsk();
-        }
-    }
-
-    //Update section
-    private void OnHasTurnChanged(bool oldValue, bool newValue)
-    {
-        if (playerUI != null)
-        {
-            playerUI.UpdateHasTurnUI(newValue);
-        }
-    }
-
-    public void UpdateTurnStatus(bool hasTurn)
-    {
-        HasTurn.Value = hasTurn;
-        if (playerUI != null)
-        {
-            playerUI.UpdateHasTurnUI(hasTurn);
-        }
-    }
-
-    private void OnScoreChanged(int oldValue, int newValue)
-    {
-        // This method is called whenever Score changes
-        UpdateScoreUI(newValue);
-    }
-
-    private void UpdateScoreUI(int score)
-    {
-        if (playerUI != null)
-        {
-            playerUI.UpdateScoreUI(score);
-        }
-    }
-
-    //to remove when isn't needed anymore:
-    public void IncrementScore()
-    {
-        Score.Value += 1; // Increment score by 1 for test
-        //Debug.Log($"Test: Incremented Score to {Score.Value}");
-    }
-
-    public void UpdatePlayerHandUI()
-    {
-        // Assuming you have a method to update UI based on the current hand
-        List<int> cardIDs = HandCards.Select(c => c.cardId.Value).ToList();
-        playerUI?.UpdatePlayerHandUIWithIDs(cardIDs);
-        Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {PlayerName.Value}'s HandCards list.");
-    }
-
-    // This method is called on the server to send the card IDs to the client
-    public void SendCardIDsToClient()
-    {
-        if (IsServer)
-        {
-            int[] cardIDs = HandCards.Select(card => card.cardId.Value).ToArray();
-            UpdatePlayerHandUI_ClientRpc(cardIDs, OwnerClientId);
-        }
-    }
-
-    // ClientRpc to update the player's hand UI with the given card IDs
-    [ClientRpc]
-    private void UpdatePlayerHandUI_ClientRpc(int[] cardIDs, ulong targetClient)
-    {
-        // Ensure that this RPC is executed only by the target client
-        if (IsOwner)
-        {
-            playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
-        }
-    }
-
-    public void UpdateCardsPlayerCanAsk()
-    {
-        // Ensure CardsPlayerCanAsk is initialized
-        if (CardsPlayerCanAsk == null)
-        {
-            CardsPlayerCanAsk = new List<Card>();
-        }
-        else
-        {
-            CardsPlayerCanAsk.Clear();
-        }
-
-        //var allCards = CardManager.Instance.allSpawnedCards; // Make sure this is a List<Card>
-        var allCardComponents = CardManager.Instance.allSpawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
-
-        // Filter out cards that have the same suit as at least one card in HandCards
-        // and are not already in HandCards
-        foreach (var card in allCardComponents)
-        {
-            if (HandCards.Any(handCard => handCard.Suit.Value == card.Suit.Value) && !HandCards.Contains(card))
+            // Filter out cards that have the same suit as at least one card in HandCards
+            // and are not already in HandCards
+            foreach (var card in allCardComponents)
             {
-                CardsPlayerCanAsk.Add(card);
+                if (HandCards.Any(handCard => handCard.Suit.Value == card.Suit.Value) && !HandCards.Contains(card))
+                {
+                    CardsPlayerCanAsk.Add(card);
+                }
             }
+            //playerUI.InitializeTurnUI(player);
+            //playerUI?.InitializeTurnUI(this);
+            OnCardsPlayerCanAskListUpdated?.Invoke();
+            Debug.Log($"Player {PlayerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
         }
-        //playerUI.InitializeTurnUI(player);
-        //playerUI?.InitializeTurnUI(this);
-        OnCardsPlayerCanAskListUpdated?.Invoke();
-        Debug.Log($"Player {PlayerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
-    }
 
-    public void UpdatePlayerToAskList(List<Player> allPlayers)
-    {
-        PlayerToAsk.Clear();
-
-        foreach (var potentialPlayer in allPlayers)
+        public void UpdatePlayerToAskList(List<Player> allPlayers)
         {
-            if (potentialPlayer != this)
+            PlayerToAsk.Clear();
+
+            foreach (var potentialPlayer in allPlayers)
             {
-                PlayerToAsk.Add(potentialPlayer);
+                if (potentialPlayer != this)
+                {
+                    PlayerToAsk.Add(potentialPlayer);
+                }
             }
+
+            OnPlayerToAskListUpdated?.Invoke(); // Raise the event
+            // Optional: Log the count for verification
+            Debug.Log($"Player {PlayerName.Value} has {PlayerToAsk.Count} players to ask.");
         }
 
-        OnPlayerToAskListUpdated?.Invoke(); // Raise the event
-        // Optional: Log the count for verification
-        Debug.Log($"Player {PlayerName.Value} has {PlayerToAsk.Count} players to ask.");
-    }
-
-    //utility method section:
-    public void CheckForQuartets()
-    {
-        // Group cards by their Suit value
-        var groupedBySuit = HandCards.GroupBy(card => card.Suit.Value.ToString());
-
-        foreach (var suitGroup in groupedBySuit)
+        //utility method section:
+        public void CheckForQuartets()
         {
-            if (suitGroup.Count() == 4) // Exactly 4 cards of the same suit
+            // Group cards by their Suit value
+            var groupedBySuit = HandCards.GroupBy(card => card.Suit.Value.ToString());
+
+            foreach (var suitGroup in groupedBySuit)
             {
-                MoveCardsToQuartetsArea(suitGroup.ToList());
+                if (suitGroup.Count() == 4) // Exactly 4 cards of the same suit
+                {
+                    MoveCardsToQuartetsArea(suitGroup.ToList());
+                }
             }
         }
-    }
 
-    public void MoveCardsToQuartetsArea(List<Card> quartet)
-    {
-        //Debug.Log("Moving cards to quartets area.");
-
-        Quartet quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartet>();
-        if (quartetZone == null)
+        public void MoveCardsToQuartetsArea(List<Card> quartet)
         {
-            Debug.LogError("Quartet zone not found.");
-            return;
+            //Debug.Log("Moving cards to quartets area.");
+
+            Quartet quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartet>();
+            if (quartetZone == null)
+            {
+                Debug.LogError("Quartet zone not found.");
+                return;
+            }
+
+            foreach (var card in quartet)
+            {
+                RemoveCardFromHand(card);
+                quartetZone.AddCardToQuartet(card);
+                Debug.Log($"Moved card {card.cardName} to Quartet.");
+            }
+            IncrementScore();
+
+            // You may want to update the player's UI here to reflect the removal of these cards from their hand
+            
         }
 
-        foreach (var card in quartet)
+        // Check if the player's hand is empty
+        public bool IsHandEmpty()
         {
-            RemoveCardFromHand(card);
-            quartetZone.AddCardToQuartet(card);
-            Debug.Log($"Moved card {card.cardName} to Quartet.");
+            return HandCards.Count == 0;
         }
-        IncrementScore();
 
-        // You may want to update the player's UI here to reflect the removal of these cards from their hand
-        
-    }
-
-    // Check if the player's hand is empty
-    public bool IsHandEmpty()
-    {
-        return HandCards.Count == 0;
-    }
-
-    // Test method to increment score
-    void Update()
-    {
-        // Simple test: Increment score on mouse click
-        if (IsServer && Input.GetMouseButtonDown(0)) // Check for left mouse click
+        // Test method to increment score
+        void Update()
         {
-            IncrementScoreTest();
+            // Simple test: Increment score on mouse click
+            if (IsServer && Input.GetMouseButtonDown(0)) // Check for left mouse click
+            {
+                IncrementScoreTest();
+            }
         }
-    }
 
-    //to remove when isn't needed anymore:
-    public void IncrementScoreTest()
-    {
-        Score.Value += 1; // Increment score by 1 for test
-        //Debug.Log($"Test: Incremented Score to {Score.Value}");
-    }
+        //to remove when isn't needed anymore:
+        public void IncrementScoreTest()
+        {
+            Score.Value += 1; // Increment score by 1 for test
+            //Debug.Log($"Test: Incremented Score to {Score.Value}");
+        }
 
-    // Ensure OnDestroy is correctly implemented to handle any cleanup
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-        // Your cleanup logic here
-    }
-
+        // Ensure OnDestroy is correctly implemented to handle any cleanup
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            // Your cleanup logic here
+        }
 }

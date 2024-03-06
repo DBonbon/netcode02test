@@ -124,4 +124,10 @@ public class PlayerManager : NetworkBehaviour
         //return null;
     }
 
+    public string GetPlayerNameByClientId(ulong clientId)
+    {
+        var player = players.Find(p => p.GetComponent<NetworkObject>().NetworkObjectId == clientId);
+        return player != null ? player.PlayerName.Value.ToString() : "Unknown Player";
+    }
+
 }

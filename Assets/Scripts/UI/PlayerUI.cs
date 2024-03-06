@@ -43,6 +43,7 @@ public class PlayerUI : MonoBehaviour
         if (playerNameText != null)
         {
             playerNameText.text = playerName;
+            Debug.Log("UpdatePlayerDbAttributes_ClientRpc was called");
         }
 
         if (!string.IsNullOrEmpty(imagePath))
@@ -63,10 +64,10 @@ public class PlayerUI : MonoBehaviour
         CardsPlayerCanAsk = player.CardsPlayerCanAsk;
         PlayerToAsk = player.PlayerToAsk;
         
-        UpdatePlayersDropdown(currentPlayer.PlayerToAsk); // Pass the list of player names
+        //UpdatePlayersDropdown(currentPlayer.PlayerToAsk); // Pass the list of player names
 
         // Update the cardsDropdown with cards that the player can ask
-        UpdateCardsDropdown(currentPlayer.CardsPlayerCanAsk);
+        //UpdateCardsDropdown(currentPlayer.CardsPlayerCanAsk);
 
         // Deactivate the turn UI objects for players without turn
         if (!player.HasTurn.Value) // Changed from !player.hasTurn to !player.HasTurn.Value
@@ -130,7 +131,39 @@ public class PlayerUI : MonoBehaviour
         guessButton.gameObject.SetActive(hasTurn);
     }
 
-    public void UpdatePlayersDropdown(List<Player> updatedPlayersToAsk)
+    public void UpdatePlayersDropdownWithIDs(ulong[] playerIDs)
+    {
+        Debug.Log($"Updating players dropdown. IDs count: {playerIDs.Length}");
+        playersDropdown.ClearOptions();
+        List<string> playerNames = new List<string>();
+
+        foreach (ulong id in playerIDs)
+        {
+            string playerName = PlayerManager.Instance.GetPlayerNameByClientId(id); // Ensure this method is correctly implemented
+            Debug.Log($"Player ID: {id}, Name: {playerName}");
+            playerNames.Add(playerName);
+        }
+
+        playersDropdown.AddOptions(playerNames);
+    }
+
+    public void UpdateCardsDropdownWithIDs(int[] cardIDs)
+    {
+        Debug.Log($"Updating cards dropdown. IDs count: {cardIDs.Length}");
+        cardsDropdown.ClearOptions();
+        List<string> cardNames = new List<string>();
+
+        foreach (int id in cardIDs)
+        {
+            string cardName = CardManager.Instance.GetCardNameById(id); // Ensure this method is correctly implemented
+            Debug.Log($"Card ID: {id}, Name: {cardName}");
+            cardNames.Add(cardName);
+        }
+
+        cardsDropdown.AddOptions(cardNames);
+    }
+
+    /*public void UpdatePlayersDropdown(List<Player> updatedPlayersToAsk)
     {
         Debug.Log("UpdatePlayersDropdown is called");
         if (updatedPlayersToAsk != null && updatedPlayersToAsk.Count > 0)
@@ -188,7 +221,7 @@ public class PlayerUI : MonoBehaviour
                 Debug.LogWarning("UpdateCardsDropdown - cards is null");
             }
         }
-    }
+    }*/
 
 
 }

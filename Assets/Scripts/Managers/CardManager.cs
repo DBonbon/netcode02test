@@ -145,7 +145,7 @@ public class CardManager : MonoBehaviour
     public void DistributeCards(List<Player> players) 
     {       
         //Debug.Log("distributecards started");
-        int cardsPerPlayer = 17; // Assuming 5 cards per player
+        int cardsPerPlayer = 5; // Assuming 5 cards per player
 
         Deck deck = DeckManager.Instance.DeckInstance.GetComponent<Deck>();
         if (deck == null) {
@@ -202,6 +202,10 @@ public class CardManager : MonoBehaviour
         }
     }
 
-
+    public string GetCardNameById(int cardId)
+    {
+        var cardData = allCardsList.Find(card => card.cardId == cardId);
+        return cardData != null ? cardData.cardName : "Unknown Card";
+    }
        // Utility methods for CardUI pool management can be added here if needed
 }
