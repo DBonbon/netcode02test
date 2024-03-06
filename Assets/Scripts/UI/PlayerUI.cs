@@ -44,6 +44,9 @@ public class PlayerUI : MonoBehaviour
         {
             playerNameText.text = playerName;
             Debug.Log("UpdatePlayerDbAttributes_ClientRpc was called");
+            cardsDropdown.gameObject.SetActive(false);
+            playersDropdown.gameObject.SetActive(false);
+            guessButton.gameObject.SetActive(false);
         }
 
         if (!string.IsNullOrEmpty(imagePath))
@@ -56,33 +59,11 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-    public void InitializeTurnUI(Player player)
+    public void ActivateTurnUIObjects(bool isActive)
     {
-        currentPlayer = player;
-
-        // Assign CardsPlayerCanAsk and PlayerToAsk lists
-        CardsPlayerCanAsk = player.CardsPlayerCanAsk;
-        PlayerToAsk = player.PlayerToAsk;
-        
-        //UpdatePlayersDropdown(currentPlayer.PlayerToAsk); // Pass the list of player names
-
-        // Update the cardsDropdown with cards that the player can ask
-        //UpdateCardsDropdown(currentPlayer.CardsPlayerCanAsk);
-
-        // Deactivate the turn UI objects for players without turn
-        if (!player.HasTurn.Value) // Changed from !player.hasTurn to !player.HasTurn.Value
-        {
-            cardsDropdown.gameObject.SetActive(false);
-            playersDropdown.gameObject.SetActive(false);
-            guessButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            cardsDropdown.gameObject.SetActive(true);
-            playersDropdown.gameObject.SetActive(true);
-            guessButton.gameObject.SetActive(true);
-        }
-
+        cardsDropdown.gameObject.SetActive(isActive);
+        playersDropdown.gameObject.SetActive(isActive);
+        guessButton.gameObject.SetActive(isActive);
     }
 
     // New method to update UI based on card IDs
@@ -117,20 +98,15 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-    public void UpdateHasTurnUI(bool hasTurn)
+    public void UpdateTurnUI(bool hasTurn)
     {
         // Assuming hasTurnIndicator is a GameObject that indicates the player's turn
         if (hasTurnIndicator != null)
         {
             hasTurnIndicator.SetActive(hasTurn);
         }
-
-        // Activate or deactivate turn UI objects based on hasTurn value
-        cardsDropdown.gameObject.SetActive(hasTurn);
-        playersDropdown.gameObject.SetActive(hasTurn);
-        guessButton.gameObject.SetActive(hasTurn);
     }
-
+    
     public void UpdatePlayersDropdownWithIDs(ulong[] playerIDs)
     {
         Debug.Log($"Updating players dropdown. IDs count: {playerIDs.Length}");

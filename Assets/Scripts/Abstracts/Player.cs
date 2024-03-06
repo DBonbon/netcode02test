@@ -68,7 +68,7 @@
             if (playerUI != null)
             {
                 playerUI.InitializePlayerUI(playerName, playerImagePath);
-                playerUI.UpdateHasTurnUI(HasTurn.Value);
+                //playerUI.UpdateHasTurnUI(HasTurn.Value);
             }
         }
 
@@ -115,57 +115,35 @@
                 UpdateCardsPlayerCanAsk();
             }
         }
-
+       
         private void OnHasTurnChanged(bool oldValue, bool newValue)
         {
-            if (IsLocalPlayer) // Ensuring this runs only for the local player's instance
-            {
-                if (newValue)
-                {
-                    PrepareTurnUIUpdate();
-                }
-                else if (playerUI != null)
-                {
-                    playerUI.UpdateHasTurnUI(false);
-                }
-            }
+            // This method is called whenever Score changes
+            UpdateTurnUI(newValue);
         }
 
-        public void PrepareTurnUIUpdate()
+        private void UpdateTurnUI(bool turnValue)
         {
-            Debug.Log($"PrepareTurnUIUpdate is called");
-            Debug.Log($"Isserver check: {IsServer}");
-            Debug.Log($"IsLocalPlayer check: {IsLocalPlayer}");
+            if (playerUI != null)
+            {
+                playerUI.UpdateTurnUI(turnValue);
+            }
+        }
+        
+        [ClientRpc]
+        public void ActivateTurnUIForPlayerClientRpc()
+        {
             if (IsLocalPlayer)
             {
-                // Log the count and contents of PlayerToAsk
-                Debug.Log($"PlayerToAsk Count: {PlayerToAsk.Count}");
-                foreach (var player in PlayerToAsk)
-                {
-                    Debug.Log($"PlayerToAsk Item: {player.PlayerName.Value} with OwnerClientId: {player.OwnerClientId}");
-                }
-
-                int[] cardIDs = HandCards.Select(card => card.cardId.Value).ToArray();
-                ulong[] playerIDs = PlayerToAsk.Select(player => player.OwnerClientId).ToArray();
-                Debug.Log($"Card IDs Count: {cardIDs.Length}, Player IDs Count: {playerIDs.Length}");
-
-                UpdateTurnUIObjectsClientRpc(true, cardIDs, playerIDs, OwnerClientId);
+                // Activate UI objects for the local player
+                playerUI.ActivateTurnUIObjects(true);
+                
+                // Ensure dropdowns are populated with current data
+                playerUI.UpdateCardsDropdownWithIDs(CardsPlayerCanAsk.Select(card => card.cardId.Value).ToArray());
+                playerUI.UpdatePlayersDropdownWithIDs(PlayerToAsk.Select(player => player.OwnerClientId).ToArray());
             }
         }
 
-        [ClientRpc]
-        private void UpdateTurnUIObjectsClientRpc(bool hasTurn, int[] cardIDs, ulong[] playerIDs, ulong targetClientId)
-        {
-            Debug.Log($"UpdateTurnUIObjectsClientRpc is called: {hasTurn} ;{cardIDs} ; {playerIDs}; {targetClientId}");
-            if (NetworkManager.Singleton.LocalClientId == targetClientId)
-            {
-                playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
-                Debug.Log($"Player cs Updating cards dropdown. IDs count: {cardIDs.Length}");
-                Debug.Log($"Player cs Updating players dropdown. IDs count: {playerIDs.Length}");
-                playerUI?.UpdatePlayersDropdownWithIDs(playerIDs);
-                playerUI?.UpdateHasTurnUI(hasTurn);
-            }
-        }
 
         private void OnScoreChanged(int oldValue, int newValue)
         {
@@ -215,7 +193,7 @@
             // Ensure that this RPC is executed only by the target client
             if (IsOwner)
             {
-                //playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
+                playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
                 Debug.Log("UpdatePlayerHandUI_ClientRpc is running");
             }
         }

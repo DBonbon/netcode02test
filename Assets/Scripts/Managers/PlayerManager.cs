@@ -109,6 +109,7 @@ public class PlayerManager : NetworkBehaviour
         // Randomly select a player to assign the turn
         int randomIndex = Random.Range(0, players.Count);
         players[randomIndex].HasTurn.Value = true;
+        players[randomIndex].ActivateTurnUIForPlayerClientRpc();
 
         Debug.Log($"Turn assigned to player: {players[randomIndex].PlayerName.Value}");
     }
