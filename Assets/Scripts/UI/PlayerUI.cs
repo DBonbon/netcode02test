@@ -62,7 +62,7 @@ public class PlayerUI : MonoBehaviour
     // New method to update UI based on card IDs
     public void UpdatePlayerHandUIWithIDs(List<int> cardIDs)
     {
-        /*foreach (Transform child in cardDisplayTransform)
+        foreach (Transform child in cardDisplayTransform)
         {
             child.gameObject.SetActive(false);
         }
@@ -80,7 +80,7 @@ public class PlayerUI : MonoBehaviour
             {
                 Debug.LogWarning($"No CardUI found for card ID: {cardID}");
             }
-        }*/
+        }
     }
 
     public void UpdateScoreUI(int score)
@@ -91,15 +91,6 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-    /*public void UpdateTurnUI(bool hasTurn)
-    {
-        // Assuming hasTurnIndicator is a GameObject that indicates the player's turn
-        if (hasTurnIndicator != null)
-        {
-            hasTurnIndicator.SetActive(hasTurn);
-            ActivateTurnUI(hasTurn);
-        }
-    }*/
     public void UpdateTurnUI(bool hasTurn)
     {
         // This ensures that the dropdown is only active for the player with the turn.
@@ -115,31 +106,6 @@ public class PlayerUI : MonoBehaviour
         // Assuming 'playersDropdown' is part of a larger turn UI GameObject
         playersDropdown.gameObject.SetActive(hasTurn); // Activate or deactivate the turn UI
         Debug.Log($"ActivateTurnUI running {hasTurn}");
-    }
-        
-
-    public void UpdatePlayersDropdownWithIDs(ulong[] playerIDs)
-    {
-        playersDropdown.ClearOptions();
-        List<string> playerNames = new List<string>();
-        Debug.Log($"Updating players dropdown. IDs count: {playerIDs.Length}");
-
-        foreach (ulong id in playerIDs)
-        {
-            string playerName = PlayerManager.Instance.GetPlayerNameByClientId(id);
-            Debug.Log($"call GetPlayerNameByClientId {id}");
-            if (!string.IsNullOrEmpty(playerName))
-            {
-                playerNames.Add(playerName);
-                Debug.Log($"Player ID: {id}, Name: {playerName}");
-            }
-            else
-            {
-                Debug.LogWarning($"Player ID: {id} not found.");
-            }
-        }
-
-        playersDropdown.AddOptions(playerNames);
     }
 
     public void UpdatePlayersDropdown(ulong[] playerIDs, string[] playerNames)
