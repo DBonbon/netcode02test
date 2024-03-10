@@ -11,7 +11,7 @@
     {   
         //[SerializeField] private TextMeshProUGUI playerNameText;
         //private float xOffset = 2f;
-        public NetworkVariable<FixedString128Bytes> PlayerName = new NetworkVariable<FixedString128Bytes>();
+        public NetworkVariable<FixedString128Bytes> playerName = new NetworkVariable<FixedString128Bytes>();
         public NetworkVariable<int> PlayerDbId = new NetworkVariable<int>();
         public NetworkVariable<FixedString128Bytes> PlayerImagePath = new NetworkVariable<FixedString128Bytes>();
         public NetworkVariable<int> Score = new NetworkVariable<int>(0);
@@ -33,6 +33,7 @@
 
         public override void OnNetworkSpawn()
         {
+            //PlayerManager.Instance.OnClientConnected(OwnerClientId);
             playerUI = GetComponent<PlayerUI>();
 
             if (IsServer)
@@ -46,13 +47,14 @@
 
             OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state.
             OnHasTurnChanged(false, HasTurn.Value); // Manually trigger to ensure UI is correctly set up on spawn.
+
         }
 
         public void InitializePlayer(string name, int dbId, string imagePath)
         {
             if (IsServer)
             {
-                PlayerName.Value = name;
+                playerName.Value = name;
                 PlayerDbId.Value = dbId;
                 PlayerImagePath.Value = imagePath;
 
@@ -76,7 +78,7 @@
         {
             if (IsServer)
             {
-                UpdatePlayerDbAttributes_ClientRpc(PlayerName.Value.ToString(), PlayerImagePath.Value.ToString());
+                UpdatePlayerDbAttributes_ClientRpc(playerName.Value.ToString(), PlayerImagePath.Value.ToString());
                 Debug.Log("UpdatePlayerDbAttributes_ClientRpc is called");
             }
         }
@@ -97,7 +99,7 @@
             if (IsServer) {
                 HandCards.Add(card);
                 // Potentially update UI here as necessary
-                //Debug.Log($"Card {card.name} added to player {PlayerName.Value}'s HandCards list.");
+                //Debug.Log($"Card {card.name} added to player {playerName.Value}'s HandCards list.");
                 UpdatePlayerHandUI();
                 UpdateCardsPlayerCanAsk(); 
                 CheckForQuartets();
@@ -118,29 +120,9 @@
        
         private void OnHasTurnChanged(bool oldValue, bool newValue)
         {
-            // This method is called whenever Score changes
-            UpdateTurnUI(newValue);
-        }
-
-        private void UpdateTurnUI(bool turnValue)
-        {
-            if (playerUI != null)
+            if (playerUI != null && IsOwner)
             {
-                playerUI.UpdateTurnUI(turnValue);
-            }
-        }
-        
-        [ClientRpc]
-        public void ActivateTurnUIForPlayerClientRpc()
-        {
-            if (IsLocalPlayer)
-            {
-                // Activate UI objects for the local player
-                playerUI.ActivateTurnUIObjects(true);
-                
-                // Ensure dropdowns are populated with current data
-                playerUI.UpdateCardsDropdownWithIDs(CardsPlayerCanAsk.Select(card => card.cardId.Value).ToArray());
-                playerUI.UpdatePlayersDropdownWithIDs(PlayerToAsk.Select(player => player.OwnerClientId).ToArray());
+                playerUI.UpdateTurnUI(newValue);
             }
         }
 
@@ -171,7 +153,7 @@
             // Assuming you have a method to update UI based on the current hand
             List<int> cardIDs = HandCards.Select(c => c.cardId.Value).ToList();
             playerUI?.UpdatePlayerHandUIWithIDs(cardIDs);
-            Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {PlayerName.Value}'s HandCards list.");
+            Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {playerName.Value}'s HandCards list.");
         }
 
         // This method is called on the server to send the card IDs to the client
@@ -213,8 +195,6 @@
             //var allCards = CardManager.Instance.allSpawnedCards; // Make sure this is a List<Card>
             var allCardComponents = CardManager.Instance.allSpawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
 
-            // Filter out cards that have the same suit as at least one card in HandCards
-            // and are not already in HandCards
             foreach (var card in allCardComponents)
             {
                 if (HandCards.Any(handCard => handCard.Suit.Value == card.Suit.Value) && !HandCards.Contains(card))
@@ -225,24 +205,41 @@
             //playerUI.InitializeTurnUI(player);
             //playerUI?.InitializeTurnUI(this);
             OnCardsPlayerCanAskListUpdated?.Invoke();
-            Debug.Log($"Player {PlayerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
+            Debug.Log($"Player {playerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
         }
 
         public void UpdatePlayerToAskList(List<Player> allPlayers)
         {
             PlayerToAsk.Clear();
-
             foreach (var potentialPlayer in allPlayers)
             {
                 if (potentialPlayer != this)
                 {
                     PlayerToAsk.Add(potentialPlayer);
+                    Debug.Log($"Added {potentialPlayer.playerName.Value} to PlayerToAsk.");
                 }
             }
 
-            OnPlayerToAskListUpdated?.Invoke(); // Raise the event
-            // Optional: Log the count for verification
-            Debug.Log($"Player {PlayerName.Value} has {PlayerToAsk.Count} players to ask.");
+            if (IsServer && HasTurn.Value)
+            {
+                ulong[] playerIDs = PlayerToAsk.Select(player => player.OwnerClientId).ToArray();
+                string playerNamesConcatenated = string.Join(",", PlayerToAsk.Select(player => player.playerName.Value.ToString()));
+                Debug.Log("UpdatePlayerToAskList calling TurnUIForPlayer_ClientRp() ");
+                TurnUIForPlayer_ClientRpc(playerIDs, playerNamesConcatenated); // Adjusted to pass concatenated names
+            }
+        }
+
+        [ClientRpc]
+        public void TurnUIForPlayer_ClientRpc(ulong[] playerIDs, string playerNamesConcatenated)
+        {
+            Debug.Log($"TurnUIForPlayer_ClientRpc is owner check: {IsOwner}");
+            if (IsOwner) // Ensure this runs only for the player whose turn it is
+            {
+                // Split the concatenated string back into an array
+                string[] playerNames = playerNamesConcatenated.Split(',');
+                playerUI.UpdatePlayersDropdown(playerIDs, playerNames);
+                Debug.Log("TurnUIForPlayer_ClientRpc is running");
+            }
         }
 
         //utility method section:

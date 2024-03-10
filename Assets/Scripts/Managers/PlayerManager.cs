@@ -2,12 +2,15 @@ using Unity.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
+using System.Reflection;
 
 public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance;
     public static int TotalPlayerPrefabs = 2; // Adjust based on your game's needs
     private int connectedPlayers = 0;
+    private bool gameInitialized = false; // Flag to track if the game start logic has been executed
     public List<Player> players = new List<Player>();
     private List<PlayerData> playerDataList;
     [SerializeField] private Transform deckUIContainer;
@@ -44,12 +47,13 @@ public class PlayerManager : NetworkBehaviour
     private void Start()
     {
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        //Debug.Log("starting playerManager");
     }
 
-    private void OnClientConnected(ulong clientId)
+    public void OnClientConnected(ulong clientId)
     {
-        if (!IsServer) return;
-
+        if (!IsServer || gameInitialized) return;
+        Debug.Log("OnClientConnected started");
         connectedPlayers++;
         var playerObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
         if (playerObject != null)
@@ -60,18 +64,14 @@ public class PlayerManager : NetworkBehaviour
                 string playerImagePath = "Images/character_01"; // Default image path
                 var playerData = playerDataList[connectedPlayers - 1]; // Example, adjust as necessary
                 player.InitializePlayer(playerData.playerName, playerData.playerDbId, playerData.playerImagePath);
-                // New logic to broadcast existing player names to the newly connected client
                 BroadcastPlayerNamesToNewClient(clientId);
-
                 players.Add(player);
-                if (connectedPlayers == TotalPlayerPrefabs)
+                Debug.Log($"num of players after: {players.Count}");
+                if (players.Count == playerDataList.Count && !gameInitialized) 
                 {
-                    //DistributeCards();
-                    CardManager.Instance.DistributeCards(players);
-                    //Debug.Log("CardManager.Instance.DistributeCards(players)");
-                    AssignTurnToPlayer();
-                    TurnManager.Instance.StartTurnManager();
-                    UpdatePlayerToAsk();
+                    gameInitialized = true;
+                    StartGameLogic();
+                    Debug.Log("calling StartGameLogic");
                 }
             }
         }
@@ -86,17 +86,66 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    private void StartGameLogic() 
+    {
+        Debug.Log("running StartGameLogic");
+        //PrintPlayersListDetails();
+        //UpdatePlayerToAsk();
+        CardManager.Instance.DistributeCards(players);
+        TurnManager.Instance.StartTurnManager();
+        PrintPlayersListDetails();
+    }
+
     private void UpdatePlayerToAsk()
     {
+        Debug.Log("UpdatePlayerToAsk started");
         // Iterate through each player in the 'players' list
         foreach (var player in players)
         {
+            Debug.Log($"UpdatePlayerToAsk playerName; {player.playerName.Value}");
             // Call a method on the player instance to update its PlayerToAsk list
             player.UpdatePlayerToAskList(players);
         }
     }
 
-    private void AssignTurnToPlayer()
+    //testing players list
+    public void PrintPlayersListDetails()
+    {
+        Debug.Log($"Printing details of all players in the PlayerManager list. Total players: {players.Count}");
+        
+        foreach (var player in players)
+        {
+            Debug.Log($"Player Details - OwnerClientId: {player.OwnerClientId}");
+
+            // Using reflection to iterate through all properties
+            PropertyInfo[] properties = player.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                object value = property.GetValue(player, null);
+                Debug.Log($"GetValue of properties name: {property.Name}: {value}");
+            }
+
+            
+            // Additionally iterating through all fields if necessary
+            FieldInfo[] fields = player.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            foreach (FieldInfo field in fields)
+            {
+                object value = field.GetValue(player);
+                Debug.Log($"{field.Name}: {value}");
+            }
+        }
+
+        foreach (var playeri in players)
+        {
+            // Directly accessing the playerName NetworkVariable
+            var playerName = playeri.playerName.Value; // Adjust PlayerName to match the actual variable name in your Player class
+            Debug.Log($"Player Name from the players list: {playerName}");
+
+            // If you have other properties or fields to log, you can include them here as well
+        }
+    }
+
+    /*private void AssignTurnToPlayer()
     {
         if (!IsServer || players.Count == 0) return;
 
@@ -111,8 +160,8 @@ public class PlayerManager : NetworkBehaviour
         players[randomIndex].HasTurn.Value = true;
         players[randomIndex].ActivateTurnUIForPlayerClientRpc();
 
-        Debug.Log($"Turn assigned to player: {players[randomIndex].PlayerName.Value}");
-    }
+        Debug.Log($"Turn assigned to player: {players[randomIndex].playerName.Value}");
+    }*/
 
     // Method to clean up players, if necessary
     public void CleanupPlayers()
@@ -125,10 +174,24 @@ public class PlayerManager : NetworkBehaviour
         //return null;
     }
 
-    public string GetPlayerNameByClientId(ulong clientId)
+    /*public string GetPlayerNameByClientId(ulong clientId)
     {
         var player = players.Find(p => p.GetComponent<NetworkObject>().NetworkObjectId == clientId);
-        return player != null ? player.PlayerName.Value.ToString() : "Unknown Player";
+        return player != null ? player.playerName.Value.ToString() : "Unknown Player";
+    }*/
+    public string GetPlayerNameByClientId(ulong clientId)
+    {
+        Debug.Log("GetPlayerNameByClientId is started");
+        foreach (var playero in players)
+        {
+            Debug.Log($"Iterating Player: OwnerClientId = {playero.OwnerClientId}, PlayerName = {playero.playerName.Value}");
+        }
+        var player = players.FirstOrDefault(p => p.OwnerClientId == clientId);
+        Debug.Log($"Player fetched: {player != null}, Client ID: {clientId}");
+        return player != null ? player.playerName.Value.ToString() : "Unknown Player";
+        Debug.Log($"Getpolayer name by client id sith string is {player.playerName.Value}");
+        Debug.Log($"Getpolayer name by client id is {player.playerName.Value}");
+        Debug.Log($"Getpolayer name provided clientid is {clientId}");
+        Debug.Log($"Getpolayer name by owenerclient id is {player.OwnerClientId}");
     }
-
 }

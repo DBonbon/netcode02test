@@ -11,6 +11,18 @@
         "score": 0,
         "playerDbId": 462,
         "playerImagePath": "Images/character_02"
+      },
+      {
+        "playerName": "Player 3",
+        "score": 0,
+        "playerDbId": 150,
+        "playerImagePath": "Images/character_03"
+      },
+      {
+        "playerName": "Player 4",
+        "score": 0,
+        "playerDbId": 220,
+        "playerImagePath": "Images/character_04"
       }
     ]
   }

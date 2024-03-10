@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class TurnManager : MonoBehaviour
@@ -29,7 +30,35 @@ public class TurnManager : MonoBehaviour
     
     public void StartTurnManager()
     {
+        Debug.Log("turnmanmager started");
+        AssignTurnToPlayer();
+        StartTurnLoop();
+    }
+
+    private void AssignTurnToPlayer()
+    {
+        Debug.Log("AssignTurnToPlayer is called");
+        var players = PlayerManager.Instance.players;
+        if (players.Count == 0) return;
+
+        foreach (var player in players)
+        {
+            player.HasTurn.Value = false;
+        }
+
+        int randomIndex = Random.Range(0, players.Count);
+        players[randomIndex].HasTurn.Value = true;
+        // Let UpdatePlayerToAskList handle the RPC call with the correct data
+        players[randomIndex].UpdatePlayerToAskList(players);
+
+        Debug.Log($"Turn assigned to player: {players[randomIndex].playerName.Value}");
+    }
+
+    private void StartTurnLoop()
+    {
         Debug.Log("Turn Manager Started");
+        AssignTurnToPlayer();
+        
         currentPlayer = PlayerManager.Instance.players.Find(player => player.HasTurn.Value);
 
         if (currentPlayer != null)
@@ -78,13 +107,7 @@ public class TurnManager : MonoBehaviour
         }
     }
 
-    /*public void MakeGuess(Player currentPlayer)
-    {
-        // 2. Ensure to pass to EnableUITMakeGuess the arguments SelectedPlayer and SelectedCard.
-        // 3. Call the AskForCard, if and only if, the SelectedCard && SelectedPlayer are not null.
-        bool enableUI = selectedCard == null && selectedPlayer == null;
-        OnEnableUI(enableUI);
-    }*/
+
 
     private void AskForCard(Card selectedCard, Player selectedPlayer)
     {
@@ -124,7 +147,7 @@ public class TurnManager : MonoBehaviour
         else
         {
             // If the guess is wrong, draw a card from the deck and end the turn.
-            DisplayMessage($"{selectedPlayer.PlayerName} does not have {selectedCard.cardName}.");
+            DisplayMessage($"{selectedPlayer.playerName} does not have {selectedCard.cardName}.");
             DrawCardFromDeck();
             EndTurn(); // This is the correct place to call EndTurn for an incorrect guess.
         }

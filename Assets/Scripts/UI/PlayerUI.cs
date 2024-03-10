@@ -44,8 +44,8 @@ public class PlayerUI : MonoBehaviour
         {
             playerNameText.text = playerName;
             Debug.Log("UpdatePlayerDbAttributes_ClientRpc was called");
-            cardsDropdown.gameObject.SetActive(false);
             playersDropdown.gameObject.SetActive(false);
+            cardsDropdown.gameObject.SetActive(false);
             guessButton.gameObject.SetActive(false);
         }
 
@@ -59,17 +59,10 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-    public void ActivateTurnUIObjects(bool isActive)
-    {
-        cardsDropdown.gameObject.SetActive(isActive);
-        playersDropdown.gameObject.SetActive(isActive);
-        guessButton.gameObject.SetActive(isActive);
-    }
-
     // New method to update UI based on card IDs
     public void UpdatePlayerHandUIWithIDs(List<int> cardIDs)
     {
-        foreach (Transform child in cardDisplayTransform)
+        /*foreach (Transform child in cardDisplayTransform)
         {
             child.gameObject.SetActive(false);
         }
@@ -87,7 +80,7 @@ public class PlayerUI : MonoBehaviour
             {
                 Debug.LogWarning($"No CardUI found for card ID: {cardID}");
             }
-        }
+        }*/
     }
 
     public void UpdateScoreUI(int score)
@@ -98,106 +91,70 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-    public void UpdateTurnUI(bool hasTurn)
+    /*public void UpdateTurnUI(bool hasTurn)
     {
         // Assuming hasTurnIndicator is a GameObject that indicates the player's turn
         if (hasTurnIndicator != null)
         {
             hasTurnIndicator.SetActive(hasTurn);
+            ActivateTurnUI(hasTurn);
         }
+    }*/
+    public void UpdateTurnUI(bool hasTurn)
+    {
+        // This ensures that the dropdown is only active for the player with the turn.
+        if (hasTurnIndicator != null)
+        {
+            hasTurnIndicator.SetActive(hasTurn);
+        }
+        ActivateTurnUI(hasTurn); // Make sure this method is responsible for showing/hiding relevant UI elements.
     }
-    
+
+    public void ActivateTurnUI(bool hasTurn)
+    {
+        // Assuming 'playersDropdown' is part of a larger turn UI GameObject
+        playersDropdown.gameObject.SetActive(hasTurn); // Activate or deactivate the turn UI
+        Debug.Log($"ActivateTurnUI running {hasTurn}");
+    }
+        
+
     public void UpdatePlayersDropdownWithIDs(ulong[] playerIDs)
     {
-        Debug.Log($"Updating players dropdown. IDs count: {playerIDs.Length}");
         playersDropdown.ClearOptions();
         List<string> playerNames = new List<string>();
+        Debug.Log($"Updating players dropdown. IDs count: {playerIDs.Length}");
 
         foreach (ulong id in playerIDs)
         {
-            string playerName = PlayerManager.Instance.GetPlayerNameByClientId(id); // Ensure this method is correctly implemented
-            Debug.Log($"Player ID: {id}, Name: {playerName}");
-            playerNames.Add(playerName);
+            string playerName = PlayerManager.Instance.GetPlayerNameByClientId(id);
+            Debug.Log($"call GetPlayerNameByClientId {id}");
+            if (!string.IsNullOrEmpty(playerName))
+            {
+                playerNames.Add(playerName);
+                Debug.Log($"Player ID: {id}, Name: {playerName}");
+            }
+            else
+            {
+                Debug.LogWarning($"Player ID: {id} not found.");
+            }
         }
 
         playersDropdown.AddOptions(playerNames);
     }
 
-    public void UpdateCardsDropdownWithIDs(int[] cardIDs)
+    public void UpdatePlayersDropdown(ulong[] playerIDs, string[] playerNames)
     {
-        Debug.Log($"Updating cards dropdown. IDs count: {cardIDs.Length}");
-        cardsDropdown.ClearOptions();
-        List<string> cardNames = new List<string>();
+        Debug.Log($"Updating players dropdown. IDs count: {playerIDs.Length}, Names count: {playerNames.Length}");
 
-        foreach (int id in cardIDs)
-        {
-            string cardName = CardManager.Instance.GetCardNameById(id); // Ensure this method is correctly implemented
-            Debug.Log($"Card ID: {id}, Name: {cardName}");
-            cardNames.Add(cardName);
-        }
+        playersDropdown.ClearOptions();
+        List<string> playerNamesList = new List<string>(playerNames);
+        
+        playersDropdown.AddOptions(playerNamesList);
 
-        cardsDropdown.AddOptions(cardNames);
+        // This log helps you verify that the dropdown options have been successfully updated.
+        Debug.Log("Players Dropdown updated with names: " + string.Join(", ", playerNames));
     }
 
-    /*public void UpdatePlayersDropdown(List<Player> updatedPlayersToAsk)
-    {
-        Debug.Log("UpdatePlayersDropdown is called");
-        if (updatedPlayersToAsk != null && updatedPlayersToAsk.Count > 0)
-        {
-            // Clear the current dropdown options and lists
-            playersDropdown.ClearOptions();
-            playerIDs.Clear();
-
-            // Add the player names to the dropdown and store their IDs
-            List<string> playerNames = updatedPlayersToAsk.Select(player =>
-            {
-                playerIDs.Add(player.PlayerDbId.Value);
-                return player.PlayerName.Value.ToString();
-            }).ToList();
-
-            playersDropdown.AddOptions(playerNames);
-        }
-        else
-        {
-            Debug.LogWarning("Updated players list is null or empty.");
-        }
-    }
-
-    public void UpdateCardsDropdown(List<Card> cards)
-    {
-        if (cardsDropdown != null)
-        {
-            cardsDropdown.ClearOptions(); // Clearing the dropdown options
-            cardIDs.Clear(); // Clearing the associated IDs list
-
-            if (cards != null)
-            {
-                List<string> cardNames = new List<string>();
-
-                foreach (Card card in cards)
-                {
-                    cardIDs.Add(card.cardId.Value);
-
-                    // Add the card name to the dropdown options
-                    string cardName = card.cardName.Value.ToString();
-                    cardNames.Add(cardName); 
-
-                    // Debug the card names to ensure they are correct
-                    Debug.Log($"Added card name: {cardName} to dropdown options.");
-                }
-
-                // Debug the options passed to the dropdown
-                Debug.Log($"Options passed to cardsDropdown: {string.Join(", ", cardNames)}");
-
-                // Update the dropdown options with the card names
-                cardsDropdown.AddOptions(cardNames);
-            }
-            else
-            {
-                Debug.LogWarning("UpdateCardsDropdown - cards is null");
-            }
-        }
-    }*/
 
 
 }
