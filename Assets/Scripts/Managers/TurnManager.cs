@@ -50,6 +50,7 @@ public class TurnManager : MonoBehaviour
         players[randomIndex].HasTurn.Value = true;
         // Let UpdatePlayerToAskList handle the RPC call with the correct data
         players[randomIndex].UpdatePlayerToAskList(players);
+        players[randomIndex].UpdateCardsPlayerCanAsk();
 
         Debug.Log($"Turn assigned to player: {players[randomIndex].playerName.Value}");
     }

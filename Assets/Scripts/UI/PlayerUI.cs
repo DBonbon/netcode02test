@@ -105,6 +105,7 @@ public class PlayerUI : MonoBehaviour
     {
         // Assuming 'playersDropdown' is part of a larger turn UI GameObject
         playersDropdown.gameObject.SetActive(hasTurn); // Activate or deactivate the turn UI
+        cardsDropdown.gameObject.SetActive(hasTurn); 
         Debug.Log($"ActivateTurnUI running {hasTurn}");
     }
 
@@ -121,6 +122,20 @@ public class PlayerUI : MonoBehaviour
         Debug.Log("Players Dropdown updated with names: " + string.Join(", ", playerNames));
     }
 
+    public void UpdateCardsDropdownWithIDs(int[] cardIDs)
+    {
+        Debug.Log($"Updating cards dropdown. IDs count: {cardIDs.Length}");
+        cardsDropdown.ClearOptions();
+        List<string> cardNames = new List<string>();
 
+        foreach (int id in cardIDs)
+        {
+            string cardName = CardManager.Instance.GetCardNameById(id); // Ensure this method is correctly implemented
+            Debug.Log($"Card ID: {id}, Name: {cardName}");
+            cardNames.Add(cardName);
+        }
+
+        cardsDropdown.AddOptions(cardNames);
+    }
 
 }

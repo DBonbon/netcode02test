@@ -202,10 +202,25 @@
                     CardsPlayerCanAsk.Add(card);
                 }
             }
-            //playerUI.InitializeTurnUI(player);
-            //playerUI?.InitializeTurnUI(this);
-            OnCardsPlayerCanAskListUpdated?.Invoke();
+            
+            if (IsServer && HasTurn.Value)
+            {
+                int[] cardIDs = CardsPlayerCanAsk.Select(card => card.cardId.Value).ToArray();
+                //OnCardsPlayerCanAskListUpdated?.Invoke();
+                UpdateCardDropdown_ClientRpc(cardIDs);
+            }
             Debug.Log($"Player {playerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
+        }
+
+        [ClientRpc]
+        private void UpdateCardDropdown_ClientRpc(int[] cardIDs)
+        {
+            Debug.Log($"UpdateTurnUIObjectsClientRpc is called: {cardIDs}");
+            if (IsOwner)
+            {
+                Debug.Log($"Player cs Updating cards dropdown. IDs count: {cardIDs.Length}");
+                playerUI?.UpdateCardsDropdownWithIDs(cardIDs);
+            }
         }
 
         public void UpdatePlayerToAskList(List<Player> allPlayers)
