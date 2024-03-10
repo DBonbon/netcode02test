@@ -105,7 +105,8 @@ public class PlayerUI : MonoBehaviour
     {
         // Assuming 'playersDropdown' is part of a larger turn UI GameObject
         playersDropdown.gameObject.SetActive(hasTurn); // Activate or deactivate the turn UI
-        cardsDropdown.gameObject.SetActive(hasTurn); 
+        cardsDropdown.gameObject.SetActive(hasTurn);
+        guessButton.gameObject.SetActive(hasTurn); 
         Debug.Log($"ActivateTurnUI running {hasTurn}");
     }
 
