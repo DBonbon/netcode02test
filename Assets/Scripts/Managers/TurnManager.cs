@@ -93,6 +93,23 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    public void OnEventGuessClick(Card selectedCard, Player selectedPlayer)
+    {
+        // Assign the selected card and player to the TurnManager's fields
+        this.selectedCard = selectedCard;
+        this.selectedPlayer = selectedPlayer;
+
+        // Check if it's a valid player turn and handle the player's turn
+        if (currentPlayer != null && !isDrawingCard)
+        {
+            HandlePlayerTurn(currentPlayer);
+        }
+        else
+        {
+            Debug.LogWarning($"{Time.time}: Invalid player turn.");
+        }
+    }
+
     private void HandlePlayerTurn(Player currentPlayer)
     {
         //MakeGuess(currentPlayer);
@@ -107,8 +124,6 @@ public class TurnManager : MonoBehaviour
             selectedPlayer = null;
         }
     }
-
-
 
     private void AskForCard(Card selectedCard, Player selectedPlayer)
     {

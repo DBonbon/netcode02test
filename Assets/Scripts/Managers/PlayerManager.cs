@@ -15,6 +15,9 @@ public class PlayerManager : NetworkBehaviour
     private List<PlayerData> playerDataList;
     [SerializeField] private Transform deckUIContainer;
 
+    private Dictionary<ulong, string> clientIdToPlayerName = new Dictionary<ulong, string>();
+    private Dictionary<string, ulong> playerNameToClientId = new Dictionary<string, ulong>();
+
     private void Awake()
     {
         if (Instance == null)
@@ -67,6 +70,19 @@ public class PlayerManager : NetworkBehaviour
                 BroadcastPlayerNamesToNewClient(clientId);
                 players.Add(player);
                 Debug.Log($"num of players after: {players.Count}");
+
+                // Update dictionaries
+                clientIdToPlayerName[clientId] = player.playerName.Value.ToString();
+                Debug.Log($"dictionary playername: {clientIdToPlayerName[clientId]}");
+                playerNameToClientId[player.playerName.Value.ToString()] = clientId;
+                Debug.Log($"dictionary playername to id: {clientId}");
+
+                // Test retrieval
+                //string testRetrievalName = GetPlayerNameByClientId(clientId);
+                //Debug.Log($"Test retrieval post-update - Client ID: {clientId}, Player Name: {testRetrievalName}");
+                // Add a debug log here to confirm the dictionary is updated
+                Debug.Log($"[PlayerManager] Added player with Client ID: {clientId} and Name: {player.playerName.Value}");
+
                 if (players.Count == playerDataList.Count && !gameInitialized) 
                 {
                     gameInitialized = true;
@@ -179,7 +195,7 @@ public class PlayerManager : NetworkBehaviour
         var player = players.Find(p => p.GetComponent<NetworkObject>().NetworkObjectId == clientId);
         return player != null ? player.playerName.Value.ToString() : "Unknown Player";
     }*/
-    public string GetPlayerNameByClientId(ulong clientId)
+    /*public string GetPlayerNameByClientId(ulong clientId)
     {
         Debug.Log("GetPlayerNameByClientId is started");
         foreach (var playero in players)
@@ -193,5 +209,26 @@ public class PlayerManager : NetworkBehaviour
         Debug.Log($"Getpolayer name by client id is {player.playerName.Value}");
         Debug.Log($"Getpolayer name provided clientid is {clientId}");
         Debug.Log($"Getpolayer name by owenerclient id is {player.OwnerClientId}");
+    }*/
+    public string GetPlayerNameByClientId(ulong clientId)
+    {
+        // New diagnostic logging
+        Debug.Log("Current client ID to Player Name mappings:");
+        foreach (var entry in clientIdToPlayerName)
+        {
+            Debug.Log($"Client ID: {entry.Key}, Player Name: {entry.Value}");
+        }
+
+        if (clientIdToPlayerName.TryGetValue(clientId, out string playerName))
+        {
+            Debug.Log($"Retrieved from dictionary - Client ID: {clientId}, Player Name: {playerName}");
+            return playerName;
+        }
+        else
+        {
+            Debug.Log($"Failed to retrieve - Client ID: {clientId} resulted in Unknown Player");
+            return "Unknown Player"; // Fallback if the clientId is not found
+        }
     }
+
 }

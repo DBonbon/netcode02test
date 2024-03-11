@@ -256,6 +256,37 @@
                 Debug.Log("TurnUIForPlayer_ClientRpc is running");
             }
         }
+        
+        /*public void UpdatePlayerToAskList(List<Player> allPlayers)
+        {
+            PlayerToAsk.Clear();
+            foreach (var potentialPlayer in allPlayers)
+            {
+                if (potentialPlayer != this)
+                {
+                    PlayerToAsk.Add(potentialPlayer);
+                    Debug.Log($"Added {potentialPlayer.playerName.Value} to PlayerToAsk.");
+                }
+            }
+
+            if (IsServer && HasTurn.Value)
+            {
+                ulong[] playerIDs = PlayerToAsk.Select(player => player.OwnerClientId).ToArray();
+                Debug.Log("UpdatePlayerToAskList calling TurnUIForPlayer_ClientRpc() ");
+                TurnUIForPlayer_ClientRpc(playerIDs); // Adjusted to pass only playerIDs
+            }
+        }
+
+        [ClientRpc]
+        public void TurnUIForPlayer_ClientRpc(ulong[] playerIDs)
+        {
+            Debug.Log($"TurnUIForPlayer_ClientRpc is owner check: {IsOwner}");
+            if (IsOwner) // Ensure this runs only for the player whose turn it is
+            {
+                playerUI.UpdatePlayersDropdown(playerIDs);
+                Debug.Log("TurnUIForPlayer_ClientRpc is running");
+            }
+        }*/
 
         //utility method section:
         public void CheckForQuartets()
