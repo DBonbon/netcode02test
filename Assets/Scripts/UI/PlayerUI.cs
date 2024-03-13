@@ -1,5 +1,6 @@
 using Unity.Collections;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ public class PlayerUI : MonoBehaviour
     private List<int> cardIDs = new List<int>();
 
     private const string DefaultImagePath = "Images/character_01";
+    private Player player;
 
     // In PlayerUI
     private List<ulong> playerIdsInDropdown = new List<ulong>();
@@ -46,6 +48,7 @@ public class PlayerUI : MonoBehaviour
     {
         // Add an onClick handler to the guessButton
         guessButton.onClick.AddListener(OnEventGuessClick);
+        player = GetComponent<Player>();
     }
     
     public void InitializePlayerUI(string playerName, string imagePath)
@@ -183,25 +186,14 @@ public class PlayerUI : MonoBehaviour
     }
 
     //event
+    
+
     public void OnEventGuessClick()
     {
-        Debug.Log("Guess button clicked!");
-        // Check if it's the player's turn
-        /*if (!currentPlayer.HasTurn.Value)
-        {
-            Debug.LogWarning("Not the player's turn.");
-            return;
-        }*/
-        // Disable the button to prevent multiple clicks
-        //guessButton.interactable = false; // Disable the guess button
-
         // Get the selected index from the dropdowns
         int selectedPlayerIndex = playersDropdown.value;
-        Debug.Log($"selected player value is: {selectedPlayerIndex}");
         int selectedCardIndex = cardsDropdown.value;
-        Debug.Log($"selected card value is: {selectedCardIndex}");
 
-        //if (selectedPlayerIndex < 0 || selectedPlayerIndex >= playerIDs.Count ||
         if (selectedCardIndex < 0 || selectedCardIndex >= cardIDs.Count)
         {
             Debug.LogError("Invalid card dropdown selection.");
@@ -213,35 +205,20 @@ public class PlayerUI : MonoBehaviour
             ulong selectedPlayerId = playerIdsInDropdown[selectedPlayerIndex];
             Debug.Log($"Selected Player Client ID: {selectedPlayerId}");
 
-            // Now you can use selectedPlayerId for further actions
+            int selectedCardId = cardIDs[selectedCardIndex];
+
+            // Wrap selectedCardId into a NetworkVariableIntWrapper
+            NetworkVariableIntWrapper networkCardId = new NetworkVariableIntWrapper(selectedCardId);
+
+            // Call the ServerRpc from the client-side
+            player.TestVarServerRpc(selectedPlayerId, selectedCardId);
+            Debug.Log($"Selected Card ID: {selectedCardId} and Selected Player ID: {selectedPlayerId}");
         }
         else
         {
             Debug.LogError("Invalid player selection.");
         }
-            //ulong selectedPlayerId = playerIDs[selectedPlayerIndex];
-            //Debug.Log($"Selected Player Client ID: {selectedPlayerId}");
-            
-            // Further actions based on selectedPlayerId
-        
 
-        int selectedCardID = cardIDs[selectedCardIndex];
-        Debug.Log($"Selected Card ID: {selectedCardID}"); // This should now display correctly
-
-        //Debug.Log($"Selected Card: {selectedCard.cardName}");
-        //Debug.Log($"Selected Player: {selectedPlayer.playerName}");
-
-        // Directly call the HandlePlayerTurn method in TurnManager
-        var turnManager = TurnManager.Instance; 
-        if (turnManager != null)
-        {
-            //turnManager.OnEventGuessClick(selectedCard, selectedPlayer);
-        }
-        else
-        {
-            Debug.LogError("TurnManager not found.");
-        }
-        
         // Re-enable the button at the end of the method
         guessButton.interactable = true;
     }

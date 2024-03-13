@@ -2,18 +2,20 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class TurnManager : MonoBehaviour
+public class TurnManager : NetworkBehaviour
 {
     public static TurnManager Instance;
     
+    public delegate void EnableUIEvent(bool enableUI);
+    public static event EnableUIEvent OnEnableUI;
+    // Start is called before the first frame update
     private Card selectedCard;
     private Player selectedPlayer;
     private Player currentPlayer;
     private bool isPlayerUIEnabled = true;
     private bool isDrawingCard = false;
-    public delegate void EnableUIEvent(bool enableUI);
-    public static event EnableUIEvent OnEnableUI;
-    // Start is called before the first frame update
+    private bool hasHandledCurrentPlayer = false;
+    private bool isInitialized = false;
     
     private void Awake()
     {
@@ -57,52 +59,77 @@ public class TurnManager : MonoBehaviour
 
     private void StartTurnLoop()
     {
-        Debug.Log("Turn Manager Started");
-        AssignTurnToPlayer();
-        
-        currentPlayer = PlayerManager.Instance.players.Find(player => player.HasTurn.Value);
+        if (!isInitialized)
+        {
+            Debug.Log("Turn Manager Started");
+            //AssignTurnToPlayer();
+            isInitialized = true;
+            currentPlayer = PlayerManager.Instance.players.Find(player => player.HasTurn.Value);
+            Debug.Log($"call TurnLoop: {currentPlayer.playerName.Value}");
 
-        if (currentPlayer != null)
-        {
-            StartCoroutine(TurnLoop());
-        }
-        else
-        {
-            Debug.LogError("No initial player with hasTurn == true found.");
+            if (currentPlayer != null)
+            {
+                StartCoroutine(TurnLoop());
+                Debug.Log($"call coroutine TurnLoop: {currentPlayer.playerName.Value}");
+            }
+            else
+            {
+                Debug.LogError("No initial player with hasTurn == true found.");
+            }
         }
     }
 
     private System.Collections.IEnumerator TurnLoop()
     {
+        Debug.Log("Turn loop is rusnning");
         while (true)
         {
+            Debug.Log($"Turn loop currewnt player: {currentPlayer.playerName.Value} with turn status: {currentPlayer.HasTurn.Value}");
             if (currentPlayer.HasTurn.Value)
             {
-                HandlePlayerTurn(currentPlayer);
-                //hasHandledCurrentPlayer = true;
-                
+                if (!hasHandledCurrentPlayer)
+                {
+                    Debug.Log($"Turn loop hasHandledCurrentPlayer current player: {currentPlayer.playerName.Value} whith turn status: {currentPlayer.HasTurn.Value} and hashandlecurretplay flag is: {hasHandledCurrentPlayer}");
+                    HandlePlayerTurn(currentPlayer);
+                    Debug.Log($"Turn loop hasHandledCurrentPlayer1 current player: {currentPlayer.playerName.Value} whith turn status: {currentPlayer.HasTurn.Value}");
+                    Debug.Log($" hashandlecurretplay flag is: {hasHandledCurrentPlayer}");
+                    hasHandledCurrentPlayer = true;
+                    Debug.Log($" hashandlecurretplay1 flag is: {hasHandledCurrentPlayer}");
+                    Debug.Log($"Turn loop hasHandledCurrentPlayer1 current player: {currentPlayer.playerName.Value} ad hashandlecurretplay flag is: {hasHandledCurrentPlayer}");
+                }
             }
 
             if (!currentPlayer.HasTurn.Value)
             {
-                //hasHandledCurrentPlayer = false;
+                Debug.Log($"Turn loop hasHandledCurrentPlayer current player: {currentPlayer.playerName.Value} has Turn: {currentPlayer.HasTurn.Value}");
+                hasHandledCurrentPlayer = false;
                 NextCurrentPlayer();
             }
-
+            // Debug log to check if the loop is still running
+            Debug.Log("Turn loop is still running");
             yield return null;
         }
+        // Debug log to check if the loop terminates
+        Debug.Log("Turn loop terminated");
     }
 
-    public void OnEventGuessClick(Card selectedCard, Player selectedPlayer)
+    public void ServerRpcTest(int id)
     {
-        // Assign the selected card and player to the TurnManager's fields
-        this.selectedCard = selectedCard;
-        this.selectedPlayer = selectedPlayer;
+        Debug.Log($"The id value is: {id}");
+    }
 
-        // Check if it's a valid player turn and handle the player's turn
-        if (currentPlayer != null && !isDrawingCard)
+    public void OnEventGuessClick(ulong playerId, NetworkVariable<int> cardId)
+    {
+        //NetworkVariable<int> networkCardId =???(cardId); 
+        Debug.Log($"The playerid value is: {playerId}, and cardid: {cardId}");
+        Card selectedCard = CardManager.Instance.FetchCardById(cardId);
+        Debug.Log($"oneventguessclick selected card: {selectedCard.cardName.Value}");
+        Player selectedPlayer = PlayerManager.Instance.players.Find(player => player.OwnerClientId == playerId);
+        Debug.Log($"oneventguessclick selected player: {selectedPlayer.playerName.Value}");
+        if (currentPlayer != null && !isDrawingCard) //
         {
             HandlePlayerTurn(currentPlayer);
+            Debug.Log($"HandlePlayerTurn currentPlayer is: {currentPlayer}");
         }
         else
         {
@@ -110,9 +137,76 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    public void OnEventGuessClick1(ulong playerId, NetworkVariable<int> cardId)
+    {
+        Debug.Log($"oneventguessclick turnmanager1: is running with playerid: {playerId} and cardid: {cardId}");
+        // Fetch the selected card by its ID
+        selectedCard = CardManager.Instance.FetchCardById(cardId);
+        Debug.Log($"oneventguessclick selected card: {selectedCard.cardName.Value}");
+        // Fetch the selected player from PlayerManager
+        selectedPlayer = PlayerManager.Instance.players.Find(player => player.OwnerClientId == playerId);
+        Debug.Log($"oneventguessclick selected player: {selectedPlayer.playerName.Value}");
+        // Assign the selected card and player to the TurnManager's fields
+        this.selectedCard = selectedCard;
+        this.selectedPlayer = selectedPlayer;
+        Debug.Log($"oneventguessclick turnmanager: {selectedCard.cardName.Value} and {selectedPlayer.playerName.Value}");
+        // Check if it's a valid player turn and handle the player's turn
+        if (currentPlayer != null && !isDrawingCard) //
+        {
+            HandlePlayerTurn(currentPlayer);
+            Debug.Log($"HandlePlayerTurn currentPlayer is: {currentPlayer}");
+        }
+        else
+        {
+            Debug.LogWarning($"{Time.time}: Invalid player turn.");
+        }
+    }
+
+    public void OnEventGuessClick2(ulong playerId, int cardId)
+    {
+        Debug.Log("oneventguessclick turnmanager: is running");
+        if (selectedCard != null)
+        {
+            Debug.LogWarning("Method already called with int card ID. Skipping recursion.");
+            return;
+        }
+        NetworkVariable<int> networkCardId = new NetworkVariable<int>(cardId);
+        Debug.Log($"oneventguessclicko card and player are {networkCardId}, {playerId} ");
+        TurnManager.Instance.OnEventGuessClick(playerId, networkCardId);
+    }
+    
+
+    public void OnEventGuessClick3(ulong playerId, NetworkVariable<int> cardId)
+    {
+        Debug.Log($"oneventguessclick turnmanager1: is running with playerid: {playerId} and cardid: {cardId}");
+        // Fetch the selected card by its ID
+        Card selectedCard = CardManager.Instance.FetchCardById(cardId);
+        Debug.Log($"oneventguessclick selected card: {selectedCard}");
+        // Fetch the selected player from PlayerManager
+        Player selectedPlayer = PlayerManager.Instance.players.Find(player => player.OwnerClientId == playerId);
+        Debug.Log($"oneventguessclick selected player: {selectedPlayer}");
+        // Assign the selected card and player to the TurnManager's fields
+        this.selectedCard = selectedCard;
+        this.selectedPlayer = selectedPlayer;
+        Debug.Log($"oneventguessclick turnmanager: {selectedCard} and {selectedPlayer}");
+        // Check if it's a valid player turn and handle the player's turn
+        if (currentPlayer != null && !isDrawingCard) //
+        {
+            HandlePlayerTurn(currentPlayer);
+            Debug.Log($"HandlePlayerTurn currentPlayer is: {currentPlayer}");
+        }
+        else
+        {
+            Debug.LogWarning($"{Time.time}: Invalid player turn.");
+        }
+    }
+
+
     private void HandlePlayerTurn(Player currentPlayer)
     {
         //MakeGuess(currentPlayer);
+        Debug.Log("HandlePlayerTurn is called");
+        Debug.Log($"currentPlazer is: {currentPlayer}");
         Debug.Log($"Selected Card: {selectedCard.cardName}");
 
         if (selectedCard != null && selectedPlayer != null)
@@ -123,7 +217,12 @@ public class TurnManager : MonoBehaviour
             selectedCard = null;
             selectedPlayer = null;
         }
+        else
+        {
+            Debug.Log($"handle player method waits for selectedCard: {selectedCard} and/or selectedPlayer {selectedPlayer}");
+        }
     }
+
 
     private void AskForCard(Card selectedCard, Player selectedPlayer)
     {

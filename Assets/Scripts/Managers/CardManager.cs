@@ -73,6 +73,20 @@ public class CardManager : MonoBehaviour
         return null;
     }
 
+    //to be used by turn manager to fetch the selectedCard
+    public Card FetchCardById(NetworkVariable<int> cardId)
+    {
+        foreach (GameObject cardObject in allSpawnedCards)
+        {
+            Card cardComponent = cardObject.GetComponent<Card>();
+            if (cardComponent != null && cardComponent.cardId.Value == cardId.Value)
+            {
+                return cardComponent;
+            }
+        }
+        return null;
+    }
+
     System.Collections.IEnumerator StartCardSpawningProcess()
     {
         while (DeckManager.Instance.DeckInstance == null)

@@ -1,11 +1,11 @@
-    using Unity.Netcode;
-    using UnityEngine;
-    using TMPro;
-    using Unity.Collections; // Required for FixedString32Bytes
-    using System.Collections.Generic;
-    using UnityEngine.UI;
-    using System.Linq;
-    using System;
+using Unity.Netcode;
+using UnityEngine;
+using TMPro;
+using Unity.Collections; // Required for FixedString32Bytes
+using System.Collections.Generic;
+using UnityEngine.UI;
+using System.Linq;
+using System;
 
     public class Player : NetworkBehaviour
     {   
@@ -177,6 +177,9 @@
             {
                 playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
                 Debug.Log("UpdatePlayerHandUI_ClientRpc is running");
+                Debug.Log("called triggersping to start server rpc");
+                TriggerPing();
+                Debug.Log("called1 triggersping to start server rpc");
             }
         }
 
@@ -191,7 +194,7 @@
             {
                 CardsPlayerCanAsk.Clear();
             }
-
+           
             //var allCards = CardManager.Instance.allSpawnedCards; // Make sure this is a List<Card>
             var allCardComponents = CardManager.Instance.allSpawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
 
@@ -210,6 +213,7 @@
                 UpdateCardDropdown_ClientRpc(cardIDs);
             }
             Debug.Log($"Player {playerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
+            
         }
 
         [ClientRpc]
@@ -355,4 +359,30 @@
             base.OnDestroy();
             // Your cleanup logic here
         }
+
+        //serverRpc test
+        public void TriggerPing()
+        {
+            Debug.Log("running triggersping");
+            if (IsOwner) // Check if this client owns this Player object
+            {
+                PingServerRpc(3); // Hardcoded value passed to ServerRpc
+                Debug.Log("running triggersping in IsOwner loop");
+            }
+        }
+
+        [ServerRpc(RequireOwnership = true)]
+        private void PingServerRpc(int testVar)
+        {
+            TurnManager.Instance.ServerRpcTest(testVar);
+        }
+
+        [ServerRpc(RequireOwnership = true)]
+        public void TestVarServerRpc(ulong selectedPlayerId, int cardId)
+        {
+            NetworkVariable<int> networkCardId = new NetworkVariable<int>(cardId);
+            Debug.Log($"PingServerRpc us caled {selectedPlayerId}, {networkCardId }");
+            TurnManager.Instance.OnEventGuessClick(selectedPlayerId, networkCardId );
+        }
+        
 }
