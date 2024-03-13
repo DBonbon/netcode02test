@@ -126,6 +126,7 @@ using System;
             }
         }
 
+        
 
         private void OnScoreChanged(int oldValue, int newValue)
         {
@@ -177,9 +178,6 @@ using System;
             {
                 playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
                 Debug.Log("UpdatePlayerHandUI_ClientRpc is running");
-                Debug.Log("called triggersping to start server rpc");
-                TriggerPing();
-                Debug.Log("called1 triggersping to start server rpc");
             }
         }
 
@@ -209,7 +207,6 @@ using System;
             if (IsServer && HasTurn.Value)
             {
                 int[] cardIDs = CardsPlayerCanAsk.Select(card => card.cardId.Value).ToArray();
-                //OnCardsPlayerCanAskListUpdated?.Invoke();
                 UpdateCardDropdown_ClientRpc(cardIDs);
             }
             Debug.Log($"Player {playerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
@@ -261,36 +258,6 @@ using System;
             }
         }
         
-        /*public void UpdatePlayerToAskList(List<Player> allPlayers)
-        {
-            PlayerToAsk.Clear();
-            foreach (var potentialPlayer in allPlayers)
-            {
-                if (potentialPlayer != this)
-                {
-                    PlayerToAsk.Add(potentialPlayer);
-                    Debug.Log($"Added {potentialPlayer.playerName.Value} to PlayerToAsk.");
-                }
-            }
-
-            if (IsServer && HasTurn.Value)
-            {
-                ulong[] playerIDs = PlayerToAsk.Select(player => player.OwnerClientId).ToArray();
-                Debug.Log("UpdatePlayerToAskList calling TurnUIForPlayer_ClientRpc() ");
-                TurnUIForPlayer_ClientRpc(playerIDs); // Adjusted to pass only playerIDs
-            }
-        }
-
-        [ClientRpc]
-        public void TurnUIForPlayer_ClientRpc(ulong[] playerIDs)
-        {
-            Debug.Log($"TurnUIForPlayer_ClientRpc is owner check: {IsOwner}");
-            if (IsOwner) // Ensure this runs only for the player whose turn it is
-            {
-                playerUI.UpdatePlayersDropdown(playerIDs);
-                Debug.Log("TurnUIForPlayer_ClientRpc is running");
-            }
-        }*/
 
         //utility method section:
         public void CheckForQuartets()
@@ -360,25 +327,8 @@ using System;
             // Your cleanup logic here
         }
 
-        //serverRpc test
-        public void TriggerPing()
-        {
-            Debug.Log("running triggersping");
-            if (IsOwner) // Check if this client owns this Player object
-            {
-                PingServerRpc(3); // Hardcoded value passed to ServerRpc
-                Debug.Log("running triggersping in IsOwner loop");
-            }
-        }
-
         [ServerRpc(RequireOwnership = true)]
-        private void PingServerRpc(int testVar)
-        {
-            TurnManager.Instance.ServerRpcTest(testVar);
-        }
-
-        [ServerRpc(RequireOwnership = true)]
-        public void TestVarServerRpc(ulong selectedPlayerId, int cardId)
+        public void OnEventGuessClickServerRpc(ulong selectedPlayerId, int cardId)
         {
             NetworkVariable<int> networkCardId = new NetworkVariable<int>(cardId);
             Debug.Log($"PingServerRpc us caled {selectedPlayerId}, {networkCardId }");

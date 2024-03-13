@@ -211,7 +211,7 @@ public class PlayerUI : MonoBehaviour
             NetworkVariableIntWrapper networkCardId = new NetworkVariableIntWrapper(selectedCardId);
 
             // Call the ServerRpc from the client-side
-            player.TestVarServerRpc(selectedPlayerId, selectedCardId);
+            player.OnEventGuessClickServerRpc(selectedPlayerId, selectedCardId);
             Debug.Log($"Selected Card ID: {selectedCardId} and Selected Player ID: {selectedPlayerId}");
         }
         else
