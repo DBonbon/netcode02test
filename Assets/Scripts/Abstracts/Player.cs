@@ -100,9 +100,10 @@ using System;
                 HandCards.Add(card);
                 // Potentially update UI here as necessary
                 //Debug.Log($"Card {card.name} added to player {playerName.Value}'s HandCards list.");
-                UpdatePlayerHandUI();
+                //UpdatePlayerHandUI();
                 UpdateCardsPlayerCanAsk(); 
                 CheckForQuartets();
+                SendCardIDsToClient();
             }
         }
 
@@ -110,11 +111,12 @@ using System;
         {
             if (card != null && IsServer)
             {
-                //HandCards.Remove(card);
+                HandCards.Remove(card);
                 Debug.Log($"Removed card {card.cardName} from player's hand.");
                 // Update UI if necessary
-                UpdatePlayerHandUI();
+                //UpdatePlayerHandUI();
                 UpdateCardsPlayerCanAsk();
+                SendCardIDsToClient();
             }
         }
        
@@ -125,8 +127,6 @@ using System;
                 playerUI.UpdateTurnUI(newValue);
             }
         }
-
-        
 
         private void OnScoreChanged(int oldValue, int newValue)
         {
@@ -258,7 +258,6 @@ using System;
             }
         }
         
-
         //utility method section:
         public void CheckForQuartets()
         {
@@ -293,8 +292,7 @@ using System;
             }
             IncrementScore();
 
-            // You may want to update the player's UI here to reflect the removal of these cards from their hand
-            
+            // You may want to update the player's UI here to reflect the removal of these cards from their hand            
         }
 
         // Check if the player's hand is empty

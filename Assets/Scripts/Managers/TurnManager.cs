@@ -207,7 +207,9 @@ public class TurnManager : NetworkBehaviour
     {
         Debug.Log("TransferCard is correct");    
         selectedPlayer.RemoveCardFromHand(selectedCard);
+        selectedPlayer.SendCardIDsToClient();
         currentPlayer.AddCardToHand(selectedCard);
+        currentPlayer.SendCardIDsToClient();
     }
 
     private bool IsPlayerHandEmpty(Player currentPlayer)

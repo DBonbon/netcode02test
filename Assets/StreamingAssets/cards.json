@@ -1,6 +1,30 @@
 {
     "cards": [
         {
+            "suit": "bard",
+            "cardName": "Bni",
+            "hint": "hint7",
+            "cardId": 26
+        },
+        {
+            "suit": "bard",
+            "cardName": "Cni",
+            "hint": "hint7",
+            "cardId": 27
+        },
+        {
+            "suit": "bard",
+            "cardName": "Ddi",
+            "hint": "hint",
+            "cardId": 29
+        },
+        {
+            "suit": "bard",
+            "cardName": "Ata",
+            "hint": "hint7",
+            "cardId": 221
+        },
+        {
             "suit": "card",
             "cardName": "Alef",
             "hint": "hint1",
@@ -25,74 +49,51 @@
             "cardId": 24
         },
         {
-            "suit": "bard",
-            "cardName": "Ani",
+            "suit": "dard",
+            "cardName": "aeta",
             "hint": "hint",
             "cardId": 25
         },
+        
         {
-            "suit": "bard",
-            "cardName": "Bico",
-            "hint": "hint7",
-            "cardId": 26
-        },
-        {
-            "suit": "bard",
-            "cardName": "Caux",
-            "hint": "hint7",
-            "cardId": 27
-        },
-        {
-            "suit": "bard",
-            "cardName": "Doz",
-            "hint": "hint",
-            "cardId": 29
-        },
-        {
-            "suit": "bard",
-            "cardName": "Ata",
-            "hint": "hint7",
-            "cardId": 221
-        },
-        {
-            "suit": "bard",
+            "suit": "dard",
             "cardName": "Beta",
-            "hint": "hint",
+            "hint": "dint",
             "cardId": 222
         },
         {
-            "suit": "bard",
-            "cardName": "Comment",
+            "suit": "dard",
+            "cardName": "ceta",
             "hint": "hint",
             "cardId": 223
         },
         {
-            "suit": "bard",
-            "cardName": "Daledi",
+            "suit": "dard",
+            "cardName": "Deta",
             "hint": "hint",
             "cardId": 224
         },
         {
             "suit": "hard",
-            "cardName": "Aalki",
+            "cardName": "Alki",
             "hint": "hint6",
             "cardId": 225
         },
         {
             "suit": "hard",
-            "cardName": "Bita",
+            "cardName": "Blki",
             "hint": "hint",
             "cardId": 226
         },
         {
             "suit": "hard",
-            "cardName": "Cuta",
+            "cardName": "Clki",
             "hint": "hint5",
             "cardId": 227
         },
         {
             "suit": "hard",
-            "cardName": "Dita",
+            "cardName": "Dlki",
             "hint": "hint",
             "cardId": 228
         },

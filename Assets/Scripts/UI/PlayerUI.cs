@@ -96,6 +96,7 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
+
     public void UpdateScoreUI(int score)
     {
         if (scoreText != null)
@@ -129,15 +130,6 @@ public class PlayerUI : MonoBehaviour
         playersDropdown.ClearOptions();
         List<string> playerNamesList = new List<string>(playerNames);
 
-        /*foreach (var playerId in playerIDs)
-        {
-            Debug.Log($"player id is: {playerId}");
-            string playerName = PlayerManager.Instance.GetPlayerNameByClientId(playerId);
-            Debug.Log($"playerName from teh update method is: {playerName}");
-            playerNamesList.Add(playerName); // Use the name from the dictionary lookup
-            Debug.Log($"Player ID is the: {playerId}, Player Name is the: {playerName}"); // Debug to verify names
-        }*/
-
         for(int i = 0; i < playerIDs.Length; i++)
         {
             playerIdsInDropdown.Add(playerIDs[i]);
@@ -148,25 +140,6 @@ public class PlayerUI : MonoBehaviour
         Debug.Log("Players Dropdown updated with names: " + string.Join(", ", playerNames));
         
     }
-
-    /*public void UpdatePlayersDropdown(ulong[] playerIDs)
-    {
-        Debug.Log($"Updating players dropdown. IDs count: {playerIDs.Length}");
-        playersDropdown.ClearOptions();
-        List<string> playerNamesList = new List<string>();
-
-        foreach (var playerId in playerIDs)
-        {
-            Debug.Log($"Print player ID: {playerId}");
-            string playerName = PlayerManager.Instance.GetPlayerNameByClientId(playerId);
-            Debug.Log($"Fetching name for Player ID {playerId}: {playerName}");
-
-            playerNamesList.Add(playerName);
-        }
-        
-        playersDropdown.AddOptions(playerNamesList);
-        Debug.Log("Players Dropdown updated with names: " + string.Join(", ", playerNamesList));
-    }*/
 
     public void UpdateCardsDropdownWithIDs(int[] cardIDs)
     {

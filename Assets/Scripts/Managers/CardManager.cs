@@ -178,43 +178,38 @@ public class CardManager : MonoBehaviour
                     break; // Stop if there are no more cards
                 }
             }
-            player.SendCardIDsToClient();
+            //player.SendCardIDsToClient();
         }
     }
 
     public void DrawCardFromDeck(Player currentPlayer)
     {
-        if (currentPlayer != null)
-        {
-            /*if (deckCards.Count > 0)
-            {
-                Card card = deckCards[0]; // Get the top card from the deck
-                deckCards.RemoveAt(0); // Remove the card from the deckCards list
-
-                currentPlayer.AddCardToHand(card); // Add the card to the player's hand
-
-                // Update the card's parent transform to the player's hand
-                card.gameObject.transform.SetParent(currentPlayer.PlayerHand);
-
-                 
-
-                // You can apply an offset if needed
-                Vector3 positionOffset = new Vector3(0, 0, currentPlayer.HandCards.Count * 0.02f);
-                card.gameObject.transform.localPosition += positionOffset;
-
-                // You might want to update the visual representation of the deck.
-                UpdateDeck();
-            }
-            else
-            {
-                Debug.LogWarning("No cards left in the deck.");
-            }*/
-        }
-        else
+        if (currentPlayer == null)
         {
             Debug.LogWarning("Invalid player.");
+            return;
         }
+        
+        Deck deck = DeckManager.Instance.DeckInstance.GetComponent<Deck>();
+        if (deck == null) 
+        {
+            Debug.LogError("Deck is not found.");
+            return;
+        }
+
+        Card card = deck.RemoveCardFromDeck(); // Adjust to use your actual method for removing a card from the deck.
+        if (card != null) 
+        {
+            currentPlayer.AddCardToHand(card); // Adapt to network context as in DistributeCards.
+            // Assuming AddCardToHand handles the necessary network synchronization internally.
+        } 
+        else 
+        {
+            Debug.LogWarning("Deck is out of cards.");
+        }
+        currentPlayer.SendCardIDsToClient();
     }
+
 
     public string GetCardNameById(int cardId)
     {
