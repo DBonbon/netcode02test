@@ -20,7 +20,7 @@
         },
         {
             "suit": "bard",
-            "cardName": "Ata",
+            "cardName": "Eni",
             "hint": "hint7",
             "cardId": 221
         },
@@ -50,11 +50,10 @@
         },
         {
             "suit": "dard",
-            "cardName": "aeta",
+            "cardName": "Aeta",
             "hint": "hint",
             "cardId": 25
         },
-        
         {
             "suit": "dard",
             "cardName": "Beta",
@@ -63,7 +62,7 @@
         },
         {
             "suit": "dard",
-            "cardName": "ceta",
+            "cardName": "Ceta",
             "hint": "hint",
             "cardId": 223
         },

@@ -160,7 +160,6 @@ public class PlayerUI : MonoBehaviour
 
     //event
     
-
     public void OnEventGuessClick()
     {
         // Get the selected index from the dropdowns

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class TurnManager : NetworkBehaviour
+public class TurnManager2 : NetworkBehaviour
 {
-    public static TurnManager Instance;
+    public static TurnManager2 Instance;
     
     public delegate void EnableUIEvent(bool enableUI);
     public static event EnableUIEvent OnEnableUI;
@@ -113,6 +113,29 @@ public class TurnManager : NetworkBehaviour
         Debug.Log("Turn loop terminated");
     }
 
+    private void HandlePlayerTurn(Player currentPlayer)
+    {
+        //MakeGuess(currentPlayer);
+        Debug.Log("HandlePlayerTurn is called");
+        Debug.Log($"currentPlazer is: {currentPlayer}");
+        //Debug.Log($"Selected Card: {selectedCard.cardName}");
+
+        if (currentPlayer != null)
+        {
+            ActivateTurnUI();
+            Debug.Log("GuessCheck is called");
+        }
+        else
+        {
+            Debug.Log($"handle player method waits for selectedCard: selectedCard and/or selectedPlayer selectedPlayer");
+        }
+    }
+
+    private void ActivateTurnUI()
+    {
+        DisplayMessage("Activate TurnUi");
+    }
+
     public void OnEventGuessClick(ulong playerId, NetworkVariable<int> cardId)
     {
         //NetworkVariable<int> networkCardId =???(cardId); 
@@ -125,7 +148,7 @@ public class TurnManager : NetworkBehaviour
         this.selectedPlayer = selectedPlayer;
         if (currentPlayer != null && !isDrawingCard) //
         {
-            HandlePlayerTurn(currentPlayer);
+            GuessCheck(selectedPlayer, selectedCard);
             Debug.Log($"HandlePlayerTurn currentPlayer is: {currentPlayer}");
         }
         else
@@ -134,30 +157,9 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-    private void HandlePlayerTurn(Player currentPlayer)
+    private void GuessCheck(Player selectedPlayer, Card selectedCard)
     {
-        //MakeGuess(currentPlayer);
-        Debug.Log("HandlePlayerTurn is called");
-        Debug.Log($"currentPlazer is: {currentPlayer}");
-        Debug.Log($"Selected Card: {selectedCard.cardName}");
-
-        if (selectedCard != null && selectedPlayer != null)
-        {
-            AskForCard(selectedCard, selectedPlayer);
-            Debug.Log("askforcard is called");
-            // Reset selectedCard and selectedPlayer to null
-            selectedCard = null;
-            selectedPlayer = null;
-        }
-        else
-        {
-            Debug.Log($"handle player method waits for selectedCard: {selectedCard} and/or selectedPlayer {selectedPlayer}");
-        }
-    }
-
-    private void AskForCard(Card selectedCard, Player selectedPlayer)
-    {
-        Debug.Log("askforcard is running");
+        Debug.Log("GuessCheck is running");
         if (selectedPlayer.HandCards.Contains(selectedCard))
         {
             Debug.Log("AskForCar guess is correct");
@@ -223,36 +225,6 @@ public class TurnManager : NetworkBehaviour
         Debug.Log("end turn is running");
     }
 
-    /*private void NextCurrentPlayer()
-    {
-        int currentIndex = PlayerManager.Instance.players.IndexOf(currentPlayer);
-        int nextIndex = (currentIndex + 1) % PlayerManager.Instance.players.Count;
-
-        int skippedPlayers = 0;
-
-        Debug.Log("next current player is called");
-        while (skippedPlayers < PlayerManager.Instance.players.Count)
-        {
-            Player nextPlayer = PlayerManager.Instance.players[nextIndex];
-
-            if (!nextPlayer.IsHandEmpty())
-            {
-                currentPlayer.HasTurn.Value = false;
-                nextPlayer.HasTurn.Value = true;
-                currentPlayer = nextPlayer;
-                return; // Found a non-empty-handed player, exit the loop
-            }
-            Debug.Log($"next current player: {nextPlayer}");
-            // If the next player's hand is empty, skip them and move to the next one.
-            nextIndex = (nextIndex + 1) % PlayerManager.Instance.players.Count;
-            skippedPlayers++;
-        }
-
-        // If all players have empty hands, you can handle this case or end the game.
-        // For example, you can call a function to end the game.
-        // HandleAllEmptyHands();
-    }*/
-
     private void NextCurrentPlayer()
     {
         Debug.Log("next current player is called");
@@ -289,7 +261,6 @@ public class TurnManager : NetworkBehaviour
             Debug.LogError("Next player index is out of valid range.");
         }
     }
-
 
     private void CheckForQuartets()
     {
