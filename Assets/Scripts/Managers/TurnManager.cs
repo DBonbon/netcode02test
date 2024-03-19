@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
+/*
+to check why the cardui aren't operates correctly. 
+print a dict of cardui.name and cardui.id. test it matches that of cards
+
+ensure it is returned correctly from the option dropdown list. 
+
+check it then against the turnmanager. 
+
+*/
+
 public class TurnManager : NetworkBehaviour
 {
     public static TurnManager Instance;
@@ -143,8 +153,9 @@ public class TurnManager : NetworkBehaviour
         //MakeGuess(currentPlayer);
         Debug.Log("HandlePlayerTurn is called");
         Debug.Log($"currentPlazer is: {currentPlayer}");
-        Debug.Log($"Selected Card: {selectedCard.cardName}");
-        ActivateTurnUI(currentPlayer);
+        Debug.Log($"Selected Card: {selectedCard.cardName.Value}");
+        ActivateTurnUI();
+        Debug.Log("ActivateTurnUI is called");
 
         if (selectedCard != null && selectedPlayer != null)
         {
@@ -160,21 +171,22 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-    private void ActivateTurnUI(Player player)
+    private void ActivateTurnUI()
     {
         // Toggle the state of the activateTurnUIFlag each time the method is called
         activateTurnUIFlag = !activateTurnUIFlag;
+        Debug.Log("starting Activating Turn UI for player: " + currentPlayer.name);
 
         // Based on the flag state, you can perform different actions
         if (activateTurnUIFlag)
         {
             // Code to activate or display the turn UI
-            Debug.Log("Activating Turn UI for player: " + player.name);
+            Debug.Log("Activating Turn UI for player: " + currentPlayer.name);
         }
         else
         {
             // Code to deactivate or hide the turn UI
-            Debug.Log("Deactivating Turn UI for player: " + player.name);
+            Debug.Log("Deactivating Turn UI for player: " + currentPlayer.name);
         }
 
         // You can also display messages or perform other operations here
@@ -182,7 +194,7 @@ public class TurnManager : NetworkBehaviour
 
     private void GuessCheck(Card selectedCard, Player selectedPlayer)
     {
-        ActivateTurnUI(currentPlayer);
+        ActivateTurnUI();
         Debug.Log("GuessCheck is running");
         if (selectedPlayer.HandCards.Contains(selectedCard))
         {
@@ -198,11 +210,11 @@ public class TurnManager : NetworkBehaviour
     {
         Debug.Log("AskForCar guess is correct");
         TransferCard(selectedCard, currentPlayer);
-        Debug.Log("TransferCard is correct");
+        Debug.Log($"TransferCard is correct: {selectedCard.cardName.Value}");
         CheckForQuartets(); 
         selectedCard = null;
         selectedPlayer = null;
-        Debug.Log($"Selected Card: {selectedCard.cardName}");  
+        Debug.Log($"Selected Card: {selectedCard.cardName.Value}");  
         //HandlePlayerTurn(currentPlayer);*/
         
         // If the guess is correct and the player's hand isn't empty, allow another guess.
@@ -242,9 +254,9 @@ public class TurnManager : NetworkBehaviour
     {
         Debug.Log("TransferCard is correct");    
         selectedPlayer.RemoveCardFromHand(selectedCard);
-        selectedPlayer.SendCardIDsToClient();
+        //selectedPlayer.SendCardIDsToClient();
         currentPlayer.AddCardToHand(selectedCard);
-        currentPlayer.SendCardIDsToClient();
+        //currentPlayer.SendCardIDsToClient();
     }
 
     private bool IsPlayerHandEmpty(Player currentPlayer)
@@ -329,8 +341,8 @@ public class TurnManager : NetworkBehaviour
 
     private void CheckGameEnd()
     {
-        /*bool allHandsEmpty = true;
-        foreach (Player player in PlayerManager.Players)
+        bool allHandsEmpty = true;
+        foreach (var player in players)
         {
             if (!player.IsHandEmpty())
             {
@@ -342,7 +354,7 @@ public class TurnManager : NetworkBehaviour
         if (allHandsEmpty)
         {
             GameEnd();
-        }*/
+        }
     }
 
     private void GameEnd()

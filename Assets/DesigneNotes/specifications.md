@@ -23,3 +23,12 @@
     Key Processes and Methods:
         PlayerUI.updatePlayersDropdown is essential for transforming player network IDs into names and updating the dropdown options accordingly.
         turnUIObjects_ClientRpc is critical for activating turn-indicating UI elements, especially the playersDropdown, aligning with turn changes and player interactions.
+
+
+
+    the game involves:
+    Players guessing cards held by other players.
+    Cards are represented as both Card (network objects with NetworkVariable attributes) and CardUI (non-network instances fetched from a pool).
+    The Player class handles the game logic related to the players, including guessing cards and updating UI based on hand changes.
+    The PlayerUI class handles the visual representation of the player's state, including updating hand UI and dropdowns for guessing.
+    The TurnManager handles the flow of turns, including guess checking and transferring cards between players on correct guesses.

@@ -96,7 +96,6 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-
     public void UpdateScoreUI(int score)
     {
         if (scoreText != null)
@@ -137,26 +136,25 @@ public class PlayerUI : MonoBehaviour
             
         playersDropdown.AddOptions(playerNamesList);
         // This log helps you verify that the dropdown options have been successfully updated.
-        Debug.Log("Players Dropdown updated with names: " + string.Join(", ", playerNames));
-        
+        Debug.Log("Players Dropdown updated with names: " + string.Join(", ", playerNames));  
     }
 
     public void UpdateCardsDropdownWithIDs(int[] cardIDs)
     {
-        Debug.Log($"Updating cards dropdown. IDs count: {cardIDs.Length}");
         cardsDropdown.ClearOptions();
         List<string> cardNames = new List<string>();
+        this.cardIDs.Clear(); // Ensure the list is cleared before repopulating
 
         foreach (int id in cardIDs)
         {
-            string cardName = CardManager.Instance.GetCardNameById(id); // Ensure this method is correctly implemented
-            Debug.Log($"Card ID: {id}, Name: {cardName}");
+            string cardName = CardManager.Instance.GetCardNameById(id);
             cardNames.Add(cardName);
-            this.cardIDs.Add(id); // Maintain ID mapping
+            this.cardIDs.Add(id); // Repopulate with current card IDs
         }
 
         cardsDropdown.AddOptions(cardNames);
     }
+
 
     //event
     
@@ -165,8 +163,7 @@ public class PlayerUI : MonoBehaviour
         // Get the selected index from the dropdowns
         int selectedPlayerIndex = playersDropdown.value;
         int selectedCardIndex = cardsDropdown.value;
-
-        if (selectedCardIndex < 0 || selectedCardIndex >= cardIDs.Count)
+        if (selectedCardIndex < 0 || selectedCardIndex >= this.cardIDs.Count)
         {
             Debug.LogError("Invalid card dropdown selection.");
             return;
@@ -177,8 +174,8 @@ public class PlayerUI : MonoBehaviour
             ulong selectedPlayerId = playerIdsInDropdown[selectedPlayerIndex];
             Debug.Log($"Selected Player Client ID: {selectedPlayerId}");
 
-            int selectedCardId = cardIDs[selectedCardIndex];
-
+            //int selectedCardId = cardIDs[selectedCardIndex];
+            int selectedCardId = this.cardIDs[selectedCardIndex];
             // Wrap selectedCardId into a NetworkVariableIntWrapper
             NetworkVariableIntWrapper networkCardId = new NetworkVariableIntWrapper(selectedCardId);
 

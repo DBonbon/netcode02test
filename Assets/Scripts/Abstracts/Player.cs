@@ -101,9 +101,9 @@ using System;
                 // Potentially update UI here as necessary
                 //Debug.Log($"Card {card.name} added to player {playerName.Value}'s HandCards list.");
                 //UpdatePlayerHandUI();
-                UpdateCardsPlayerCanAsk(); 
                 CheckForQuartets();
                 SendCardIDsToClient();
+                UpdateCardsPlayerCanAsk();  
             }
         }
 
@@ -147,14 +147,6 @@ using System;
         {
             Score.Value += 1; // Increment score by 1 for test
             //Debug.Log($"Test: Incremented Score to {Score.Value}");
-        }
-
-        public void UpdatePlayerHandUI()
-        {
-            // Assuming you have a method to update UI based on the current hand
-            List<int> cardIDs = HandCards.Select(c => c.cardId.Value).ToList();
-            playerUI?.UpdatePlayerHandUIWithIDs(cardIDs);
-            Debug.Log($"Card UpdatePlayerHandUIWithIDs was called for player {playerName.Value}'s HandCards list.");
         }
 
         // This method is called on the server to send the card IDs to the client
@@ -210,7 +202,6 @@ using System;
                 UpdateCardDropdown_ClientRpc(cardIDs);
             }
             Debug.Log($"Player {playerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
-            
         }
 
         [ClientRpc]
@@ -329,8 +320,8 @@ using System;
         public void OnEventGuessClickServerRpc(ulong selectedPlayerId, int cardId)
         {
             NetworkVariable<int> networkCardId = new NetworkVariable<int>(cardId);
-            Debug.Log($"PingServerRpc us caled {selectedPlayerId}, {networkCardId }");
-            TurnManager.Instance.OnEventGuessClick(selectedPlayerId, networkCardId );
+            Debug.Log($"PingServerRpc us called {selectedPlayerId}, {networkCardId.Value}");
+            TurnManager.Instance.OnEventGuessClick(selectedPlayerId, networkCardId);
         }
         
 }
