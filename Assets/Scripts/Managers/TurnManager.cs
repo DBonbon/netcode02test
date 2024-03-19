@@ -1,4 +1,5 @@
 //turnmanager
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -62,7 +63,9 @@ public class TurnManager : NetworkBehaviour
             player.HasTurn.Value = false;
         }
 
-        int randomIndex = Random.Range(0, players.Count);
+        //int randomIndex = Random.Range(0, players.Count);
+        int randomIndex = UnityEngine.Random.Range(0, players.Count);
+
         players[randomIndex].HasTurn.Value = true;
         // Let UpdatePlayerToAskList handle the RPC call with the correct data
         players[randomIndex].UpdatePlayerToAskList(players);
@@ -220,23 +223,18 @@ public class TurnManager : NetworkBehaviour
         // If the guess is correct and the player's hand isn't empty, allow another guess.
         if (!IsPlayerHandEmpty(currentPlayer))
         {
-            // Allow the player to make another guess without drawing a card or ending the turn.
-            selectedCard = null;
-            selectedPlayer = null;
             HandlePlayerTurn(currentPlayer);
         }
         else if (DeckManager.Instance.CurrentDeck != null && DeckManager.Instance.CurrentDeck.DeckCards.Count > 0)
         {
-            // If the player's hand is empty but the deck isn't, draw a card from the deck.
-            DrawCardFromDeck();
-            // After drawing a card, re-evaluate the hand.
-            if (!IsPlayerHandEmpty(currentPlayer))
+            DrawCardFromDeck(() =>
             {
-                // Allow the player to make another guess.
-                selectedCard = null;
-                selectedPlayer = null;
-                HandlePlayerTurn(currentPlayer);
-            }
+                // This callback ensures we re-evaluate the hand only after the card has been drawn
+                if (!IsPlayerHandEmpty(currentPlayer))
+                {
+                    HandlePlayerTurn(currentPlayer);
+                }
+            });
         }
         // No need to check for the deck being empty here, as we've alrug.Loady handled that case.
     }
@@ -245,11 +243,16 @@ public class TurnManager : NetworkBehaviour
     {
         Debug.Log("ask for card, player doesn't have card");
         DisplayMessage($"{selectedPlayer.playerName} does not have {selectedCard.cardName}.");
-        DrawCardFromDeck();
-        Debug.Log("ask for card, call end turn");
-        EndTurn(); // This is the correct place to call EndTurn for an incorrect guess.
+        DrawCardFromDeck(() => 
+        {
+            // Actions to take after drawing the card, if any.
+            // For example, you might want to update some UI elements here to reflect the new card in the player's hand.
+            
+            Debug.Log("ask for card, call end turn");
+            EndTurn(); // This is now inside the callback, ensuring it's called after drawing a card.
+        });
     }
-
+    
     private void TransferCard(Card selectedCard, Player curPlayer)
     {
         Debug.Log("TransferCard is correct");    
@@ -326,7 +329,7 @@ public class TurnManager : NetworkBehaviour
         Debug.Log("Display Message: " + message);
     }
 
-    public void DrawCardFromDeck()
+    /*public void DrawCardFromDeck()
     {
         Debug.Log("draw card from deck is called");
         if (CardManager.Instance != null && currentPlayer != null)
@@ -337,7 +340,18 @@ public class TurnManager : NetworkBehaviour
         {
             Debug.LogError($"{Time.time}: CardManager reference or current player or selected card is not assigned.");
         }
+    }*/
+    public void DrawCardFromDeck(Action onCardDrawn)
+    {
+        Debug.Log("draw card from deck is called");
+        // Assume this method involves adding a card to currentPlayer's hand
+        CardManager.Instance.DrawCardFromDeck(currentPlayer);
+        
+        // Simulate the card drawing and hand update process
+        // Once complete, invoke the callback
+        onCardDrawn?.Invoke();
     }
+
 
     private void CheckGameEnd()
     {
