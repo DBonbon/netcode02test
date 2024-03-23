@@ -13,6 +13,7 @@ using UnityEngine;
 
 public class ServerStartUp : MonoBehaviour
 {
+    public static event System.Action ClientInstance;
     private const string InternalServerIP = "0.0.0.0";
     private string _externalServerIP = "0.0.0.0";
     private ushort _serverPort = 7777;
@@ -56,6 +57,10 @@ public class ServerStartUp : MonoBehaviour
         {
             StartServer();
             await StartServerServices();
+        }
+        else
+        {
+            ClientInstance?.Invoke();
         }
         
     }

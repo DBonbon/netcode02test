@@ -11,7 +11,7 @@ public class PlayerManager : NetworkBehaviour
     public static int TotalPlayerPrefabs = 2; // Adjust based on your game's needs
     private int connectedPlayers = 0;
     private bool gameInitialized = false; // Flag to track if the game start logic has been executed
-    public List<Player> players = new List<Player>();
+    public List<Player1> players1 = new List<Player1>();
     private List<PlayerData> playerDataList;
     [SerializeField] private Transform deckUIContainer;
 
@@ -61,15 +61,15 @@ public class PlayerManager : NetworkBehaviour
         var playerObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
         if (playerObject != null)
         {
-            var player = playerObject.GetComponent<Player>();
+            var player = playerObject.GetComponent<Player1>();
             if (player != null && connectedPlayers <= playerDataList.Count)
             {
                 string playerImagePath = "Images/character_01"; // Default image path
                 var playerData = playerDataList[connectedPlayers - 1]; // Example, adjust as necessary
                 player.InitializePlayer(playerData.playerName, playerData.playerDbId, playerData.playerImagePath);
                 BroadcastPlayerNamesToNewClient(clientId);
-                players.Add(player);
-                Debug.Log($"num of players after: {players.Count}");
+                players1.Add(player);
+                Debug.Log($"num of players after: {players1.Count}");
 
                 // Update dictionaries
                 clientIdToPlayerName[clientId] = player.playerName.Value.ToString();
@@ -83,7 +83,7 @@ public class PlayerManager : NetworkBehaviour
                 // Add a debug log here to confirm the dictionary is updated
                 Debug.Log($"[PlayerManager] Added player with Client ID: {clientId} and Name: {player.playerName.Value}");
 
-                if (players.Count == playerDataList.Count && !gameInitialized) 
+                if (players1.Count == playerDataList.Count && !gameInitialized) 
                 {
                     gameInitialized = true;
                     StartGameLogic();
@@ -95,7 +95,7 @@ public class PlayerManager : NetworkBehaviour
 
     private void BroadcastPlayerNamesToNewClient(ulong newClientId)
     {
-        foreach (var player in players)
+        foreach (var player in players1)
         {
             // Use the new method to broadcast both attributes
             player.BroadcastPlayerDbAttributes();
@@ -107,7 +107,7 @@ public class PlayerManager : NetworkBehaviour
         Debug.Log("running StartGameLogic");
         //PrintPlayersListDetails();
         //UpdatePlayerToAsk();
-        CardManager.Instance.DistributeCards(players);
+        CardManager.Instance.DistributeCards(players1);
         TurnManager.Instance.StartTurnManager();
         PrintPlayersListDetails();
     }
@@ -115,21 +115,21 @@ public class PlayerManager : NetworkBehaviour
     private void UpdatePlayerToAsk()
     {
         Debug.Log("UpdatePlayerToAsk started");
-        // Iterate through each player in the 'players' list
-        foreach (var player in players)
+        // Iterate through each player in the 'players1' list
+        foreach (var player in players1)
         {
             Debug.Log($"UpdatePlayerToAsk playerName; {player.playerName.Value}");
             // Call a method on the player instance to update its PlayerToAsk list
-            player.UpdatePlayerToAskList(players);
+            player.UpdatePlayerToAskList(players1);
         }
     }
 
-    //testing players list
+    //testing players1 list
     public void PrintPlayersListDetails()
     {
-        Debug.Log($"Printing details of all players in the PlayerManager list. Total players: {players.Count}");
+        Debug.Log($"Printing details of all players1 in the PlayerManager list. Total players1: {players1.Count}");
         
-        foreach (var player in players)
+        foreach (var player in players1)
         {
             Debug.Log($"Player Details - OwnerClientId: {player.OwnerClientId}");
 
@@ -151,7 +151,7 @@ public class PlayerManager : NetworkBehaviour
             }
         }
 
-        foreach (var playeri in players)
+        foreach (var playeri in players1)
         {
             // Directly accessing the playerName NetworkVariable
             var playerName = playeri.playerName.Value; // Adjust PlayerName to match the actual variable name in your Player class
@@ -182,7 +182,7 @@ public class PlayerManager : NetworkBehaviour
     // Method to clean up players, if necessary
     public void CleanupPlayers()
     {
-        players.Clear();
+        players1.Clear();
     }
 
     public void GenerateGamePlayers(List<PlayerData> name)

@@ -22,14 +22,14 @@ public class TurnManager : NetworkBehaviour
     public static event EnableUIEvent OnEnableUI;
     // Start is called before the first frame update
     private Card selectedCard;
-    private Player selectedPlayer;
-    private Player currentPlayer;
+    private Player1 selectedPlayer;
+    private Player1 currentPlayer;
     private bool isPlayerUIEnabled = true;
     private bool isDrawingCard = false;
     private bool hasHandledCurrentPlayer = false;
     private bool isInitialized = false;
     private bool activateTurnUIFlag = false;
-    private List<Player> players;
+    private List<Player1> players;
     
     private void Awake()
     {
@@ -37,7 +37,7 @@ public class TurnManager : NetworkBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            players = PlayerManager.Instance.players;
+            players = PlayerManager.Instance.players1;
         }
         else
         {
@@ -136,7 +136,7 @@ public class TurnManager : NetworkBehaviour
         Debug.Log($"The playerid value is: {playerId}, and cardid: {cardId}");
         Card selectedCard = CardManager.Instance.FetchCardById(cardId);
         Debug.Log($"oneventguessclick selected card: {selectedCard.cardName.Value}");
-        Player selectedPlayer = players.Find(player => player.OwnerClientId == playerId);
+        Player1 selectedPlayer = players.Find(player => player.OwnerClientId == playerId);
         Debug.Log($"oneventguessclick selected player: {selectedPlayer.playerName.Value}");
         this.selectedCard = selectedCard;
         this.selectedPlayer = selectedPlayer;
@@ -151,7 +151,7 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-    private void HandlePlayerTurn(Player currentPlayer)
+    private void HandlePlayerTurn(Player1 currentPlayer)
     {
         //MakeGuess(currentPlayer);
         Debug.Log("HandlePlayerTurn is called");
@@ -195,7 +195,7 @@ public class TurnManager : NetworkBehaviour
         // You can also display messages or perform other operations here
     }
 
-    private void GuessCheck(Card selectedCard, Player selectedPlayer)
+    private void GuessCheck(Card selectedCard, Player1 selectedPlayer)
     {
         ActivateTurnUI();
         Debug.Log("GuessCheck is running");
@@ -253,7 +253,7 @@ public class TurnManager : NetworkBehaviour
         });
     }
     
-    private void TransferCard(Card selectedCard, Player curPlayer)
+    private void TransferCard(Card selectedCard, Player1 curPlayer)
     {
         Debug.Log("TransferCard is correct");    
         selectedPlayer.RemoveCardFromHand(selectedCard);
@@ -262,7 +262,7 @@ public class TurnManager : NetworkBehaviour
         //currentPlayer.SendCardIDsToClient();
     }
 
-    private bool IsPlayerHandEmpty(Player currentPlayer)
+    private bool IsPlayerHandEmpty(Player1 currentPlayer)
     {
         return currentPlayer.IsHandEmpty();
     }
@@ -276,7 +276,7 @@ public class TurnManager : NetworkBehaviour
     private void NextCurrentPlayer()
     {
         Debug.Log("next current player is called");
-        var players = PlayerManager.Instance.players;
+        var players = PlayerManager.Instance.players1;
         if (players.Count == 0) return;
 
         // Find the index of the current player who has the turn.

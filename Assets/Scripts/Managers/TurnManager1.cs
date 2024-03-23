@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class TurnManager1 : NetworkBehaviour
-{
+{/*
     public static TurnManager1 Instance;
     
     public delegate void EnableUIEvent(bool enableUI);
@@ -301,5 +301,5 @@ public class TurnManager1 : NetworkBehaviour
         Debug.Log($"{Time.time}: Game Ended");
         // Call the method to display end game results
         //gameFlowManager.DisplayEndGameResults();
-    }
+    }*/
 }

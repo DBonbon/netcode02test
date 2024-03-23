@@ -30,25 +30,25 @@ public class PlayerUI : MonoBehaviour
 
     //lists to retreive cards value in the guessbuttonclickhandler
     private List<Card> CardsPlayerCanAsk;
-    private List<Player> PlayerToAsk;
+    private List<Player1> PlayerToAsk;
 
     private List<int> playerIDs = new List<int>();
     private List<int> cardIDs = new List<int>();
 
     private const string DefaultImagePath = "Images/character_01";
-    private Player player;
+    private Player1 player;
 
     // In PlayerUI
     private List<ulong> playerIdsInDropdown = new List<ulong>();
 
 
-    public Player currentPlayer;
+    public Player1 currentPlayer;
 
     void Awake()
     {
         // Add an onClick handler to the guessButton
         guessButton.onClick.AddListener(OnEventGuessClick);
-        player = GetComponent<Player>();
+        player = GetComponent<Player1>();
     }
     
     public void InitializePlayerUI(string playerName, string imagePath)

@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class TurnManager2 : NetworkBehaviour
-{
+{/*
     public static TurnManager2 Instance;
     
     public delegate void EnableUIEvent(bool enableUI);
@@ -169,7 +169,7 @@ public class TurnManager2 : NetworkBehaviour
             selectedCard = null;
             selectedPlayer = null;
             Debug.Log($"Selected Card: {selectedCard.cardName}");  
-            //HandlePlayerTurn(currentPlayer);*/
+            //HandlePlayerTurn(currentPlayer);
             
             // If the guess is correct and the player's hand isn't empty, allow another guess.
             if (!IsPlayerHandEmpty(currentPlayer))
@@ -296,20 +296,7 @@ public class TurnManager2 : NetworkBehaviour
 
     private void CheckGameEnd()
     {
-        /*bool allHandsEmpty = true;
-        foreach (Player player in PlayerManager.Players)
-        {
-            if (!player.IsHandEmpty())
-            {
-                allHandsEmpty = false;
-                break;
-            }
-        }
-
-        if (allHandsEmpty)
-        {
-            GameEnd();
-        }*/
+        
     }
 
     private void GameEnd()
@@ -317,5 +304,5 @@ public class TurnManager2 : NetworkBehaviour
         Debug.Log($"{Time.time}: Game Ended");
         // Call the method to display end game results
         //gameFlowManager.DisplayEndGameResults();
-    }
+    }*/
 }

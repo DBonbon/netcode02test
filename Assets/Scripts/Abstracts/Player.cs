@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using System.Linq;
 using System;
 
-    public class Player : NetworkBehaviour
+    public class Player1 : NetworkBehaviour
     {   
         //[SerializeField] private TextMeshProUGUI playerNameText;
         //private float xOffset = 2f;
@@ -20,7 +20,7 @@ using System;
         public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
 
         public List<Card> HandCards { get; set; } = new List<Card>();
-        public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
+        public List<Player1> PlayerToAsk { get; private set; } = new List<Player1>();
         public List<Card> CardsPlayerCanAsk { get; private set; } = new List<Card>();
         public List<Card> Quartets { get; private set; } = new List<Card>();
 
@@ -47,7 +47,6 @@ using System;
 
             OnScoreChanged(0, Score.Value); // Manually trigger the update to set initial UI state.
             OnHasTurnChanged(false, HasTurn.Value); // Manually trigger to ensure UI is correctly set up on spawn.
-
         }
 
         public void InitializePlayer(string name, int dbId, string imagePath)
@@ -215,7 +214,7 @@ using System;
             }
         }
 
-        public void UpdatePlayerToAskList(List<Player> allPlayers)
+        public void UpdatePlayerToAskList(List<Player1> allPlayers)
         {
             PlayerToAsk.Clear();
             foreach (var potentialPlayer in allPlayers)
