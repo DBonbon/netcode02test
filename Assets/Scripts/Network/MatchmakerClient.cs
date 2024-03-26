@@ -81,6 +81,24 @@ public class MatchmakerClient : MonoBehaviour
         var options = new CreateTicketOptions(queueName:"QuartetsMode");
         var players = new List<Player>
         {
+            new Player (PlayerID(), null)
+        };
+
+        try
+        {
+            var ticketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, options);
+            _ticketId = ticketResponse.Id;
+            Debug.Log($"Ticket ID: {_ticketId}");
+            PollTicketStatus();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to create a matchmaking ticket: {e.Message}");
+        }
+
+        /*
+        var players = new List<Player>
+        {
             new Player (
                 PlayerID(),
                 new MacthmakingPlayerData
@@ -93,7 +111,7 @@ public class MatchmakerClient : MonoBehaviour
         var ticketResponse = await MatchmakerService.Instance.CreateTicketAsync(players, options);
         _ticketId = ticketResponse.Id;
         Debug.Log($"Ticket ID: {_ticketId}");
-        PollTicketStatus();
+        PollTicketStatus();*/
     }
 
     [Serializable]
