@@ -626,7 +626,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &402299705049651319
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1096,6 +1096,8 @@ MonoBehaviour:
   - {fileID: 2519724970570780942}
   - {fileID: 8517146888627532931}
   - {fileID: 1645338880898752423}
+  cardFront: {fileID: 3100271253544963260}
+  cardBack: {fileID: 3373250775241401266}
 --- !u!1 &8257556683478287802
 GameObject:
   m_ObjectHideFlags: 0

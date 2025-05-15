@@ -156,7 +156,7 @@ public class CardManager : MonoBehaviour
         DataManager.OnCardDataLoaded -= LoadCardDataLoaded;
     }
 
-    public void DistributeCards(List<Player1> players1) 
+    public void DistributeCards(List<Player> players) 
     {       
         //Debug.Log("distributecards started");
         int cardsPerPlayer = 5; // Assuming 5 cards per player
@@ -167,7 +167,7 @@ public class CardManager : MonoBehaviour
             return;
         }
 
-        foreach (var player in players1) {
+        foreach (var player in players) {
             for (int i = 0; i < cardsPerPlayer; i++) {
                 Card card = deck.RemoveCardFromDeck(); // This now returns a Card object
                 if (card != null) {
@@ -182,7 +182,7 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    public void DrawCardFromDeck(Player1 currentPlayer)
+    public void DrawCardFromDeck(Player currentPlayer)
     {
         if (currentPlayer == null)
         {

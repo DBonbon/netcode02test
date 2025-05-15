@@ -13,8 +13,15 @@ public class CardUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI hintText;
     [SerializeField] private Image iconImage;
     [SerializeField] private List<TextMeshProUGUI> siblingTexts;
+    [SerializeField] private GameObject cardFront;
+    [SerializeField] private GameObject cardBack;
 
     private Sprite[] cardIcons;
+
+    private void Start()
+    {
+        SetFaceUp(false); // Optional: start all cards face down
+    }
 
     public void UpdateCardUIWithCardData(CardData cardData)
     {
@@ -23,6 +30,15 @@ public class CardUI : MonoBehaviour
 
         string matchingSiblingName = cardData.cardName;
         UpdateUI(cardData.cardName, cardData.suit, cardData.hint, cardData.siblings, matchingSiblingName, cardData.cardImage);
+    }
+
+    public void SetFaceUp(bool faceUp)
+    {
+        if (cardFront != null && cardBack != null)
+        {
+            cardFront.SetActive(faceUp);
+            cardBack.SetActive(!faceUp);
+        }
     }
 
     public void UpdateUI(string cardName, string suit, string hint, List<string> siblings, string matchingSiblingName, string iconFileName)

@@ -79,9 +79,9 @@ public class MatchmakerClient : MonoBehaviour
     private async void CreateATicket()
     {
         var options = new CreateTicketOptions(queueName:"QuartetsMode");
-        var players = new List<Player>
+        var players = new List<Unity.Services.Matchmaker.Models.Player>
         {
-            new Player (PlayerID(), null)
+            new Unity.Services.Matchmaker.Models.Player(PlayerID(), null)
         };
 
         try

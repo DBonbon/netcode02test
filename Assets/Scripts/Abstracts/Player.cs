@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using System.Linq;
 using System;
 
-    public class Player1 : NetworkBehaviour
+    public class Player : NetworkBehaviour
     {   
         //[SerializeField] private TextMeshProUGUI playerNameText;
         //private float xOffset = 2f;
@@ -20,7 +20,7 @@ using System;
         public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
 
         public List<Card> HandCards { get; set; } = new List<Card>();
-        public List<Player1> PlayerToAsk { get; private set; } = new List<Player1>();
+        public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
         public List<Card> CardsPlayerCanAsk { get; private set; } = new List<Card>();
         public List<Card> Quartets { get; private set; } = new List<Card>();
 
@@ -92,11 +92,30 @@ using System;
             }
         }
 
+        public void ShowHand(bool isLocalPlayer)
+        {
+            foreach (var card in HandCards)
+            {
+                var cardUI = card.GetComponent<CardUI>();
+                if (cardUI != null)
+                {
+                    cardUI.SetFaceUp(isLocalPlayer); // Show only if this is the local player's hand
+                }
+            }
+        }
+
+
         // In Player.cs
         public void AddCardToHand(Card card) 
         {
             if (IsServer) {
                 HandCards.Add(card);
+                CardUI cardUI = CardManager.Instance.FetchCardUIById(card.cardId.Value);
+                if (cardUI != null)
+                {
+                    cardUI.gameObject.SetActive(true);
+                    cardUI.SetFaceUp(IsOwner); // Flip face-up if local player
+                }
                 // Potentially update UI here as necessary
                 //Debug.Log($"Card {card.name} added to player {playerName.Value}'s HandCards list.");
                 //UpdatePlayerHandUI();
@@ -214,7 +233,7 @@ using System;
             }
         }
 
-        public void UpdatePlayerToAskList(List<Player1> allPlayers)
+        public void UpdatePlayerToAskList(List<Player> allPlayers)
         {
             PlayerToAsk.Clear();
             foreach (var potentialPlayer in allPlayers)

@@ -91,11 +91,11 @@ public class TurnManager2 : NetworkBehaviour
                 {
                     Debug.Log($"Turn loop hasHandledCurrentPlayer current player: {currentPlayer.playerName.Value} whith turn status: {currentPlayer.HasTurn.Value} and hashandlecurretplay flag is: {hasHandledCurrentPlayer}");
                     HandlePlayerTurn(currentPlayer);
-                    Debug.Log($"Turn loop hasHandledCurrentPlayer1 current player: {currentPlayer.playerName.Value} whith turn status: {currentPlayer.HasTurn.Value}");
+                    Debug.Log($"Turn loop hasHandledCurrentplayer current player: {currentPlayer.playerName.Value} whith turn status: {currentPlayer.HasTurn.Value}");
                     Debug.Log($" hashandlecurretplay flag is: {hasHandledCurrentPlayer}");
                     hasHandledCurrentPlayer = true;
                     Debug.Log($" hashandlecurretplay1 flag is: {hasHandledCurrentPlayer}");
-                    Debug.Log($"Turn loop hasHandledCurrentPlayer1 current player: {currentPlayer.playerName.Value} ad hashandlecurretplay flag is: {hasHandledCurrentPlayer}");
+                    Debug.Log($"Turn loop hasHandledCurrentplayer current player: {currentPlayer.playerName.Value} ad hashandlecurretplay flag is: {hasHandledCurrentPlayer}");
                 }
             }
 
