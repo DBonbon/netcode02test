@@ -282,22 +282,22 @@ using System;
             }
         }
 
-        public void MoveCardsToQuartetsArea(List<Card> quartet)
+        public void MoveCardsToQuartetsArea(List<Card> quartets)
         {
             //Debug.Log("Moving cards to quartets area.");
 
-            Quartet quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartet>();
+            Quartets quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartets>();
             if (quartetZone == null)
             {
-                Debug.LogError("Quartet zone not found.");
+                Debug.LogError("Quartets zone not found.");
                 return;
             }
 
-            foreach (var card in quartet)
+            foreach (var card in quartets)
             {
                 RemoveCardFromHand(card);
                 quartetZone.AddCardToQuartet(card);
-                //Debug.Log($"Moved card {card.cardName} to Quartet.");
+                //Debug.Log($"Moved card {card.cardName} to Quartets.");
             }
             IncrementScore();
 

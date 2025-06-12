@@ -5,7 +5,7 @@ using System.Linq;
 
 // ToDo change name and location as this acts as Quartetsneteworkmanager
 
-public class Quartet : NetworkBehaviour
+public class Quartets : NetworkBehaviour
 {
     [SerializeField] public Transform cardsContainer; // Assign in the inspector
 
@@ -31,7 +31,7 @@ public class Quartet : NetworkBehaviour
         }
         else
         {
-            Debug.LogError("Attempted to add a null card to Quartet.");
+            Debug.LogError("Attempted to add a null card to Quartets.");
         }
     }
 

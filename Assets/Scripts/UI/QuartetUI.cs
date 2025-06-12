@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class QuartetUI : MonoBehaviour
 {
-    [SerializeField] private Transform quartetDisplayTransform; // UI container for quartet cards. this is a Fallback or Default option, i.e. since the transform is passed from the quartetmanager
+    [SerializeField] private Transform quartetDisplayTransform; // UI container for quartets cards. this is a Fallback or Default option, i.e. since the transform is passed from the quartetmanager
 
      // New method to set the quartetDisplayTransform
     public void SetQuartetDisplayTransform(Transform newDisplayTransform)
@@ -12,7 +12,7 @@ public class QuartetUI : MonoBehaviour
         quartetDisplayTransform = newDisplayTransform;
     }
     
-    // Method to be called to update the UI representation of the quartet
+    // Method to be called to update the UI representation of the quartets
     public void UpdateQuartetUIWithIDs(List<int> cardIDs)
     {
         // Deactivate all child GameObjects to reset the state
@@ -21,7 +21,7 @@ public class QuartetUI : MonoBehaviour
             child.gameObject.SetActive(false); // Disable all cards initially
         }
 
-        // Activate and reparent the CardUI objects based on the current quartet
+        // Activate and reparent the CardUI objects based on the current quartets
         foreach (int cardID in cardIDs)
         {
             CardUI cardUI = CardManager.Instance.FetchCardUIById(cardID);

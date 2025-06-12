@@ -5,7 +5,7 @@ public class QuartetManager : MonoBehaviour
 {
     public static QuartetManager Instance;
     public GameObject quartetPrefab;
-    public GameObject QuartetInstance { get; private set; } // Store the spawned quartet instance
+    public GameObject QuartetInstance { get; private set; } // Store the spawned quartets instance
 
     private void Awake()
     {
@@ -39,7 +39,7 @@ public class QuartetManager : MonoBehaviour
         {
             QuartetInstance = Instantiate(quartetPrefab);
             QuartetInstance.GetComponent<NetworkObject>().Spawn();
-            Debug.Log("Quartet prefab spawned on server start.");
+            Debug.Log("Quartets prefab spawned on server start.");
         }
     }
 }
