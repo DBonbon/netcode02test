@@ -47,14 +47,14 @@ public class TurnManager : NetworkBehaviour
     
     public void StartTurnManager()
     {
-        Debug.Log("turnmanmager started");
+        Debug.Log("[TurnManager] turnmanmager started");
         AssignTurnToPlayer();
         StartTurnLoop();
     }
 
     private void AssignTurnToPlayer()
     {
-        Debug.Log("AssignTurnToPlayer is called");
+        Debug.Log("[TurnManager] AssignTurnToPlayer is called");
         //var players = PlayerManager.Instance.players;
         if (players.Count == 0) return;
 

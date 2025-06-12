@@ -43,7 +43,7 @@ public class PlayerManager : NetworkBehaviour
 
     public void LoadPlayerDataLoaded(List<PlayerData> loadedPlayerDataList)
     {
-        this.playerDataList = loadedPlayerDataList; 
+        this.playerDataList = loadedPlayerDataList;
         //Debug.Log("Player data loaded into PlayerManager.");
     }
 
@@ -83,7 +83,7 @@ public class PlayerManager : NetworkBehaviour
                 // Add a debug log here to confirm the dictionary is updated
                 Debug.Log($"[PlayerManager] Added player with Client ID: {clientId} and Name: {player.playerName.Value}");
 
-                if (players.Count == playerDataList.Count && !gameInitialized) 
+                if (players.Count == playerDataList.Count && !gameInitialized)
                 {
                     gameInitialized = true;
                     StartGameLogic();
@@ -102,13 +102,13 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    private void StartGameLogic() 
+    private void StartGameLogic()
     {
         Debug.Log("running StartGameLogic");
         //PrintPlayersListDetails();
         //UpdatePlayerToAsk();
         CardManager.Instance.DistributeCards(players);
-        
+
         TurnManager.Instance.StartTurnManager();
         PrintPlayersListDetails();
     }
@@ -129,7 +129,7 @@ public class PlayerManager : NetworkBehaviour
     public void PrintPlayersListDetails()
     {
         Debug.Log($"Printing details of all players in the PlayerManager list. Total players: {players.Count}");
-        
+
         foreach (var player in players)
         {
             Debug.Log($"Player Details - OwnerClientId: {player.OwnerClientId}");
@@ -142,7 +142,7 @@ public class PlayerManager : NetworkBehaviour
                 Debug.Log($"GetValue of properties name: {property.Name}: {value}");
             }
 
-            
+
             // Additionally iterating through all fields if necessary
             FieldInfo[] fields = player.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (FieldInfo field in fields)
@@ -162,74 +162,21 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    /*private void AssignTurnToPlayer()
-    {
-        if (!IsServer || players.Count == 0) return;
-
-        // Reset all players' HasTurn to false first
-        foreach (var player in players)
-        {
-            player.HasTurn.Value = false;
-        }
-
-        // Randomly select a player to assign the turn
-        int randomIndex = Random.Range(0, players.Count);
-        players[randomIndex].HasTurn.Value = true;
-        players[randomIndex].ActivateTurnUIForPlayerClientRpc();
-
-        Debug.Log($"Turn assigned to player: {players[randomIndex].playerName.Value}");
-    }*/
-
-    // Method to clean up players, if necessary
+    // Method to clean up players, is used by networkmanagerui
     public void CleanupPlayers()
     {
         players.Clear();
     }
 
-    public void GenerateGamePlayers(List<PlayerData> name)
-    {
-        //return null;
-    }
-
-    /*public string GetPlayerNameByClientId(ulong clientId)
-    {
-        var player = players.Find(p => p.GetComponent<NetworkObject>().NetworkObjectId == clientId);
-        return player != null ? player.playerName.Value.ToString() : "Unknown Player";
-    }*/
-    /*public string GetPlayerNameByClientId(ulong clientId)
-    {
-        Debug.Log("GetPlayerNameByClientId is started");
-        foreach (var playero in players)
-        {
-            Debug.Log($"Iterating Player: OwnerClientId = {playero.OwnerClientId}, PlayerName = {playero.playerName.Value}");
-        }
-        var player = players.FirstOrDefault(p => p.OwnerClientId == clientId);
-        Debug.Log($"Player fetched: {player != null}, Client ID: {clientId}");
-        return player != null ? player.playerName.Value.ToString() : "Unknown Player";
-        Debug.Log($"Getpolayer name by client id sith string is {player.playerName.Value}");
-        Debug.Log($"Getpolayer name by client id is {player.playerName.Value}");
-        Debug.Log($"Getpolayer name provided clientid is {clientId}");
-        Debug.Log($"Getpolayer name by owenerclient id is {player.OwnerClientId}");
-    }*/
     public string GetPlayerNameByClientId(ulong clientId)
     {
-        // New diagnostic logging
-        Debug.Log("Current client ID to Player Name mappings:");
-        foreach (var entry in clientIdToPlayerName)
-        {
-            Debug.Log($"Client ID: {entry.Key}, Player Name: {entry.Value}");
-        }
-
         if (clientIdToPlayerName.TryGetValue(clientId, out string playerName))
         {
-            Debug.Log($"Retrieved from dictionary - Client ID: {clientId}, Player Name: {playerName}");
             return playerName;
         }
         else
         {
-            Debug.Log($"Failed to retrieve - Client ID: {clientId} resulted in Unknown Player");
-            return "Unknown Player"; // Fallback if the clientId is not found
+            return "Unknown Player";
         }
     }
-
 }
