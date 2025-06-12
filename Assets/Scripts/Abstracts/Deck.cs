@@ -8,7 +8,7 @@ public class Deck : NetworkBehaviour
 {
     [SerializeField] public Transform cardsContainer; // Assign in the inspector
 
-    public List<Card> DeckCards { get; set; } = new List<Card>();
+    public List<CardInstance> DeckCards { get; set; } = new List<CardInstance>();
 
     private DeckUI deckUI;
 
@@ -22,7 +22,7 @@ public class Deck : NetworkBehaviour
     {
         if (cardGameObject != null)
         {
-            var cardComponent = cardGameObject.GetComponent<Card>();
+            var cardComponent = cardGameObject.GetComponent<CardInstance>();
             if (IsServer && cardComponent != null)
             {
                 DeckCards.Add(cardComponent);
@@ -54,11 +54,11 @@ public class Deck : NetworkBehaviour
         }
     }
 
-    public Card RemoveCardFromDeck()
+    public CardInstance RemoveCardFromDeck()
     {
         if (DeckCards.Count > 0)
         {
-            Card cardToGive = DeckCards[0]; // Take the first card
+            CardInstance cardToGive = DeckCards[0]; // Take the first card
             DeckCards.RemoveAt(0); // Remove it from the deck
 
             // Immediately update the list of card IDs

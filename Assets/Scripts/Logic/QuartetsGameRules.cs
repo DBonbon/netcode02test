@@ -11,7 +11,7 @@ public static class QuartetsGameRules
     /// <summary>
     /// Check if a guess is valid according to Quartets rules
     /// </summary>
-    public static bool IsValidGuess(Player guessingPlayer, Player targetPlayer, Card requestedCard)
+    public static bool IsValidGuess(Player guessingPlayer, Player targetPlayer, CardInstance requestedCard)
     {
         // Rule: Can't guess if you already have the card
         bool alreadyHasCard = guessingPlayer.HandCards.Any(c => c.cardId.Value == requestedCard.cardId.Value);
@@ -20,7 +20,7 @@ public static class QuartetsGameRules
         bool targetHasCard = targetPlayer.HandCards.Contains(requestedCard);
         
         // Rule: Can only ask for cards in suits you already have
-        bool hasSameSuit = guessingPlayer.HandCards.Any(c => c.Suit.Value.ToString() == requestedCard.Suit.Value.ToString());
+        bool hasSameSuit = guessingPlayer.HandCards.Any(c => c.suit.Value.ToString() == requestedCard.suit.Value.ToString());
         
         return !alreadyHasCard && targetHasCard && hasSameSuit;
     }
@@ -28,7 +28,7 @@ public static class QuartetsGameRules
     /// <summary>
     /// Process the result of a guess - returns true if guess was correct
     /// </summary>
-    public static bool ProcessGuess(Player guessingPlayer, Player targetPlayer, Card requestedCard)
+    public static bool ProcessGuess(Player guessingPlayer, Player targetPlayer, CardInstance requestedCard)
     {
         if (!IsValidGuess(guessingPlayer, targetPlayer, requestedCard))
         {
@@ -49,7 +49,7 @@ public static class QuartetsGameRules
         var completedSuits = new List<string>();
         
         // Group cards by suit
-        var groupedBySuit = player.HandCards.GroupBy(card => card.Suit.Value.ToString());
+        var groupedBySuit = player.HandCards.GroupBy(card => card.suit.Value.ToString());
         
         foreach (var suitGroup in groupedBySuit)
         {

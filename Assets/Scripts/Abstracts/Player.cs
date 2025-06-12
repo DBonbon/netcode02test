@@ -19,14 +19,12 @@ using System;
         public NetworkVariable<bool> IsWinner = new NetworkVariable<bool>(false);
         public NetworkVariable<bool> HasTurn = new NetworkVariable<bool>(false);
 
-        public List<Card> HandCards { get; set; } = new List<Card>();
+        public List<CardInstance> HandCards { get; set; } = new List<CardInstance>();
         public List<Player> PlayerToAsk { get; private set; } = new List<Player>();
-        public List<Card> CardsPlayerCanAsk { get; private set; } = new List<Card>();
-        public List<Card> Quartets { get; private set; } = new List<Card>();
-
-        //we use Action event since these aren't Network variables like score for which the event onValueChange is already incuded in the 
-        //from the networkvariable wrapper, NetworkVariable<T>.OnValueChanged
-        public event Action OnPlayerToAskListUpdated;
+        public List<CardInstance> CardsPlayerCanAsk { get; private set; } = new List<CardInstance>();
+        public List<CardInstance> Quartets { get; private set; } = new List<CardInstance>();
+    //from the networkvariable wrapper, NetworkVariable<T>.OnValueChanged
+    public event Action OnPlayerToAskListUpdated;
         public event Action OnCardsPlayerCanAskListUpdated;
 
         private PlayerUI playerUI;
@@ -106,7 +104,7 @@ using System;
 
 
         // In Player.cs
-        public void AddCardToHand(Card card) 
+        public void AddCardToHand(CardInstance card) 
         {
             if (IsServer) {
                 HandCards.Add(card);
@@ -125,7 +123,7 @@ using System;
             }
         }
 
-        public void RemoveCardFromHand(Card card)
+        public void RemoveCardFromHand(CardInstance card)
         {
             if (card != null && IsServer)
             {
@@ -196,7 +194,7 @@ using System;
             // Ensure CardsPlayerCanAsk is initialized
             if (CardsPlayerCanAsk == null)
             {
-                CardsPlayerCanAsk = new List<Card>();
+                CardsPlayerCanAsk = new List<CardInstance>();
             }
             else
             {
@@ -204,11 +202,11 @@ using System;
             }
            
             //var allCards = CardManager.Instance.allSpawnedCards; // Make sure this is a List<Card>
-            var allCardComponents = CardManager.Instance.allSpawnedCards.Select(go => go.GetComponent<Card>()).Where(c => c != null);
+            var allCardComponents = CardManager.Instance.allSpawnedCards;
 
             foreach (var card in allCardComponents)
             {
-                if (HandCards.Any(handCard => handCard.Suit.Value == card.Suit.Value) && !HandCards.Contains(card))
+                if (HandCards.Any(handCard => handCard.suit.Value == card.suit.Value) && !HandCards.Contains(card))
                 {
                     CardsPlayerCanAsk.Add(card);
                 }
@@ -271,7 +269,7 @@ using System;
         public void CheckForQuartets()
         {
             // Group cards by their Suit value
-            var groupedBySuit = HandCards.GroupBy(card => card.Suit.Value.ToString());
+            var groupedBySuit = HandCards.GroupBy(card => card.suit.Value.ToString());
 
             foreach (var suitGroup in groupedBySuit)
             {
@@ -282,7 +280,7 @@ using System;
             }
         }
 
-        public void MoveCardsToQuartetsArea(List<Card> quartets)
+        public void MoveCardsToQuartetsArea(List<CardInstance> quartets)
         {
             //Debug.Log("Moving cards to quartets area.");
 

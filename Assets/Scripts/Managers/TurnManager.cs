@@ -22,7 +22,7 @@ public class TurnManager : NetworkBehaviour
     public delegate void EnableUIEvent(bool enableUI);
     public static event EnableUIEvent OnEnableUI;
     // Start is called before the first frame update
-    private Card selectedCard;
+    private CardInstance selectedCard;
     private Player selectedPlayer;
     private Player currentPlayer;
     private bool isPlayerUIEnabled = true;
@@ -135,7 +135,7 @@ public class TurnManager : NetworkBehaviour
     {
         //NetworkVariable<int> networkCardId =???(cardId); 
         Debug.Log($"The playerid value is: {playerId}, and cardid: {cardId}");
-        Card selectedCard = CardManager.Instance.FetchCardById(cardId);
+        CardInstance selectedCard = CardManager.Instance.FetchCardById(cardId);
         Debug.Log($"oneventguessclick selected card: {selectedCard.cardName.Value}");
         Player selectedPlayer = players.Find(player => player.OwnerClientId == playerId);
         Debug.Log($"oneventguessclick selected player: {selectedPlayer.playerName.Value}");
@@ -196,7 +196,7 @@ public class TurnManager : NetworkBehaviour
         // You can also display messages or perform other operations here
     }
 
-    private void GuessCheck(Card selectedCard, Player selectedPlayer)
+    private void GuessCheck(CardInstance selectedCard, Player selectedPlayer)
     {
         ActivateTurnUI();
         Debug.Log("GuessCheck is running");
@@ -258,7 +258,7 @@ public class TurnManager : NetworkBehaviour
         });
     }
     
-    private void TransferCard(Card selectedCard, Player curPlayer)
+    private void TransferCard(CardInstance selectedCard, Player curPlayer)
     {
         Debug.Log("TransferCard is correct");    
         selectedPlayer.RemoveCardFromHand(selectedCard);
@@ -329,7 +329,7 @@ public class TurnManager : NetworkBehaviour
             {
                 // Get all cards of this suit from player's hand
                 var cardsToMove = currentPlayer.HandCards
-                    .Where(card => card.Suit.Value.ToString() == suit)
+                    .Where(card => card.suit.Value.ToString() == suit)
                     .Take(4) // Take exactly 4 cards for the quartet
                     .ToList();
                 

@@ -9,7 +9,7 @@ public class Quartets : NetworkBehaviour
 {
     [SerializeField] public Transform cardsContainer; // Assign in the inspector
 
-    public List<Card> QuartetCards { get; set; } = new List<Card>();
+    public List<CardInstance> QuartetCards { get; set; } = new List<CardInstance>();
 
     private QuartetUI quartetUI;
 
@@ -19,7 +19,7 @@ public class Quartets : NetworkBehaviour
         quartetUI = GetComponent<QuartetUI>(); // Get the QuartetUI component
     }
 
-    public void AddCardToQuartet(Card card)
+    public void AddCardToQuartet(CardInstance card)
     {
         if (card != null && IsServer)
         {

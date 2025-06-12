@@ -11,7 +11,7 @@ public class CardManager : MonoBehaviour
 
     private List<CardUI> cardUIPool = new List<CardUI>(); // Pool for Card UI
     public List<CardData> allCardsList = new List<CardData>(); // Loaded card data
-    public List<GameObject> allSpawnedCards = new List<GameObject>(); // Inventory of spawned network card object
+    public List<CardInstance> allSpawnedCards = new List<CardInstance>(); // Inventory of spawned card instances
 
     private void Awake()
     {
@@ -74,14 +74,13 @@ public class CardManager : MonoBehaviour
     }
 
     //to be used by turn manager to fetch the selectedCard
-    public Card FetchCardById(NetworkVariable<int> cardId)
+    public CardInstance FetchCardById(NetworkVariable<int> cardId)
     {
-        foreach (GameObject cardObject in allSpawnedCards)
+        foreach (CardInstance cardInstance in allSpawnedCards)
         {
-            Card cardComponent = cardObject.GetComponent<Card>();
-            if (cardComponent != null && cardComponent.cardId.Value == cardId.Value)
+            if (cardInstance != null && cardInstance.cardId.Value == cardId.Value)
             {
-                return cardComponent;
+                return cardInstance;
             }
         }
         return null;
@@ -106,12 +105,12 @@ public class CardManager : MonoBehaviour
             {
                 networkObject.Spawn();
                 
-                var cardComponent = spawnedCard.GetComponent<Card>();
+                var cardComponent = spawnedCard.GetComponent<CardInstance>();
                 if (cardComponent != null)
                 {
                     // Initialize the card
                     cardComponent.InitializeCard(cardData.cardId, cardData.cardName, cardData.suit, cardData.hint, cardData.siblings);
-                    allSpawnedCards.Add(spawnedCard);
+                    allSpawnedCards.Add(cardComponent); // Add the component, not the GameObject
 
                     // Assuming DeckInstance holds the deck GameObject, access Deck component to call AddCardToDeck
                     if (DeckManager.Instance.DeckInstance != null)
@@ -169,7 +168,7 @@ public class CardManager : MonoBehaviour
 
         foreach (var player in players) {
             for (int i = 0; i < cardsPerPlayer; i++) {
-                Card card = deck.RemoveCardFromDeck(); // This now returns a Card object
+                CardInstance card = deck.RemoveCardFromDeck();  // This now returns a Card object
                 if (card != null) {
                     player.AddCardToHand(card); // Adjusted to accept Card objects
                     //Debug.Log("playerAddCardToHand Card");
@@ -197,7 +196,7 @@ public class CardManager : MonoBehaviour
             return;
         }
 
-        Card card = deck.RemoveCardFromDeck(); // Adjust to use your actual method for removing a card from the deck.
+        CardInstance card = deck.RemoveCardFromDeck(); // This now returns a CardInstance object // Adjust to use your actual method for removing a card from the deck.
         if (card != null) 
         {
             currentPlayer.AddCardToHand(card); // Adapt to network context as in DistributeCards.

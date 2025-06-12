@@ -327,7 +327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 447c3642fbab52d4a84da457c0697f97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardPrefab: {fileID: 3172851869048252884, guid: 48d9e2c2e3c412b4182bb61ce582be57, type: 3}
+  cardPrefab: {fileID: 6641722686662912092, guid: 6211685a11c20a842b0ced5f49aa8438, type: 3}
   cardUIPrefab: {fileID: 8109355277419734685, guid: eaff271e9156c7c41bd155b5b0dcd641, type: 3}
   DecklTransform: {fileID: 1674250969}
   allCardsList: []
@@ -344,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d49822db61dd5b6408e7a6f064e223d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players1: []
+  players: []
   deckUIContainer: {fileID: 0}
 --- !u!114 &158141707
 MonoBehaviour:
