@@ -12,6 +12,7 @@ public class PlayerManager : NetworkBehaviour
     private int connectedPlayers = 0;
     private bool gameInitialized = false; // Flag to track if the game start logic has been executed
     public List<Player> players = new List<Player>();
+    public List<PlayerInstance> playerInstances = new List<PlayerInstance>();
     private List<PlayerData> playerDataList;
     [SerializeField] private Transform deckUIContainer;
 
@@ -70,6 +71,11 @@ public class PlayerManager : NetworkBehaviour
                 BroadcastPlayerNamesToNewClient(clientId);
                 players.Add(player);
                 Debug.Log($"num of players after: {players.Count}");
+
+                // CREATE PLAYERINSTANCE HERE (inside the if block)
+                var playerInstance = new PlayerInstance(playerData);
+                playerInstance.SetComponents(player, player.GetComponent<PlayerUI>());
+                playerInstances.Add(playerInstance);
 
                 // Update dictionaries
                 clientIdToPlayerName[clientId] = player.playerName.Value.ToString();
