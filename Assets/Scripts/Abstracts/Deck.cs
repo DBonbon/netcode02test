@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+// ToDo change name and location as this acts as deckneteworkmanager
 public class Deck : NetworkBehaviour
 {
     [SerializeField] public Transform cardsContainer; // Assign in the inspector
@@ -12,7 +13,7 @@ public class Deck : NetworkBehaviour
     private DeckUI deckUI;
 
     public override void OnNetworkSpawn()
-    { 
+    {
         base.OnNetworkSpawn();
         deckUI = GetComponent<DeckUI>(); // Get the DeckUI component
     }
@@ -34,7 +35,7 @@ public class Deck : NetworkBehaviour
                     cardIDs.Add(card.cardId.Value);
                 }
 
-                
+
                 // Update the UI with the list of card IDs
                 if (deckUI != null)
                 {
@@ -62,7 +63,7 @@ public class Deck : NetworkBehaviour
 
             // Immediately update the list of card IDs
             List<int> cardIDs = DeckCards.Select(card => card.cardId.Value).ToList();
-            
+
             // Update the UI with the list of card IDs
             deckUI.UpdateDeckUIWithIDs(cardIDs);
 
@@ -82,7 +83,7 @@ public class Deck : NetworkBehaviour
             deckUI.UpdateDeckUIWithIDs(new List<int>(cardIDs)); // Ensure UI update call on client
         }
     }
-    
+
     /*
     private void UpdateDeckUIOnAllClients()
     {

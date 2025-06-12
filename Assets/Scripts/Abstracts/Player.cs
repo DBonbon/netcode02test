@@ -78,7 +78,7 @@ using System;
             if (IsServer)
             {
                 UpdatePlayerDbAttributes_ClientRpc(playerName.Value.ToString(), PlayerImagePath.Value.ToString());
-                Debug.Log("UpdatePlayerDbAttributes_ClientRpc is called");
+                //Debug.Log("UpdatePlayerDbAttributes_ClientRpc is called");
             }
         }
 
@@ -88,7 +88,7 @@ using System;
             if (playerUI != null)
             {
                 playerUI.InitializePlayerUI(playerName, playerImagePath);
-                Debug.Log("UpdatePlayerDbAttributes_ClientRpc is running");
+                //Debug.Log("UpdatePlayerDbAttributes_ClientRpc is running");
             }
         }
 
@@ -130,7 +130,7 @@ using System;
             if (card != null && IsServer)
             {
                 HandCards.Remove(card);
-                Debug.Log($"Removed card {card.cardName} from player's hand.");
+                //Debug.Log($"Removed card {card.cardName} from player's hand.");
                 // Update UI if necessary
                 //UpdatePlayerHandUI();
                 UpdateCardsPlayerCanAsk();
@@ -174,7 +174,7 @@ using System;
             {
                 int[] cardIDs = HandCards.Select(card => card.cardId.Value).ToArray();
                 UpdatePlayerHandUI_ClientRpc(cardIDs, OwnerClientId);
-                Debug.Log("UpdatePlayerHandUI_ClientRpc is called");
+                //Debug.Log("UpdatePlayerHandUI_ClientRpc is called");
                 
             }
         }
@@ -187,7 +187,7 @@ using System;
             if (IsOwner)
             {
                 playerUI?.UpdatePlayerHandUIWithIDs(cardIDs.ToList());
-                Debug.Log("UpdatePlayerHandUI_ClientRpc is running");
+                //Debug.Log("UpdatePlayerHandUI_ClientRpc is running");
             }
         }
 
@@ -219,7 +219,7 @@ using System;
                 int[] cardIDs = CardsPlayerCanAsk.Select(card => card.cardId.Value).ToArray();
                 UpdateCardDropdown_ClientRpc(cardIDs);
             }
-            Debug.Log($"Player {playerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
+            //Debug.Log($"Player {playerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
         }
 
         [ClientRpc]
@@ -228,7 +228,7 @@ using System;
             Debug.Log($"UpdateTurnUIObjectsClientRpc is called: {cardIDs}");
             if (IsOwner)
             {
-                Debug.Log($"Player cs Updating cards dropdown. IDs count: {cardIDs.Length}");
+                //Debug.Log($"Player cs Updating cards dropdown. IDs count: {cardIDs.Length}");
                 playerUI?.UpdateCardsDropdownWithIDs(cardIDs);
             }
         }
@@ -249,7 +249,7 @@ using System;
             {
                 ulong[] playerIDs = PlayerToAsk.Select(player => player.OwnerClientId).ToArray();
                 string playerNamesConcatenated = string.Join(",", PlayerToAsk.Select(player => player.playerName.Value.ToString()));
-                Debug.Log("UpdatePlayerToAskList calling TurnUIForPlayer_ClientRp() ");
+                //Debug.Log("UpdatePlayerToAskList calling TurnUIForPlayer_ClientRp() ");
                 TurnUIForPlayer_ClientRpc(playerIDs, playerNamesConcatenated); // Adjusted to pass concatenated names
             }
         }
@@ -297,7 +297,7 @@ using System;
             {
                 RemoveCardFromHand(card);
                 quartetZone.AddCardToQuartet(card);
-                Debug.Log($"Moved card {card.cardName} to Quartet.");
+                //Debug.Log($"Moved card {card.cardName} to Quartet.");
             }
             IncrementScore();
 
@@ -310,22 +310,6 @@ using System;
             return HandCards.Count == 0;
         }
 
-        // Test method to increment score
-        void Update()
-        {
-            // Simple test: Increment score on mouse click
-            if (IsServer && Input.GetMouseButtonDown(0)) // Check for left mouse click
-            {
-                IncrementScoreTest();
-            }
-        }
-
-        //to remove when isn't needed anymore:
-        public void IncrementScoreTest()
-        {
-            Score.Value += 1; // Increment score by 1 for test
-            //Debug.Log($"Test: Incremented Score to {Score.Value}");
-        }
 
         // Ensure OnDestroy is correctly implemented to handle any cleanup
         public override void OnDestroy()
@@ -338,7 +322,7 @@ using System;
         public void OnEventGuessClickServerRpc(ulong selectedPlayerId, int cardId)
         {
             NetworkVariable<int> networkCardId = new NetworkVariable<int>(cardId);
-            Debug.Log($"PingServerRpc us called {selectedPlayerId}, {networkCardId.Value}");
+            //Debug.Log($"PingServerRpc us called {selectedPlayerId}, {networkCardId.Value}");
             TurnManager.Instance.OnEventGuessClick(selectedPlayerId, networkCardId);
         }
         
