@@ -1,4 +1,5 @@
 //turnmanager
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -199,7 +200,11 @@ public class TurnManager : NetworkBehaviour
     {
         ActivateTurnUI();
         Debug.Log("GuessCheck is running");
-        if (selectedPlayer.HandCards.Contains(selectedCard))
+        
+        // Use GameRules to determine if guess is correct
+        bool isCorrectGuess = QuartetsGameRules.ProcessGuess(currentPlayer, selectedPlayer, selectedCard);
+        
+        if (isCorrectGuess)
         {
             CorrectGuess();
         }
@@ -264,7 +269,7 @@ public class TurnManager : NetworkBehaviour
 
     private bool IsPlayerHandEmpty(Player currentPlayer)
     {
-        return currentPlayer.IsHandEmpty();
+        return QuartetsGameRules.IsHandEmpty(currentPlayer);
     }
 
     private void EndTurn()
@@ -313,9 +318,28 @@ public class TurnManager : NetworkBehaviour
     private void CheckForQuartets()
     {
         Debug.Log("check for quartets is called");
-        currentPlayer.CheckForQuartets(); // Implement your quartets-checking logic here
+        
+        // Use GameRules to check for completed quartets
+        var completedQuartets = QuartetsGameRules.GetCompletedQuartets(currentPlayer);
+        
+        // If any quartets were found, move them to quartet area
+        if (completedQuartets.Count > 0)
+        {
+            foreach (string suit in completedQuartets)
+            {
+                // Get all cards of this suit from player's hand
+                var cardsToMove = currentPlayer.HandCards
+                    .Where(card => card.Suit.Value.ToString() == suit)
+                    .Take(4) // Take exactly 4 cards for the quartet
+                    .ToList();
+                
+                // Move them to quartets area (using existing Player method)
+                currentPlayer.MoveCardsToQuartetsArea(cardsToMove);
+            }
+        }
+        
         // Check if the player's hand is empty after quartets are checked.
-        if (IsPlayerHandEmpty(currentPlayer) &&  DeckManager.Instance.CurrentDeck.DeckCards.Count == 0)
+        if (IsPlayerHandEmpty(currentPlayer) && DeckManager.Instance.CurrentDeck.DeckCards.Count == 0)
         {
             CheckGameEnd();
             EndTurn();
@@ -355,17 +379,9 @@ public class TurnManager : NetworkBehaviour
 
     private void CheckGameEnd()
     {
-        bool allHandsEmpty = true;
-        foreach (var player in players)
-        {
-            if (!player.IsHandEmpty())
-            {
-                allHandsEmpty = false;
-                break;
-            }
-        }
-
-        if (allHandsEmpty)
+        int cardsLeftInDeck = DeckManager.Instance.CurrentDeck?.DeckCards.Count ?? 0;
+        
+        if (QuartetsGameRules.IsGameOver(players, cardsLeftInDeck))
         {
             GameEnd();
         }
