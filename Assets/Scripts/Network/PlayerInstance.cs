@@ -26,7 +26,7 @@ public class PlayerInstance
     }
 
     // In PlayerInstance.cs - ADD this new method
-    public void IncrementScore_New()
+    public void IncrementScore()
     {
         Score += 1; // Update local Score
         
@@ -39,46 +39,103 @@ public class PlayerInstance
         Debug.Log($"PlayerInstance: Incremented Score to {Score}");
     }
 
+    // In PlayerInstance.cs - ADD this new method
+    public bool IsHandEmpty()
+    {
+        return HandCards.Count == 0;
+    }
+
     public void SetComponents(Player player, PlayerUI ui)
     {
         playerComponent = player;
         playerUI = ui;
     }
 
-    public void AddCardToHand(CardInstance card)
+    // In PlayerInstance.cs - ADD this new method
+// In PlayerInstance.cs - REPLACE the AddCardToHand_New method
+    public void AddCardToHand(CardInstance card) 
     {
-        if (card != null && !HandCards.Contains(card))
+        if (card != null)
         {
-            HandCards.Add(card);
+            // Update PlayerInstance HandCards
+            if (!HandCards.Contains(card))
+            {
+                HandCards.Add(card);
+            }
+            
+            // Also update Player component HandCards (for now, during transition)
+            if (playerComponent != null && !playerComponent.HandCards.Contains(card))
+            {
+                playerComponent.HandCards.Add(card);
+            }
+            
+            // Handle CardUI
+            CardUI cardUI = CardManager.Instance.FetchCardUIById(card.cardId.Value);
+            if (cardUI != null)
+            {
+                cardUI.gameObject.SetActive(true);
+                cardUI.SetFaceUp(playerComponent != null && playerComponent.IsOwner);
+            }
+            
             CheckForQuartets();
             UpdateCardsPlayerCanAsk();
+            
+            Debug.Log($"PlayerInstance: Added card {card.cardName.Value} to hand");
         }
     }
 
+    // In PlayerInstance.cs - ADD this new method
     public void RemoveCardFromHand(CardInstance card)
     {
-        if (card != null && HandCards.Remove(card))
+        if (card != null)
         {
+            // Remove from PlayerInstance HandCards
+            HandCards.Remove(card);
+            
+            // Also remove from Player component HandCards (during transition)
+            if (playerComponent != null)
+            {
+                playerComponent.HandCards.Remove(card);
+            }
+            
             UpdateCardsPlayerCanAsk();
+            
+            Debug.Log($"PlayerInstance: Removed card {card.cardName.Value} from hand");
+        }
+    }
+    
+    // In PlayerInstance.cs - ADD this new method
+    public void CheckForQuartets()
+    {
+        // Group cards by their Suit value
+        var groupedBySuit = HandCards.GroupBy(card => card.suit.Value.ToString());
+
+        foreach (var suitGroup in groupedBySuit)
+        {
+            if (suitGroup.Count() == 4) // Exactly 4 cards of the same suit
+            {
+                MoveCardsToQuartetsArea(suitGroup.ToList());
+            }
         }
     }
 
-    public void UpdateCardsPlayerCanAsk()
+    // We'll also need to add this helper method
+    public void MoveCardsToQuartetsArea(List<CardInstance> quartets)
     {
-        CardsPlayerCanAsk.Clear();
-        
-        var allCardComponents = CardManager.Instance.allSpawnedCards
-            .Select(go => go.GetComponent<CardInstance>())
-            .Where(c => c != null);
-
-        foreach (var card in allCardComponents)
+        Quartets quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartets>();
+        if (quartetZone == null)
         {
-            if (HandCards.Any(handCard => handCard.suit.Value.ToString() == card.suit.Value.ToString()) 
-                && !HandCards.Contains(card))
-            {
-                CardsPlayerCanAsk.Add(card);
-            }
+            Debug.LogError("Quartets zone not found.");
+            return;
         }
+
+        foreach (var card in quartets)
+        {
+            RemoveCardFromHand(card);
+            quartetZone.AddCardToQuartet(card);
+            Debug.Log($"PlayerInstance: Moved card {card.cardName.Value} to Quartets.");
+        }
+        IncrementScore();
     }
 
     public void UpdatePlayersToAsk(List<PlayerInstance> allPlayers)
@@ -94,45 +151,74 @@ public class PlayerInstance
         }
     }
 
-    public void CheckForQuartets()
+    // In PlayerInstance.cs - ADD this new method
+    public void UpdateCardsPlayerCanAsk()
     {
-        var groupedBySuit = HandCards.GroupBy(card => card.suit.Value.ToString());
-
-        foreach (var suitGroup in groupedBySuit)
+        // Ensure CardsPlayerCanAsk is initialized
+        if (CardsPlayerCanAsk == null)
         {
-            if (suitGroup.Count() == 4)
+            CardsPlayerCanAsk = new List<CardInstance>();
+        }
+        else
+        {
+            CardsPlayerCanAsk.Clear();
+        }
+    
+        var allCardComponents = CardManager.Instance.allSpawnedCards;
+
+        foreach (var card in allCardComponents)
+        {
+            if (HandCards.Any(handCard => handCard.suit.Value == card.suit.Value) && !HandCards.Contains(card))
             {
-                MoveCardsToQuartetsArea(suitGroup.ToList());
+                CardsPlayerCanAsk.Add(card);
+            }
+        }
+        
+        // Update the Player component's list (during transition)
+        if (playerComponent != null)
+        {
+            playerComponent.CardsPlayerCanAsk.Clear();
+            playerComponent.CardsPlayerCanAsk.AddRange(CardsPlayerCanAsk);
+            
+            // If this player has turn, update the dropdown
+            if (playerComponent.IsServer && playerComponent.HasTurn.Value)
+            {
+                int[] cardIDs = CardsPlayerCanAsk.Select(card => card.cardId.Value).ToArray();
+                playerComponent.UpdateCardDropdown_ClientRpc(cardIDs);
+            }
+        }
+        
+        Debug.Log($"PlayerInstance: Player can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
+    }
+
+    // In PlayerInstance.cs - ADD this new method
+    public void UpdatePlayerToAskList(List<Player> allPlayers)
+    {
+        // Clear the PlayerInstance list
+        PlayersToAsk.Clear();
+        
+        // Also update the Player component list (during transition)
+        if (playerComponent != null)
+        {
+            playerComponent.PlayerToAsk.Clear();
+            
+            foreach (var potentialPlayer in allPlayers)
+            {
+                if (potentialPlayer != playerComponent)
+                {
+                    playerComponent.PlayerToAsk.Add(potentialPlayer);
+                    Debug.Log($"PlayerInstance: Added {potentialPlayer.playerName.Value} to PlayerToAsk.");
+                }
+            }
+
+            // If this player has turn, update the dropdown
+            if (playerComponent.IsServer && playerComponent.HasTurn.Value)
+            {
+                ulong[] playerIDs = playerComponent.PlayerToAsk.Select(player => player.OwnerClientId).ToArray();
+                string playerNamesConcatenated = string.Join(",", playerComponent.PlayerToAsk.Select(player => player.playerName.Value.ToString()));
+                playerComponent.TurnUIForPlayer_ClientRpc(playerIDs, playerNamesConcatenated);
             }
         }
     }
 
-    public void MoveCardsToQuartetsArea(List<CardInstance> quartets)
-    {
-        Quartets quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartets>();
-        if (quartetZone != null)
-        {
-            foreach (var card in quartets)
-            {
-                RemoveCardFromHand(card);
-                quartetZone.AddCardToQuartet(card);
-            }
-            IncrementScore();
-        }
-    }
-
-
-    public void IncrementScore()
-    {
-        Score += 1;
-        if (playerComponent != null && playerComponent.IsServer)
-        {
-            playerComponent.Score.Value = Score;
-        }
-    }
-
-    public bool IsHandEmpty()
-    {
-        return HandCards.Count == 0;
-    }
 }

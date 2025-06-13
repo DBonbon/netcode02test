@@ -104,37 +104,64 @@ using System;
 
 
         // In Player.cs
+        // In Player.cs - MODIFY existing method
         public void AddCardToHand(CardInstance card) 
         {
             if (IsServer) {
+                // OLD WAY (keep commented for safety):
+                /*
                 HandCards.Add(card);
                 CardUI cardUI = CardManager.Instance.FetchCardUIById(card.cardId.Value);
                 if (cardUI != null)
                 {
                     cardUI.gameObject.SetActive(true);
-                    cardUI.SetFaceUp(IsOwner); // Flip face-up if local player
+                    cardUI.SetFaceUp(IsOwner);
                 }
-                // Potentially update UI here as necessary
-                //Debug.Log($"Card {card.name} added to player {playerName.Value}'s HandCards list.");
-                //UpdatePlayerHandUI();
                 CheckForQuartets();
-                SendCardIDsToClient();
-                UpdateCardsPlayerCanAsk();  
-            }
-        }
-
-        public void RemoveCardFromHand(CardInstance card)
-        {
-            if (card != null && IsServer)
-            {
-                HandCards.Remove(card);
-                //Debug.Log($"Removed card {card.cardName} from player's hand.");
-                // Update UI if necessary
-                //UpdatePlayerHandUI();
                 UpdateCardsPlayerCanAsk();
+                */
+                
+                // NEW WAY:
+                if (PlayerManager.Instance.playerInstances != null)
+                {
+                    var playerInstance = PlayerManager.Instance.playerInstances
+                        .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
+                    if (playerInstance != null)
+                    {
+                        playerInstance.AddCardToHand(card);
+                    }
+                }
+                
+                // Keep network synchronization here
                 SendCardIDsToClient();
             }
         }
+        // In Player.cs - MODIFY existing method
+    public void RemoveCardFromHand(CardInstance card)
+    {
+        if (card != null && IsServer)
+        {
+            // OLD WAY (keep commented for safety):
+            /*
+            HandCards.Remove(card);
+            UpdateCardsPlayerCanAsk();
+            */
+            
+            // NEW WAY:
+            if (PlayerManager.Instance.playerInstances != null)
+            {
+                var playerInstance = PlayerManager.Instance.playerInstances
+                    .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
+                if (playerInstance != null)
+                {
+                    playerInstance.RemoveCardFromHand(card);
+                }
+            }
+            
+            // Keep network synchronization here
+            SendCardIDsToClient();
+        }
+    }
        
         private void OnHasTurnChanged(bool oldValue, bool newValue)
         {
@@ -172,7 +199,7 @@ using System;
                     .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
                 if (playerInstance != null)
                 {
-                    playerInstance.IncrementScore_New();
+                    playerInstance.IncrementScore();
                 }
             }
         }
@@ -201,9 +228,11 @@ using System;
             }
         }
 
+        // In Player.cs - MODIFY existing method
         public void UpdateCardsPlayerCanAsk()
         {
-            // Ensure CardsPlayerCanAsk is initialized
+            // OLD WAY (keep commented for safety):
+            /*
             if (CardsPlayerCanAsk == null)
             {
                 CardsPlayerCanAsk = new List<CardInstance>();
@@ -212,8 +241,7 @@ using System;
             {
                 CardsPlayerCanAsk.Clear();
             }
-           
-            //var allCards = CardManager.Instance.allSpawnedCards; // Make sure this is a List<Card>
+        
             var allCardComponents = CardManager.Instance.allSpawnedCards;
 
             foreach (var card in allCardComponents)
@@ -229,11 +257,22 @@ using System;
                 int[] cardIDs = CardsPlayerCanAsk.Select(card => card.cardId.Value).ToArray();
                 UpdateCardDropdown_ClientRpc(cardIDs);
             }
-            //Debug.Log($"Player {playerName.Value} can ask for {CardsPlayerCanAsk.Count} cards based on suits.");
+            */
+            
+            // NEW WAY:
+            if (PlayerManager.Instance.playerInstances != null)
+            {
+                var playerInstance = PlayerManager.Instance.playerInstances
+                    .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
+                if (playerInstance != null)
+                {
+                    playerInstance.UpdateCardsPlayerCanAsk();
+                }
+            }
         }
 
         [ClientRpc]
-        private void UpdateCardDropdown_ClientRpc(int[] cardIDs)
+        public void UpdateCardDropdown_ClientRpc(int[] cardIDs)
         {
             Debug.Log($"UpdateTurnUIObjectsClientRpc is called: {cardIDs}");
             if (IsOwner)
@@ -243,8 +282,11 @@ using System;
             }
         }
 
+        // In Player.cs - MODIFY existing method
         public void UpdatePlayerToAskList(List<Player> allPlayers)
         {
+            // OLD WAY (keep commented for safety):
+            /*
             PlayerToAsk.Clear();
             foreach (var potentialPlayer in allPlayers)
             {
@@ -259,8 +301,19 @@ using System;
             {
                 ulong[] playerIDs = PlayerToAsk.Select(player => player.OwnerClientId).ToArray();
                 string playerNamesConcatenated = string.Join(",", PlayerToAsk.Select(player => player.playerName.Value.ToString()));
-                //Debug.Log("UpdatePlayerToAskList calling TurnUIForPlayer_ClientRp() ");
-                TurnUIForPlayer_ClientRpc(playerIDs, playerNamesConcatenated); // Adjusted to pass concatenated names
+                TurnUIForPlayer_ClientRpc(playerIDs, playerNamesConcatenated);
+            }
+            */
+            
+            // NEW WAY:
+            if (PlayerManager.Instance.playerInstances != null)
+            {
+                var playerInstance = PlayerManager.Instance.playerInstances
+                    .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
+                if (playerInstance != null)
+                {
+                    playerInstance.UpdatePlayerToAskList(allPlayers);
+                }
             }
         }
 
@@ -278,48 +331,85 @@ using System;
         }
         
         //utility method section:
+        // In Player.cs - MODIFY existing method
         public void CheckForQuartets()
         {
-            // Group cards by their Suit value
+            // OLD WAY (keep commented for safety):
+            /*
             var groupedBySuit = HandCards.GroupBy(card => card.suit.Value.ToString());
-
             foreach (var suitGroup in groupedBySuit)
             {
-                if (suitGroup.Count() == 4) // Exactly 4 cards of the same suit
+                if (suitGroup.Count() == 4)
                 {
                     MoveCardsToQuartetsArea(suitGroup.ToList());
                 }
             }
+            */
+            
+            // NEW WAY:
+            if (PlayerManager.Instance.playerInstances != null)
+            {
+                var playerInstance = PlayerManager.Instance.playerInstances
+                    .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
+                if (playerInstance != null)
+                {
+                    playerInstance.CheckForQuartets();
+                }
+            }
         }
 
+        // In Player.cs - MODIFY existing method
         public void MoveCardsToQuartetsArea(List<CardInstance> quartets)
         {
-            //Debug.Log("Moving cards to quartets area.");
-
+            // OLD WAY (keep commented for safety):
+            /*
             Quartets quartetZone = QuartetManager.Instance.QuartetInstance.GetComponent<Quartets>();
             if (quartetZone == null)
             {
                 Debug.LogError("Quartets zone not found.");
                 return;
             }
-
             foreach (var card in quartets)
             {
                 RemoveCardFromHand(card);
                 quartetZone.AddCardToQuartet(card);
-                //Debug.Log($"Moved card {card.cardName} to Quartets.");
             }
             IncrementScore();
-
-            // You may want to update the player's UI here to reflect the removal of these cards from their hand            
+            */
+            
+            // NEW WAY:
+            if (PlayerManager.Instance.playerInstances != null)
+            {
+                var playerInstance = PlayerManager.Instance.playerInstances
+                    .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
+                if (playerInstance != null)
+                {
+                    playerInstance.MoveCardsToQuartetsArea(quartets);
+                }
+            }
         }
 
         // Check if the player's hand is empty
+        // In Player.cs - MODIFY existing method
         public bool IsHandEmpty()
         {
+            // OLD WAY (keep commented for safety):
+            // return HandCards.Count == 0;
+            
+            // NEW WAY:
+            if (PlayerManager.Instance.playerInstances != null)
+            {
+                var playerInstance = PlayerManager.Instance.playerInstances
+                    .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
+                if (playerInstance != null)
+                {
+                    return playerInstance.IsHandEmpty();
+                }
+            }
+            
+            // Fallback to old way if playerInstance not found
             return HandCards.Count == 0;
         }
-
 
         // Ensure OnDestroy is correctly implemented to handle any cleanup
         public override void OnDestroy()
