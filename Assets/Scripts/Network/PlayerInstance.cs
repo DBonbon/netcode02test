@@ -25,6 +25,20 @@ public class PlayerInstance
         HasTurn = false;
     }
 
+    // In PlayerInstance.cs - ADD this new method
+    public void IncrementScore_New()
+    {
+        Score += 1; // Update local Score
+        
+        // Update the network Score through Player component
+        if (playerComponent != null && playerComponent.IsServer)
+        {
+            playerComponent.Score.Value = Score;
+        }
+        
+        Debug.Log($"PlayerInstance: Incremented Score to {Score}");
+    }
+
     public void SetComponents(Player player, PlayerUI ui)
     {
         playerComponent = player;
@@ -106,6 +120,7 @@ public class PlayerInstance
             IncrementScore();
         }
     }
+
 
     public void IncrementScore()
     {

@@ -161,8 +161,20 @@ using System;
         //to remove when isn't needed anymore:
         public void IncrementScore()
         {
-            Score.Value += 1; // Increment score by 1 for test
-            //Debug.Log($"Test: Incremented Score to {Score.Value}");
+            // OLD WAY (keep commented for safety):
+            // Score.Value += 1;
+            // Debug.Log($"Test: Incremented Score to {Score.Value}");
+            
+            // NEW WAY:
+            if (PlayerManager.Instance.playerInstances != null)
+            {
+                var playerInstance = PlayerManager.Instance.playerInstances
+                    .Find(pi => pi.Data.playerDbId == PlayerDbId.Value);
+                if (playerInstance != null)
+                {
+                    playerInstance.IncrementScore_New();
+                }
+            }
         }
 
         // This method is called on the server to send the card IDs to the client
