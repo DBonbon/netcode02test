@@ -8,6 +8,8 @@ using System.Reflection;
 public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance;
+    // Add this line near the top with other lists
+    public List<PlayerController> playerControllers = new List<PlayerController>();
     public static int TotalPlayerPrefabs = 2; // Adjust based on your game's needs
     private int connectedPlayers = 0;
     private bool gameInitialized = false; // Flag to track if the game start logic has been executed
@@ -72,11 +74,16 @@ public class PlayerManager : NetworkBehaviour
                 players.Add(player);
                 Debug.Log($"num of players after: {players.Count}");
 
-                // CREATE PLAYERINSTANCE HERE (inside the if block)
+                // CREATE BOTH SYSTEMS IN PARALLEL (inside the if block)
+                // NEW: PlayerController system
+                var playerController = player.gameObject.AddComponent<PlayerController>();
+                playerController.Initialize(playerData);
+                playerControllers.Add(playerController);
+
+                // OLD: Keep PlayerInstance system for now
                 var playerInstance = new PlayerInstance(playerData);
                 playerInstance.SetComponents(player, player.GetComponent<PlayerUI>());
                 playerInstances.Add(playerInstance);
-
                 // Update dictionaries
                 clientIdToPlayerName[clientId] = player.playerName.Value.ToString();
                 Debug.Log($"dictionary playername: {clientIdToPlayerName[clientId]}");
